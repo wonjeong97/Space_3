@@ -18,8 +18,6 @@ public class TutorialSetting
 
 public class TutorialManager : MonoBehaviour
 {
-    public static TutorialManager Instance { get; private set; }
-
     [Header("Camera")] 
     [SerializeField] private Camera mainCamera; // Display1 Camera
     [SerializeField] private Camera camera2; // Display2 Camera
@@ -32,9 +30,8 @@ public class TutorialManager : MonoBehaviour
     [Header("UI")] 
     [SerializeField] private GameObject infoText; // Display1 Info Text
 
-    [Header("TutorialImage")] [SerializeField]
-    private GameObject tutorialImage1;
-
+    [Header("TutorialImage")] 
+    [SerializeField] private GameObject tutorialImage1;
     [SerializeField] private GameObject tutorialImage2;
     [SerializeField] private GameObject tutorialImage3;
 
@@ -43,22 +40,12 @@ public class TutorialManager : MonoBehaviour
     private TutorialSetting _tutorialSetting;
     private float _camera3TurnSpeed;
     private float _fadeTime;
-    private bool _inputReceived;
-    private bool _canInput;
-    private bool _transitioning;
-    private int _step;
+    private bool _canInput;         // 페이드 중 입력 방지
+    private bool _transitioning;    // 튜토리얼 전환 중 입력 방지
+    private int _step;              
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
-
         if (!mainCamera || !camera2 || !camera3)
         {
             Debug.LogError("[TutorialManager] camera is not assigned");
@@ -76,10 +63,10 @@ public class TutorialManager : MonoBehaviour
 
         if (!tutorialImage1 || !tutorialImage2 || !tutorialImage3)
         {
-            Debug.LogError("[TutorialManager] tutorialImage1 is not assigned");
+            Debug.LogError("[TutorialManager] Some tutorialImages are not assigned");
         }
         
-        // 튜토리얼 이미지들을 리스트에 넣어 관리함
+        // 튜토리얼 이미지들을 리스트에 넣어 관리
         _tutorialImages.Add(tutorialImage1);
         _tutorialImages.Add(tutorialImage2);
         _tutorialImages.Add(tutorialImage3);

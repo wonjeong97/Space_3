@@ -17,8 +17,6 @@ public class TitleSetting
 
 public class TitleManager : MonoBehaviour
 {
-    public static TitleManager Instance { get; private set; }
-
     [Header("Camera")] 
     [SerializeField] private Camera mainCamera;     // Display1 Camera
     [SerializeField] private Camera camera2;        // Display2 Camera
@@ -40,15 +38,6 @@ public class TitleManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
-
         if (!mainCamera || !camera2 || !camera3)
         {
             Debug.LogError("[TitleManager] camera is not assigned");

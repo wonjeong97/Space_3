@@ -16,8 +16,8 @@ public class UICreator : MonoBehaviour
 {
     public static UICreator Instance { get; private set; }
 
-    private readonly List<GameObject> instances = new();
-    private readonly Dictionary<string, AsyncOperationHandle> assetCache = new();
+    private readonly List<GameObject> _instances = new();
+    private readonly Dictionary<string, AsyncOperationHandle> _assetCache = new();
 
     private void Awake()
     {
@@ -41,7 +41,7 @@ public class UICreator : MonoBehaviour
             // 취소 토큰을 지원해 완료/취소 중 먼저 끝나는 쪽을 대기
             GameObject go = await UIUtility.AwaitWithCancellation(handle, token);
 
-            if (go) instances.Add(go); // 성공 시 추적 목록에 등록
+            if (go) _instances.Add(go); // 성공 시 추적 목록에 등록
             return go; // 생성된 인스턴스 반환
         }
         catch (OperationCanceledException)
@@ -66,7 +66,7 @@ public class UICreator : MonoBehaviour
         if (string.IsNullOrEmpty(key)) return null; // 유효하지 않은 키 방어
 
         // 캐시에 있으면 즉시 반환(핸들 유효성 확인)
-        if (assetCache.TryGetValue(key, out AsyncOperationHandle existing))
+        if (_assetCache.TryGetValue(key, out AsyncOperationHandle existing))
         {
             return existing.IsValid() ? (T)existing.Result : null;
         }
@@ -80,7 +80,7 @@ public class UICreator : MonoBehaviour
         T asset = await UIUtility.AwaitWithCancellation(handle, token);
 
         // 핸들을 캐시에 저장(나중에 일괄 Release용)
-        assetCache[key] = handle;
+        _assetCache[key] = handle;
 
         return asset; // 로드된 에셋 반환
     }
@@ -88,24 +88,24 @@ public class UICreator : MonoBehaviour
     /// <summary>Addressables 에셋 캐시 전부 해제하고 비우기</summary>
     private void ReleaseAllCachedAssets()
     {
-        foreach (KeyValuePair<string, AsyncOperationHandle> kv in assetCache) // 캐시 항목 순회
+        foreach (KeyValuePair<string, AsyncOperationHandle> kv in _assetCache) // 캐시 항목 순회
         {
             if (kv.Value.IsValid()) Addressables.Release(kv.Value); // 유효한 핸들만 Release
         }
 
-        assetCache.Clear(); // 캐시 딕셔너리 비우기
+        _assetCache.Clear(); // 캐시 딕셔너리 비우기
     }
 
     /// <summary>추적 중인 Addressables 인스턴스 전부 해제</summary>
     public void DestroyAllTrackedInstances()
     {
-        for (int i = instances.Count - 1; i >= 0; --i) // 뒤에서부터 해제(인덱스 안전)
+        for (int i = _instances.Count - 1; i >= 0; --i) // 뒤에서부터 해제(인덱스 안전)
         {
-            GameObject go = instances[i];
+            GameObject go = _instances[i];
             if (go != null) Addressables.ReleaseInstance(go); // 유효한 것만 Release
         }
 
-        instances.Clear(); // 추적 목록 비우기
+        _instances.Clear(); // 추적 목록 비우기
     }
 
     /// <summary>추적 중인 특정 인스턴스 해제 시도 후 성공 여부 반환</summary>
@@ -113,11 +113,11 @@ public class UICreator : MonoBehaviour
     {
         if (go == null) return false; // 유효성 검사
 
-        int idx = instances.IndexOf(go); // 추적 목록에서 위치 조회
+        int idx = _instances.IndexOf(go); // 추적 목록에서 위치 조회
         if (idx >= 0)
         {
             Addressables.ReleaseInstance(go); // Addressables 인스턴스 해제
-            instances.RemoveAt(idx); // 추적 목록에서 제거
+            _instances.RemoveAt(idx); // 추적 목록에서 제거
             return true; // 해제 성공
         }
 
