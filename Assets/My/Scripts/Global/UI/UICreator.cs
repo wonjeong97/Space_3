@@ -144,7 +144,7 @@ public class UICreator : MonoBehaviour
     }
 
     /// <summary>폰트 키 매핑과 에셋 로드를 거쳐 TMP 텍스트 속성 적용</summary>
-    private async Task ApplyFontAsync(TextMeshProUGUI uiText, string fontKey, string textValue,
+    public async Task ApplyFontAsync(TextMeshProUGUI uiText, string fontKey, string textValue,
         float fontSize, Color fontColor, TextAlignmentOptions alignment, CancellationToken token)
     {
         if (!uiText || string.IsNullOrEmpty(fontKey)) return; // 방어 코드

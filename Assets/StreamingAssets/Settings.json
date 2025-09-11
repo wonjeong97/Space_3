@@ -1,0 +1,18 @@
+{
+  "inactivityTime": 300.0,
+  "fadeTime": 1,
+  "closeSetting": {
+	"position": { "x": 1, "y": 0 },
+	"numToClose": 10,
+	"resetClickTime": 60,
+	"imageAlpha": 1.0
+  },
+  "fontMap": {
+	"font1": "Fonts/TMPro/DungGeunMo SDF.asset",
+	"font2": "Fonts/TMPro/NanumGothic-Regular SDF.asset"
+  },
+  "sounds": [
+	{ "key": "click1", "clipPath": "click1.wav", "volume": 1.0 },
+	{ "key": "click2", "clipPath": "click2.wav", "volume": 0.5 }
+  ]
+}
