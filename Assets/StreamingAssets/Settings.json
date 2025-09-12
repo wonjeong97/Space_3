@@ -14,5 +14,9 @@
   "sounds": [
 	{ "key": "click1", "clipPath": "click1.wav", "volume": 1.0 },
 	{ "key": "click2", "clipPath": "click2.wav", "volume": 0.5 }
-  ]
+  ],
+  "canvas1TargetMonitorIndex": 0,
+  "canvas2TargetMonitorIndex": 1,
+  "canvas3TargetMonitorIndex": 2,
+  "camera3TurnSpeed": 5.0
 }

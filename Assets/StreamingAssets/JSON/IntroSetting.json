@@ -1,9 +1,0 @@
-{
-  "camera3TurnSpeed": 5.0,
-  "introVideo": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"fileName": "Video/Intro/SampleVideo.mp4",
-	"volume": 1.0
-  }
-}

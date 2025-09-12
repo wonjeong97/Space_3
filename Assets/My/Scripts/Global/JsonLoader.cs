@@ -219,6 +219,12 @@ public class Settings
     public CloseSetting closeSetting;
     public FontMaps fontMap;
     public SoundSetting[] sounds;
+    
+    public int canvas1TargetMonitorIndex;
+    public int canvas2TargetMonitorIndex;
+    public int canvas3TargetMonitorIndex;
+
+    public float camera3TurnSpeed;
 }
 
 #endregion
