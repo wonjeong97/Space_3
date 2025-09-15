@@ -125,6 +125,32 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         canInput = true;
     }
+    
+    /// <summary> 두 게임오브젝트의 이미지를 크로스 페이드 함 </summary>
+    protected IEnumerator CrossFade(GameObject fromGo, GameObject toGo, float duration)
+    {
+        if (!fromGo || !toGo) yield break;
+        Image from = fromGo.GetComponent<Image>();
+        Image to = toGo.GetComponent<Image>();
+        if (!from || !to) yield break;
+
+        toGo.SetActive(true);
+        SetAlpha(to, 0f);
+
+        float t = 0f;
+        while (t < duration)
+        {
+            float a = t / duration;
+            SetAlpha(from, 1f - a);
+            SetAlpha(to, a);
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        SetAlpha(from, 0f);
+        fromGo.SetActive(false);
+        SetAlpha(to, 1f);
+    }
 
     /// <summary> 입력한 씬으로 전환 </summary>
     protected IEnumerator FadeAndLoadScene(int sceneBuildIndex, Image[] fadeImage)

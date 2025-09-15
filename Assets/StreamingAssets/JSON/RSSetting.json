@@ -1,0 +1,40 @@
+{
+  "transitionTime": 1,
+  "explainImages": [
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/1.png"
+    },
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/2.png"
+    },
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/3.png"
+    },
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/4.png"
+    },
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/5.png"
+    },
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/6.png"
+    },
+    {
+      "position": { "x": 960, "y": 540 },
+      "size": { "x": 1500, "y": 800 },
+      "sourceImage": "Image/RocketStructure/7.png"
+    }
+  ]
+}

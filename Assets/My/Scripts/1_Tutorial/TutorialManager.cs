@@ -10,7 +10,6 @@ using UnityEngine.UI;
 [Serializable]
 public class TutorialSetting
 {
-    public float camera3TurnSpeed;
     public TextSetting infoText;
     public ImageSetting[] tutorialImages;
 }
@@ -115,28 +114,5 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
         _transitioning = false;
     }
 
-    private IEnumerator CrossFade(GameObject fromGo, GameObject toGo, float duration)
-    {
-        if (!fromGo || !toGo) yield break;
-        Image from = fromGo.GetComponent<Image>();
-        Image to = toGo.GetComponent<Image>();
-        if (!from || !to) yield break;
-
-        toGo.SetActive(true);
-        SetAlpha(to, 0f);
-
-        float t = 0f;
-        while (t < duration)
-        {
-            float a = t / duration;
-            SetAlpha(from, 1f - a);
-            SetAlpha(to, a);
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        SetAlpha(from, 0f);
-        fromGo.SetActive(false);
-        SetAlpha(to, 1f);
-    }
+   
 }

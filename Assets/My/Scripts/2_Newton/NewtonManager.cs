@@ -21,7 +21,7 @@ public class NewtonSetting
 
 public class NewtonManager : SceneManager_Base<NewtonSetting>
 {
-    [Header("UI")] 
+    [Header("UI")]
     [SerializeField] private GameObject videoPlayerObject;
     [SerializeField] private GameObject titleText;
     [SerializeField] private GameObject infoText;
@@ -30,8 +30,14 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     private VideoPlayer _vp;
     private RawImage _raw;
     private AudioSource _audioSource;
-    
-    private enum Phase { Intro, RuleSeq, Done }
+
+    private enum Phase
+    {
+        Intro,
+        RuleSeq,
+        Done
+    }
+
     private Phase _phase;
     private VideoSetting[] _ruleSeq;
     private int _ruleIndex;
@@ -41,7 +47,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     private Coroutine _awaitInputCo;
     private bool _infoShown;
     private bool _waitingForInput;
-    
+
     private void OnDisable()
     {
         StopAllCoroutines();
@@ -62,14 +68,14 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
         _audioSource = UIUtility.GetOrAdd<AudioSource>(videoPlayerObject);
-    
+
         // 타이틀 "뉴턴의 운동 법칙) 작용과 반작용" 텍스트 설정
         await SettingTextObject(titleText, setting.titleText);
-        
+
         // 인포 "컨트롤러의 아무 버튼을 누르면 다음 화면으로 진행됩니다." 텍스트 설정
         await SettingTextObject(infoText, setting.infoText);
         infoText.SetActive(false);
-        
+
         // 비디오 저장
         _ruleSeq = new[]
         {
@@ -79,7 +85,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         };
         _ruleIndex = 0;
         _phase = Phase.Intro;
-        
+
         await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audioSource);
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
@@ -87,18 +93,18 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         StartCoroutine(TurnCamera3());
         StartCoroutine(FadeImage(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 }));
     }
-    
+
     private void OnVideoEnded(VideoPlayer vp)
-    {   
+    {
         vp.loopPointReached -= OnVideoEnded;
         vp.Stop();
-        
+
         if (_progressCo != null)
         {
             StopCoroutine(_progressCo);
             _progressCo = null;
         }
-        
+
         // 인트로 비디오가 끝났을 경우
         if (_phase == Phase.Intro)
         {
@@ -116,18 +122,18 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             else // 마지막 비디오가 끝난 후
             {
                 _phase = Phase.Done;
-                StartCoroutine(FinishFlow());
+                FinishFlow();
             }
         }
     }
-    
+
     /// <summary> 다음 비디오로 변환함 </summary>
     private IEnumerator SwitchAndPlayNext(VideoSetting next)
-    {   
+    {
         if (infoText) infoText.SetActive(false);
         _infoShown = false;
         _waitingForInput = false;
-        
+
         // 페이드 아웃(검게 덮기)
         yield return FadeImage(0f, 1f, fadeTime, new[] { fadeImage1 });
 
@@ -146,7 +152,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         // 끝 이벤트 재구독
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
-        
+
         if (_phase == Phase.RuleSeq)
         {
             if (_progressCo != null) StopCoroutine(_progressCo);
@@ -156,13 +162,13 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         // 페이드 인(화면 열기)
         yield return FadeImage(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
     }
-    
-    private IEnumerator FinishFlow()
+
+    private void FinishFlow()
     {
-        // 마지막 페이드 아웃
-        yield return FadeImage(0f, 1f, fadeTime, new[] { fadeImage1, fadeImage3 });
+        // 다음 씬 로드
+        StartCoroutine(FadeAndLoadScene(3, new[] { fadeImage1, fadeImage3 }));
     }
-    
+
     private IEnumerator _MonitorRuleProgress()
     {
         // 영상 길이 정보가 잡힐 때까지 잠깐 대기
@@ -183,22 +189,23 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                 {
                     if (infoText) infoText.SetActive(true);
                     _infoShown = true;
-                    
+
                     if (!_waitingForInput)
                     {
                         _waitingForInput = true;
                         if (_awaitInputCo != null) StopCoroutine(_awaitInputCo);
-                        _awaitInputCo = StartCoroutine(_WaitForAnyInputThenProceed());
+                        _awaitInputCo = StartCoroutine(WaitForAnyInput());
                     }
                 }
             }
+
             yield return null;
         }
 
         _progressCo = null;
     }
-    
-    private IEnumerator _WaitForAnyInputThenProceed()
+
+    private IEnumerator WaitForAnyInput()
     {
         while (!IsAnyUserInputDown())
             yield return null;
@@ -206,11 +213,16 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _waitingForInput = false;
 
         // 이벤트/코루틴 정리
-        if (_progressCo != null) { StopCoroutine(_progressCo); _progressCo = null; }
+        if (_progressCo != null)
+        {
+            StopCoroutine(_progressCo);
+            _progressCo = null;
+        }
+
         if (_vp)
         {
             _vp.loopPointReached -= OnVideoEnded; // 끝 이벤트 중복 방지
-            _vp.Stop();                           // 현재 룰 영상 스킵
+            _vp.Stop(); // 현재 룰 영상 스킵
         }
 
         if (infoText) infoText.SetActive(false);
@@ -228,7 +240,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         if (Input.touchCount > 0) return true;
         return false;
     }
-    
+
     private void ProceedToNextFromInput()
     {
         if (_phase != Phase.RuleSeq) return;
@@ -241,7 +253,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         else
         {
             _phase = Phase.Done;
-            StartCoroutine(FinishFlow());
+            FinishFlow();
         }
     }
 }
