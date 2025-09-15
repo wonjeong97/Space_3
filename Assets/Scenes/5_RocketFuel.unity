@@ -1000,7 +1000,6 @@ MonoBehaviour:
   mainImage1: {fileID: 2103544916}
   mainImage2: {fileID: 1897131097}
   mainImage3: {fileID: 1902434241}
-  popupImage: {fileID: 191159779}
   videoPlayerObject: {fileID: 186308652}
   subImage1: {fileID: 665106649}
 --- !u!1 &842421002
@@ -1438,7 +1437,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &1345879961
 RectTransform:
   m_ObjectHideFlags: 0

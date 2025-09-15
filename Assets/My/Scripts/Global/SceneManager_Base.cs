@@ -126,6 +126,25 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         canInput = true;
     }
     
+    protected async Task FadeImageAsync(float start, float end, float duration, Image[] targets)
+    {
+        canInput = false;
+        float elapsed = 0f;
+        float alpha = start;
+
+        while (elapsed < duration)
+        {
+            alpha = Mathf.Lerp(start, end, elapsed / duration);
+            foreach (var image in targets) SetAlpha(image, alpha);
+
+            elapsed += Time.deltaTime;
+            await Task.Yield(); // 다음 프레임까지 양보
+        }
+
+        foreach (var image in targets) SetAlpha(image, end);
+        canInput = true;
+    }
+    
     /// <summary> 두 게임오브젝트의 이미지를 크로스 페이드 함 </summary>
     protected IEnumerator CrossFade(GameObject fromGo, GameObject toGo, float duration)
     {
