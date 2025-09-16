@@ -10,69 +10,89 @@ using UnityEngine.Video;
 
 public abstract class SceneManager_Base<T> : MonoBehaviour
 {
+    #region Serialized Refs
+
     [Header("Camera")] 
-    [SerializeField] protected Camera mainCamera; // Display1 Camera
-    [SerializeField] protected Camera camera2; // Display2 Camera
-    [SerializeField] protected Camera camera3; // Display3 Camera
+    [SerializeField] protected Camera mainCamera; // Display1
+    [SerializeField] protected Camera camera2; // Display2
+    [SerializeField] protected Camera camera3; // Display3
 
     [Header("Canvas")]
     [SerializeField] protected Canvas mainCanvas;
     [SerializeField] protected Canvas subCanvas;
     [SerializeField] protected Canvas verticalCanvas;
 
-    [Header("FadeImage")]
+    [Header("Fade Images")]
     [SerializeField] protected Image fadeImage1; // Display1 Fade
     [SerializeField] protected Image fadeImage2; // Display2 Fade
     [SerializeField] protected Image fadeImage3; // Display3 Fade
 
+    [Header("Scene Flow")] 
+    [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")]
+    [SerializeField] protected int nextSceneBuildIndex = -1;
+
+    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")]
+    [SerializeField] private bool useInactivityTimeout = true;
+
+    #endregion
+
+    #region Settings / State
+
     [NonSerialized] protected T setting;
-    private Settings jsonSetting;
+    private Settings _globalSettings; // JsonLoader.Instance.settings 캐시
+
+    protected float fadeTime; // 페이드 시간
+    protected bool canInput; // 페이드 중/전환 중 입력 방지
+    protected bool inputReceived; // 중복 입력 방지
+
+    private float _inactivityTimer; // 무입력 시간 누적
+    private float _inactivityThreshold; // Scene0로 복귀 임계값
+    private float _camera3TurnSpeed; // 회전 속도
+
     protected abstract string JsonPath { get; }
 
-    private float _camera3TurnSpeed;
-    protected float fadeTime;
-    protected bool inputReceived; // 중복 입력 방지
-    protected bool canInput; // 페이드 중 입력 방지
+    private CancellationTokenSource _cts; // 씬 생명주기용 CTS
+
+    #endregion
+
+    #region Unity Life-Cycle
 
     protected virtual void Awake()
     {
         if (!mainCamera || !camera2 || !camera3)
-        {
             Debug.LogError("[SceneManager] camera is not assigned");
-        }
 
         if (!mainCanvas || !subCanvas || !verticalCanvas)
-        {
             Debug.LogError("[SceneManager] canvas is not assigned");
-        }
 
         if (!fadeImage1 || !fadeImage2 || !fadeImage3)
-        {
-            Debug.LogError("[SceneManager]] fadeImage is not assigned");
-        }
+            Debug.LogError("[SceneManager] fadeImage is not assigned");
+
+        _cts = new CancellationTokenSource();
     }
 
     protected virtual async void Start()
     {
         try
         {
-            jsonSetting ??= JsonLoader.Instance.settings;
+            _globalSettings ??= JsonLoader.Instance.settings;
             setting = JsonLoader.Instance.LoadJsonData<T>(JsonPath);
-            
-            _camera3TurnSpeed = jsonSetting.camera3TurnSpeed;
-            fadeTime = jsonSetting.fadeTime;
 
-            // 윈도우에서 디스플레이 번호가 바꼈을 때를 대비한 캔버스, 카메라 타깃 디스플레이 설정            
-            mainCamera.targetDisplay = jsonSetting.canvas1TargetMonitorIndex;
-            mainCanvas.targetDisplay = jsonSetting.canvas1TargetMonitorIndex;
-            
-            camera2.targetDisplay = jsonSetting.canvas2TargetMonitorIndex;
-            subCanvas.targetDisplay = jsonSetting.canvas2TargetMonitorIndex;
-            
-            camera3.targetDisplay = jsonSetting.canvas3TargetMonitorIndex;
-            verticalCanvas.targetDisplay = jsonSetting.canvas3TargetMonitorIndex;
-            
-            await Init();
+            _camera3TurnSpeed = _globalSettings.camera3TurnSpeed;
+            fadeTime = _globalSettings.fadeTime;
+            _inactivityThreshold = _globalSettings.inactivityTime;
+
+            // 윈도우 디스플레이 순서가 바뀌어도 JSON으로 지정 가능
+            mainCamera.targetDisplay = _globalSettings.canvas1TargetMonitorIndex;
+            mainCanvas.targetDisplay = _globalSettings.canvas1TargetMonitorIndex;
+
+            camera2.targetDisplay = _globalSettings.canvas2TargetMonitorIndex;
+            subCanvas.targetDisplay = _globalSettings.canvas2TargetMonitorIndex;
+
+            camera3.targetDisplay = _globalSettings.canvas3TargetMonitorIndex;
+            verticalCanvas.targetDisplay = _globalSettings.canvas3TargetMonitorIndex;
+
+            await InitSafe(); // 자식 초기화
         }
         catch (Exception e)
         {
@@ -80,14 +100,80 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         }
     }
 
+    protected virtual void Update()
+    {
+        if (!useInactivityTimeout) return;
+
+        // 타이틀에서는 무시
+        if (SceneManager.GetActiveScene().buildIndex != 0)
+        {
+            _inactivityTimer += Time.deltaTime;
+            if (_inactivityTimer >= _inactivityThreshold)
+            {
+                _inactivityTimer = 0f;
+                // 페이드 후 타이틀 복귀
+                _ = LoadSceneAsync(0, new[] { fadeImage1, fadeImage2, fadeImage3 });
+            }
+        }
+
+        if (IsAnyUserInputDown())
+            _inactivityTimer = 0f;
+    }
+
+    protected virtual void OnDisable()
+    {
+        try
+        {
+            _cts?.Cancel();
+        }
+        catch
+        {
+        }
+
+        _cts?.Dispose();
+        _cts = null;
+    }
+
+    #endregion
+
+    #region Template Methods (for children)
+
+    /// <summary> 자식에서 구현할 실제 초기화. 안전 래핑은 InitSafe가 담당. </summary>
     protected abstract Task Init();
+
+    /// <summary> 입력 1회 트리거를 받고 싶을 때 호출할 헬퍼 </summary>
+    protected bool TryConsumeSingleInput()
+    {
+        if (inputReceived || !canInput) return false;
+        if (!IsAnyUserInputDown()) return false;
+
+        inputReceived = true;
+        return true;
+    }
+
+    #endregion
+
+    #region Init Wrapper
+
+    private async Task InitSafe()
+    {
+        canInput = false;
+        inputReceived = false;
+
+        await Init(); // 자식 초기화
+        canInput = true;
+    }
+
+    #endregion
+
+    #region Camera / Fade / Scene
 
     /// <summary> Display3 카메라를 일정 속도로 계속 회전시킴 </summary>
     protected IEnumerator TurnCamera3()
     {
         if (!camera3)
         {
-            Debug.LogError("[TitleManager] camera3 is not assigned");
+            Debug.LogError("[SceneManager] camera3 is not assigned");
             yield break;
         }
 
@@ -98,72 +184,50 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         }
     }
 
-    /// <summary> 씬 시작, 다음 씬 넘어가기 전 화면 페이드를 설정함 </summary>
-    protected IEnumerator FadeImage(float start, float end, float duration, Image[] targets)
+    /// <summary> 알파값만 변경 </summary>
+    protected void SetAlpha(Graphic g, float a)
     {
-        canInput = false;
-        float elapsed = 0f;
-        float alpha = 0f;
-
-        while (elapsed < duration)
-        {
-            alpha = Mathf.Lerp(start, end, elapsed / duration);
-
-            foreach (Image image in targets)
-            {
-                SetAlpha(image, alpha);
-            }
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        foreach (Image image in targets)
-        {
-            SetAlpha(image, alpha);
-        }
-
-        canInput = true;
+        if (!g) return;
+        Color c = g.color;
+        c.a = a;
+        g.color = c;
     }
-    
+
+    /// <summary> 씬 시작/종료 페이드용 </summary>
     protected async Task FadeImageAsync(float start, float end, float duration, Image[] targets)
     {
         canInput = false;
         float elapsed = 0f;
-        float alpha = start;
 
         while (elapsed < duration)
         {
-            alpha = Mathf.Lerp(start, end, elapsed / duration);
-            foreach (var image in targets) SetAlpha(image, alpha);
-
+            float a = Mathf.Lerp(start, end, elapsed / duration);
+            foreach (Image img in targets) SetAlpha(img, a);
             elapsed += Time.deltaTime;
-            await Task.Yield(); // 다음 프레임까지 양보
+            await Task.Yield();
         }
 
-        foreach (var image in targets) SetAlpha(image, end);
+        foreach (Image img in targets) SetAlpha(img, end);
         canInput = true;
     }
-    
-    /// <summary> 두 게임오브젝트의 이미지를 크로스 페이드 함 </summary>
-    protected IEnumerator CrossFade(GameObject fromGo, GameObject toGo, float duration)
+
+    /// <summary> 두 UI 이미지 간 크로스 페이드 </summary>
+    protected async Task CrossFadeAsync(GameObject fromGo, GameObject toGo, float duration)
     {
-        if (!fromGo || !toGo) yield break;
-        Image from = fromGo.GetComponent<Image>();
-        Image to = toGo.GetComponent<Image>();
-        if (!from || !to) yield break;
+        if (!fromGo || !toGo) return;
+        if (!fromGo.TryGetComponent(out Image from) || !toGo.TryGetComponent(out Image to)) return;
 
         toGo.SetActive(true);
         SetAlpha(to, 0f);
 
-        float t = 0f;
-        while (t < duration)
+        float time = 0f;
+        while (time < duration)
         {
-            float a = t / duration;
-            SetAlpha(from, 1f - a);
-            SetAlpha(to, a);
-            t += Time.deltaTime;
-            yield return null;
+            float alpha = time / duration;
+            SetAlpha(from, 1f - alpha);
+            SetAlpha(to, alpha);
+            time += Time.deltaTime;
+            await Task.Yield(); // 다음 프레임까지 양보
         }
 
         SetAlpha(from, 0f);
@@ -171,79 +235,102 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         SetAlpha(to, 1f);
     }
 
-    /// <summary> 입력한 씬으로 전환 </summary>
-    protected IEnumerator FadeAndLoadScene(int sceneBuildIndex, Image[] fadeImage)
+    /// <summary> 페이드 후 씬 로드 (async) </summary>
+    protected async Task LoadSceneAsync(int buildIndex, Image[] fades)
     {
-        // 페이드 아웃 
-        yield return FadeImage(0f, 1f, fadeTime, fadeImage);
-        SceneManager.LoadScene(sceneBuildIndex);
-    }
-    
-    protected void SetAlpha(Image img, float alpha)
-    {
-        Color c = img.color;
-        c.a = alpha;
-        img.color = c;
+        await FadeImageAsync(0f, 1f, fadeTime, fades);
+        SceneManager.LoadSceneAsync(buildIndex);
+        await Task.Yield();
     }
 
-    protected async Task SettingTextObject(GameObject textObject, TextSetting textSetting)
+    #endregion
+
+    #region UI Builders
+
+    /// <summary> TextObject 설정: 폰트/문구/색/정렬/RectTransform 반영 </summary>
+    protected async Task SettingTextObject(GameObject textObject, TextSetting ts)
     {
-        if (textObject.TryGetComponent(out TextMeshProUGUI text) &&
+        if (!textObject || ts == null) return;
+        if (textObject.TryGetComponent(out TextMeshProUGUI tmp) &&
             textObject.TryGetComponent(out RectTransform rt))
         {
             await UICreator.Instance.ApplyFontAsync(
-                text,
-                textSetting.fontName,
-                textSetting.text,
-                textSetting.fontSize,
-                textSetting.fontColor,
-                textSetting.alignment,
+                tmp,
+                ts.fontName,
+                ts.text,
+                ts.fontSize,
+                ts.fontColor,
+                ts.alignment,
                 CancellationToken.None
             );
-            
-            UIUtility.ApplyRect(rt,
+
+            UIUtility.ApplyRect(
+                rt,
                 size: null,
-                anchoredPos: new Vector2(textSetting.position.x, -textSetting.position.y),
-                rotation: textSetting.rotation);
+                anchoredPos: new Vector2(ts.position.x, -ts.position.y),
+                rotation: ts.rotation
+            );
         }
     }
 
-    protected void SettingImageObject(GameObject imageObject, ImageSetting imageSetting)
+    /// <summary> ImageObject 설정: 스트리밍 에셋 이미지 로드/타입/RectTransform 반영 </summary>
+    protected void SettingImageObject(GameObject imageObject, ImageSetting iset)
     {
-        if (imageObject.TryGetComponent(out Image image)&&
+        if (!imageObject || iset == null) return;
+        if (imageObject.TryGetComponent(out Image img) &&
             imageObject.TryGetComponent(out RectTransform rt))
         {
-            Texture2D texture = UIUtility.LoadTextureFromStreamingAssets(imageSetting.sourceImage);
-            if (texture != null)
+            Texture2D tex = UIUtility.LoadTextureFromStreamingAssets(iset.sourceImage);
+            if (tex != null)
             {
-                image.sprite = Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
-                image.color = imageSetting.color;
-                image.type = (Image.Type)imageSetting.type;
+                img.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+                img.color = iset.color;
+                img.type = (Image.Type)iset.type;
             }
 
-            UIUtility.ApplyRect(rt,
-                size: imageSetting.size,
-                anchoredPos: new Vector2(imageSetting.position.x, -imageSetting.position.y),
-                rotation: imageSetting.rotation);
+            UIUtility.ApplyRect(
+                rt,
+                size: iset.size,
+                anchoredPos: new Vector2(iset.position.x, -iset.position.y),
+                rotation: iset.rotation
+            );
         }
     }
-    
-    protected async Task SettingVideoObject(GameObject vpObject, VideoSetting videoSetting, VideoPlayer vp, RawImage raw, AudioSource audioSource)
+
+    /// <summary> VideoObject 설정: RT 바인딩, URL 해석, Prepare & Play </summary>
+    protected async Task SettingVideoObject(GameObject vpObject, VideoSetting vs, VideoPlayer vp, RawImage raw, AudioSource audioSource)
     {
+        if (!vpObject || vs == null || !vp || !raw) return;
+
         if (vpObject.TryGetComponent(out RectTransform rt))
         {
             UIUtility.ApplyRect(
                 rt,
-                size: videoSetting.size,
-                anchoredPos: new Vector2(videoSetting.position.x, -videoSetting.position.y),
+                size: vs.size,
+                anchoredPos: new Vector2(vs.position.x, -vs.position.y),
                 rotation: Vector3.zero
             );
         }
 
         VideoManager.Instance.WireRawImageAndRenderTexture(
-            vp, raw, new Vector2Int(Mathf.RoundToInt(videoSetting.size.x), Mathf.RoundToInt(videoSetting.size.y)));
+            vp, raw, new Vector2Int(Mathf.RoundToInt(vs.size.x), Mathf.RoundToInt(vs.size.y)));
 
-        string url = VideoManager.Instance.ResolvePlayableUrl(videoSetting.fileName);
-        await VideoManager.Instance.PrepareAndPlayAsync(vp, url, audioSource, videoSetting.volume, CancellationToken.None);
+        string url = VideoManager.Instance.ResolvePlayableUrl(vs.fileName);
+        await VideoManager.Instance.PrepareAndPlayAsync(vp, url, audioSource, vs.volume, CancellationToken.None);
     }
+
+    #endregion
+
+    #region Input Utils
+
+    /// <summary> 사용자 입력이 있었는지 간단 체크 </summary>
+    private bool IsAnyUserInputDown()
+    {
+        if (Input.anyKeyDown) return true;
+        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2)) return true;
+        if (Input.touchCount > 0) return true;
+        return false;
+    }
+
+    #endregion
 }

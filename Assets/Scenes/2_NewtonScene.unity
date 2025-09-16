@@ -788,9 +788,11 @@ MonoBehaviour:
   fadeImage1: {fileID: 1123139911}
   fadeImage2: {fileID: 2080994037}
   fadeImage3: {fileID: 638666639}
+  nextSceneBuildIndex: 3
+  useInactivityTimeout: 1
   videoPlayerObject: {fileID: 337159217}
-  titleText: {fileID: 1658023595}
-  infoText: {fileID: 1070180340}
+  titleTextObj: {fileID: 1658023595}
+  infoTextObj: {fileID: 1070180340}
 --- !u!4 &776960349
 Transform:
   m_ObjectHideFlags: 0
@@ -2117,5 +2119,5 @@ SceneRoots:
   - {fileID: 265556548}
   - {fileID: 1290518548}
   - {fileID: 842421006}
-  - {fileID: 776960349}
   - {fileID: 1355680765}
+  - {fileID: 776960349}

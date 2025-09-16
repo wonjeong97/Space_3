@@ -844,13 +844,16 @@ MonoBehaviour:
   fadeImage1: {fileID: 1345879963}
   fadeImage2: {fileID: 2080994037}
   fadeImage3: {fileID: 638666639}
-  image_Explain1: {fileID: 2133691488}
-  image_Explain2: {fileID: 1159896374}
-  image_Explain3: {fileID: 127532963}
-  image_Explain4: {fileID: 2011914235}
-  image_Explain5: {fileID: 5725278}
-  image_Explain6: {fileID: 1902539773}
-  image_Explain7: {fileID: 1193735321}
+  nextSceneBuildIndex: 4
+  useInactivityTimeout: 1
+  explainImageObjs:
+  - {fileID: 2133691488}
+  - {fileID: 1159896374}
+  - {fileID: 127532963}
+  - {fileID: 2011914235}
+  - {fileID: 5725278}
+  - {fileID: 1902539773}
+  - {fileID: 1193735321}
 --- !u!1 &842421002
 GameObject:
   m_ObjectHideFlags: 0

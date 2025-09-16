@@ -997,12 +997,14 @@ MonoBehaviour:
   fadeImage1: {fileID: 1345879963}
   fadeImage2: {fileID: 2080994037}
   fadeImage3: {fileID: 638666639}
+  nextSceneBuildIndex: 5
+  useInactivityTimeout: 1
   mainImage1: {fileID: 2103544916}
   mainImage2: {fileID: 1897131097}
   mainImage3: {fileID: 1902434241}
   popupImage: {fileID: 191159779}
   videoPlayerObject: {fileID: 186308652}
-  subImage1: {fileID: 665106649}
+  subImage: {fileID: 665106649}
 --- !u!1 &842421002
 GameObject:
   m_ObjectHideFlags: 0
@@ -2208,5 +2210,5 @@ SceneRoots:
   - {fileID: 265556548}
   - {fileID: 1290518548}
   - {fileID: 842421006}
-  - {fileID: 776960349}
   - {fileID: 509728413}
+  - {fileID: 776960349}

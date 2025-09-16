@@ -397,6 +397,8 @@ MonoBehaviour:
   fadeImage1: {fileID: 1431570168}
   fadeImage2: {fileID: 700591220}
   fadeImage3: {fileID: 1352670520}
+  nextSceneBuildIndex: 1
+  useInactivityTimeout: 0
   titleText: {fileID: 524301730}
   infoText: {fileID: 2133899146}
 --- !u!1 &524301730
@@ -2188,7 +2190,6 @@ SceneRoots:
   - {fileID: 1034087465}
   - {fileID: 1519031298}
   - {fileID: 705507995}
-  - {fileID: 420962363}
   - {fileID: 525326775}
   - {fileID: 1661062866}
   - {fileID: 602040265}
@@ -2197,3 +2198,4 @@ SceneRoots:
   - {fileID: 852878004}
   - {fileID: 265556548}
   - {fileID: 1930481789}
+  - {fileID: 420962363}

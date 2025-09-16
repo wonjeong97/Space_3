@@ -1362,10 +1362,13 @@ MonoBehaviour:
   fadeImage1: {fileID: 1123139911}
   fadeImage2: {fileID: 2080994037}
   fadeImage3: {fileID: 638666639}
-  infoText: {fileID: 1409478092}
-  tutorialImage1: {fileID: 110587910}
-  tutorialImage2: {fileID: 273867571}
-  tutorialImage3: {fileID: 594527295}
+  nextSceneBuildIndex: 2
+  useInactivityTimeout: 1
+  infoTextObj: {fileID: 1409478092}
+  tutorialImageObjs:
+  - {fileID: 110587910}
+  - {fileID: 273867571}
+  - {fileID: 594527295}
 --- !u!4 &1227946350
 Transform:
   m_ObjectHideFlags: 0
@@ -2055,6 +2058,6 @@ SceneRoots:
   - {fileID: 705507995}
   - {fileID: 1553166800}
   - {fileID: 265556548}
-  - {fileID: 1227946350}
   - {fileID: 1290518548}
   - {fileID: 842421006}
+  - {fileID: 1227946350}

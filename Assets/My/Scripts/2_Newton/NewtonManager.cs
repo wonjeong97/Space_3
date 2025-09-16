@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,38 +21,34 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
 {
     [Header("UI")]
     [SerializeField] private GameObject videoPlayerObject;
-    [SerializeField] private GameObject titleText;
-    [SerializeField] private GameObject infoText;
+    [SerializeField] private GameObject titleTextObj;
+    [SerializeField] private GameObject infoTextObj;
+    
     protected override string JsonPath => "JSON/NewtonSetting.json";
 
     private VideoPlayer _vp;
     private RawImage _raw;
-    private AudioSource _audioSource;
+    private AudioSource _audio;
 
-    private enum Phase
-    {
-        Intro,
-        RuleSeq,
-        Done
-    }
-
+    private enum Phase { Intro, RuleSeq, Done }
     private Phase _phase;
+
     private VideoSetting[] _ruleSeq;
     private int _ruleIndex;
 
-    // 비디오가 50% 재생되었을 때 인포 텍스트를 표시 및 입력을 받도록 함
-    private Coroutine _progressCo;
-    private Coroutine _awaitInputCo;
-    private bool _infoShown;
-    private bool _waitingForInput;
+    private bool _infoShown;        // 50% 시 안내 노출 여부
+    private bool _awaitingSkip;     // 스킵 입력 대기 중인지
 
-    private void OnDisable()
+    private CancellationTokenSource _progressCts;
+    private CancellationTokenSource _skipCts;
+    
+    protected override void OnDisable()
     {
-        StopAllCoroutines();
-        _progressCo = null;
-        _infoShown = false;
-
-        if (infoText) infoText.SetActive(false);
+        // 이벤트 정리 및 비디오 정지
+        try { _progressCts?.Cancel(); } catch { }
+        try { _skipCts?.Cancel(); } catch { }
+        _progressCts?.Dispose(); _progressCts = null;
+        _skipCts?.Dispose();     _skipCts = null;
 
         if (_vp)
         {
@@ -62,196 +58,181 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     }
 
     protected override async Task Init()
-    {
+    {   
+        if (!videoPlayerObject) Debug.LogError("[NewtonManager] videoPlayerObject is not assigned");
+        
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
-        _audioSource = UIUtility.GetOrAdd<AudioSource>(videoPlayerObject);
+        _audio = UIUtility.GetOrAdd<AudioSource>(videoPlayerObject); // 비디오 오브젝트에 오디오 소스를 보장함
 
-        // 타이틀 "뉴턴의 운동 법칙) 작용과 반작용" 텍스트 설정
-        await SettingTextObject(titleText, setting.titleText);
+        // 타이틀/안내 텍스트 설정
+        await SettingTextObject(titleTextObj, setting.titleText);
+        await SettingTextObject(infoTextObj, setting.infoText);
+        if (infoTextObj) infoTextObj.SetActive(false);
 
-        // 인포 "컨트롤러의 아무 버튼을 누르면 다음 화면으로 진행됩니다." 텍스트 설정
-        await SettingTextObject(infoText, setting.infoText);
-        infoText.SetActive(false);
-
-        // 비디오 저장
-        _ruleSeq = new[]
-        {
-            setting.newtonsRule1Video,
-            setting.newtonsRule2Video,
-            setting.newtonsRule3Video
-        };
+        // 뉴턴의 법칙 비디오 저장
+        _ruleSeq = new[] { setting.newtonsRule1Video, setting.newtonsRule2Video, setting.newtonsRule3Video };
         _ruleIndex = 0;
         _phase = Phase.Intro;
 
-        await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audioSource);
+        // 인트로 세팅 및 재생  
+        await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
 
         StartCoroutine(TurnCamera3());
-        StartCoroutine(FadeImage(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 }));
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
     }
 
-    private void OnVideoEnded(VideoPlayer vp)
+    private async void OnVideoEnded(VideoPlayer vp)
     {
-        vp.loopPointReached -= OnVideoEnded;
-        vp.Stop();
+        try
+        {   
+            CancelAndDispose(ref _progressCts);
+            CancelAndDispose(ref _skipCts);
+            
+            _vp.loopPointReached -= OnVideoEnded;
 
-        if (_progressCo != null)
-        {
-            StopCoroutine(_progressCo);
-            _progressCo = null;
-        }
-
-        // 인트로 비디오가 끝났을 경우
-        if (_phase == Phase.Intro)
-        {
-            _phase = Phase.RuleSeq; // 페이즈 변경
-            _ruleIndex = 0; // 인덱스 0번부터 시작
-            StartCoroutine(SwitchAndPlayNext(_ruleSeq[_ruleIndex]));
-        }
-        else if (_phase == Phase.RuleSeq)
-        {
-            _ruleIndex++;
-            if (_ruleIndex < _ruleSeq.Length)
+            if (_phase == Phase.Intro) // 인트로 비디오가 끝남
             {
-                StartCoroutine(SwitchAndPlayNext(_ruleSeq[_ruleIndex]));
+                _phase = Phase.RuleSeq;
+                _ruleIndex = 0;
+                await SwitchAndPlayNextAsync(_ruleSeq[_ruleIndex]);
             }
-            else // 마지막 비디오가 끝난 후
+            else if (_phase == Phase.RuleSeq) // 뉴턴의 법칙 비디오가 끝남
             {
-                _phase = Phase.Done;
-                FinishFlow();
+                _ruleIndex++;
+                if (_ruleIndex < _ruleSeq.Length)
+                {
+                    await SwitchAndPlayNextAsync(_ruleSeq[_ruleIndex]);
+                }
+                else // 마지막 비디오 재생 후 다음 씬 전환
+                {
+                    _phase = Phase.Done;
+                    await GoNextSceneAsync();
+                }
             }
         }
+        catch (Exception e)
+        {
+            Debug.LogError("[NewtonManager] Video player ended: " + e.Message);
+        }
+      
     }
 
-    /// <summary> 다음 비디오로 변환함 </summary>
-    private IEnumerator SwitchAndPlayNext(VideoSetting next)
-    {
-        if (infoText) infoText.SetActive(false);
-        _infoShown = false;
-        _waitingForInput = false;
+    /// <summary> 다음 비디오로 페이드 아웃/인 하며 전환하고 50% 모니터링 시작 </summary>
+    private async Task SwitchAndPlayNextAsync(VideoSetting next)
+    {   
+        CancelAndDispose(ref _progressCts);
+        CancelAndDispose(ref _skipCts);
 
-        // 페이드 아웃(검게 덮기)
-        yield return FadeImage(0f, 1f, fadeTime, new[] { fadeImage1 });
+        // 비디오 재생 프로퍼티 초기화
+        if (infoTextObj) infoTextObj.SetActive(false);  // 스킵 메시지 비활성화
+        _infoShown = false; 
+        _awaitingSkip = false;  // 스킵 비활성화
+        inputReceived = false;  // 입력을 받지 않음
+        
+        // 페이드 아웃
+        await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
 
-        // 현재 비디오 정지
         if (_vp) _vp.Stop();
+        await SettingVideoObject(videoPlayerObject, next, _vp, _raw, _audio); // 다음 비디오 준비
 
-        // 다음 비디오 세팅
-        Task t = SettingVideoObject(videoPlayerObject, next, _vp, _raw, _audioSource);
-        while (!t.IsCompleted) yield return null;
-        if (t.IsFaulted)
-        {
-            Debug.LogError(t.Exception);
-            yield break;
-        }
-
-        // 끝 이벤트 재구독
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
 
-        if (_phase == Phase.RuleSeq)
-        {
-            if (_progressCo != null) StopCoroutine(_progressCo);
-            _progressCo = StartCoroutine(_MonitorRuleProgress());
-        }
-
-        // 페이드 인(화면 열기)
-        yield return FadeImage(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
+        // 새 토큰 발급 & 현재 ruleIndex 캡처
+        _progressCts = new CancellationTokenSource();
+        int capturedIndex = _ruleIndex;
+        _ = MonitorProgressAndEnableSkipAsync(_progressCts.Token, capturedIndex);
+        
+        // 페이드 인
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
     }
-
-    private void FinishFlow()
+    
+    /// <summary> 영상 길이 확보 대기 및 50% 도달 시 안내 노출 및 스킵 입력 대기 시작 </summary>
+    private async Task MonitorProgressAndEnableSkipAsync(CancellationToken token, int ruleIndexAtStart)
     {
-        // 다음 씬 로드
-        StartCoroutine(FadeAndLoadScene(3, new[] { fadeImage1, fadeImage3 }));
-    }
+        // 비디오가 준비될 때까지 대기 (isPrepared == true)
+        while (!token.IsCancellationRequested && _vp && !_vp.isPrepared)
+            await Task.Yield();
 
-    private IEnumerator _MonitorRuleProgress()
-    {
-        // 영상 길이 정보가 잡힐 때까지 잠깐 대기
-        float guard = 0f;
-        while (_vp && _vp.isPrepared && _vp.length <= 0.0 && guard < 1.0f)
+        // 재생 중 50% 모니터링
+        while (!token.IsCancellationRequested && _vp && _vp.isPlaying)
         {
-            guard += Time.unscaledDeltaTime;
-            yield return null;
-        }
+            // 인덱스가 바뀌면(비디오 전환됨) 즉시 종료
+            if (ruleIndexAtStart != _ruleIndex) break;
 
-        // 재생 중 진행률 체크
-        while (_vp && _vp.isPlaying)
-        {
             if (!_infoShown && _vp.length > 0.0)
-            {
+            {   
+                // 비디오 재생 퍼센트 계산
                 double ratio = _vp.time / _vp.length;
                 if (ratio >= 0.5)
                 {
-                    if (infoText) infoText.SetActive(true);
+                    if (infoTextObj) infoTextObj.SetActive(true);
                     _infoShown = true;
-
-                    if (!_waitingForInput)
+                    inputReceived = false; // 입력 받았음을 한번 더 초기화
+                    
+                    if (!_awaitingSkip)
                     {
-                        _waitingForInput = true;
-                        if (_awaitInputCo != null) StopCoroutine(_awaitInputCo);
-                        _awaitInputCo = StartCoroutine(WaitForAnyInput());
+                        _awaitingSkip = true;
+                        _skipCts = new CancellationTokenSource();
+                        _ = WaitSkipThenProceedAsync(_skipCts.Token, ruleIndexAtStart);
                     }
                 }
             }
-
-            yield return null;
+            await Task.Yield();
         }
-
-        _progressCo = null;
     }
 
-    private IEnumerator WaitForAnyInput()
+    /// <summary> 사용자 입력을 단발로 소비하고, 현재 영상을 스킵하여 다음으로 진행 </summary>
+    private async Task WaitSkipThenProceedAsync(CancellationToken token, int ruleIndexAtStart)
     {
-        while (!IsAnyUserInputDown())
-            yield return null;
+        while (!token.IsCancellationRequested && !TryConsumeSingleInput())
+            await Task.Yield();
 
-        _waitingForInput = false;
+        if (token.IsCancellationRequested) return;
 
-        // 이벤트/코루틴 정리
-        if (_progressCo != null)
-        {
-            StopCoroutine(_progressCo);
-            _progressCo = null;
-        }
+        // 전환되었다면 무시
+        if (ruleIndexAtStart != _ruleIndex) return;
 
+        // 스킵 처리
         if (_vp)
         {
-            _vp.loopPointReached -= OnVideoEnded; // 끝 이벤트 중복 방지
-            _vp.Stop(); // 현재 룰 영상 스킵
+            _vp.loopPointReached -= OnVideoEnded;
+            _vp.Stop();
         }
+        if (infoTextObj) infoTextObj.SetActive(false);
 
-        if (infoText) infoText.SetActive(false);
-
-        // 다음으로 진행 or Finish
-        ProceedToNextFromInput();
-
-        _awaitInputCo = null;
-    }
-
-    private bool IsAnyUserInputDown()
-    {
-        if (Input.anyKeyDown) return true;
-        if (Input.GetMouseButtonDown(0) || Input.GetMouseButtonDown(1) || Input.GetMouseButtonDown(2)) return true;
-        if (Input.touchCount > 0) return true;
-        return false;
-    }
-
-    private void ProceedToNextFromInput()
-    {
         if (_phase != Phase.RuleSeq) return;
+
+        // 기존 모니터/스킵 태스크 중단
+        CancelAndDispose(ref _progressCts);
+        CancelAndDispose(ref _skipCts);
 
         _ruleIndex++;
         if (_ruleIndex < _ruleSeq.Length)
         {
-            StartCoroutine(SwitchAndPlayNext(_ruleSeq[_ruleIndex]));
+            await SwitchAndPlayNextAsync(_ruleSeq[_ruleIndex]);
         }
         else
         {
             _phase = Phase.Done;
-            FinishFlow();
+            await GoNextSceneAsync();
         }
+    }
+
+    private Task GoNextSceneAsync()
+    {
+        int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 3;
+        return LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
+    }
+
+    private void CancelAndDispose(ref CancellationTokenSource cts)
+    {
+        if (cts == null) return;
+        try { cts.Cancel(); } catch { }
+        cts.Dispose();
+        cts = null;
     }
 }

@@ -1,0 +1,46 @@
+{
+  "popupFadeTime": 1,
+  "fuelFillSpeed": 0.5,
+  "main1": {
+	"position": { "x": "400", "y": 540 },
+	"size": { "x": 500, "y": 800 },
+	"sourceImage": "Image/RocketFuel/1.png"
+  },
+  "main2": {
+	"position": { "x": "960", "y": 540 },
+	"size": { "x": 500, "y": 800 },
+	"sourceImage": "Image/RocketFuel/2.png"
+  },
+  "main3": {
+	"position": { "x": "1520", "y": 540 },
+	"size": { "x": 500, "y": 800 },
+	"sourceImage": "Image/RocketFuel/3.png"
+  },
+  "fuelPopup": {
+	"position": { "x": "960", "y": 540 },
+	"size": { "x": 1000, "y": 900 },
+	"sourceImage": "Image/RocketFuel/Popup.png"
+  },
+  "sub1": {
+	"position": { "x": "720", "y": 240 },
+	"size": { "x": 1440, "y": 480 },
+	"sourceImage": "Image/RocketFuel/sub1.png"
+  },
+  "fuelImage": [
+	{
+	  "position": { "x": "-255", "y": -5 },
+	  "size": { "x": 365, "y": 180 },
+	  "sourceImage": "Image/RocketFuel/fuel.png"
+	},
+	{
+	  "position": { "x": "150", "y": -7.5 },
+	  "size": { "x": 180, "y": 120 },
+	  "sourceImage": "Image/RocketFuel/fuel.png"
+	},
+	{
+	  "position": { "x": "490", "y": -7.5 },
+	  "size": { "x": 100, "y": 120 },
+	  "sourceImage": "Image/RocketFuel/fuel.png"
+	}
+  ]
+}

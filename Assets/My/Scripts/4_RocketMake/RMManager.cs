@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,68 +20,42 @@ public class RMSetting
     public VideoSetting rocketMakeVideo;
 }
 
+/// <summary>
+/// 로켓/위성 선택 → 장소 영상 → 제작 영상 → 다음 씬
+/// - 입력/페이드/씬 전환은 부모(SceneManager_Base) 공통 메서드 사용
+/// - 비디오는 loopPointReached 이벤트 + async 전환으로 처리
+/// </summary>
 public class RMManager : SceneManager_Base<RMSetting>
 {
-    [Header("UI")] 
+    [Header("UI")]
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
-    [SerializeField] private GameObject popupImage;
-    [SerializeField] private GameObject videoPlayerObject;
-    [SerializeField] private GameObject subImage1;
+    [SerializeField] private GameObject popupImage;        // 좌측 선택 미리보기
+    [SerializeField] private GameObject videoPlayerObject; // RawImage + VideoPlayer
+    [SerializeField] private GameObject subImage;
 
     protected override string JsonPath => "JSON/RMSetting.json";
 
-    private enum Phase
-    {
-        SelectRocket,
-        SelectSatellite,
-        Location
-    }
-
+    private enum Phase { SelectRocket, SelectSatellite, Location, PlayingMake, Done }
     private Phase _phase = Phase.SelectRocket;
+
     private int _selectedRocket = -1;
     private int _selectedSatellite = -1;
 
     private VideoPlayer _vp;
     private RawImage _raw;
-    private AudioSource _audioSource;
-    
+    private AudioSource _audio;
+
     private float _videoFadeTime;
 
-    private void Update()
+    protected override void OnDisable()
     {
-        if (!canInput) return;
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
+        if (_vp)
         {
-            if (_phase == Phase.SelectRocket)
-            {
-                if (_selectedRocket > 0) _selectedRocket--;
-                SetSelectedImage(_selectedRocket);
-            }
-            else if (_phase == Phase.SelectSatellite)
-            {
-                if (_selectedSatellite > 0) _selectedSatellite--;
-                SetSelectedImage(_selectedSatellite);
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            if (_phase == Phase.SelectRocket)
-            {
-                if (_selectedRocket < setting.rockets.Length - 1) _selectedRocket++;
-                SetSelectedImage(_selectedRocket);
-            }
-            else if (_phase == Phase.SelectSatellite)
-            {
-                if (_selectedSatellite < setting.satellites.Length - 1) _selectedSatellite++;
-                SetSelectedImage(_selectedSatellite);
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            EnterConfirm();
+            _vp.loopPointReached -= OnLocationEnded;
+            _vp.loopPointReached -= OnMakeEnded;
+            _vp.Stop();
         }
     }
 
@@ -90,136 +63,177 @@ public class RMManager : SceneManager_Base<RMSetting>
     {
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
-        _audioSource = UIUtility.GetOrAdd<AudioSource>(videoPlayerObject);
-        
-        _videoFadeTime = setting.videoFadeTime;
+        _audio = UIUtility.GetOrAdd<AudioSource>(videoPlayerObject);
 
+        _videoFadeTime = Mathf.Max(0f, setting.videoFadeTime);
+
+        // 고정 이미지/서브 디스플레이 세팅
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
-        SettingImageObject(popupImage, setting.rockets[0]);
-        SettingImageObject(subImage1, setting.sub1);
-        
+        SettingImageObject(subImage,  setting.sub1);
+
         popupImage.SetActive(false);
 
-        await SettingVideoObject(videoPlayerObject, setting.locationVideo, _vp, _raw, _audioSource);
+        // 장소 영상 세팅 
+        await SettingVideoObject(videoPlayerObject, setting.locationVideo, _vp, _raw, _audio);
+        _vp.Pause();
+        _vp.time = 0;
         videoPlayerObject.SetActive(false);
 
-        StartCoroutine(FadeImage(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 }));
-    }
-    
-    /// <summary> 가장 좌측 이미지를 index에 따라 텍스쳐를 변경함 </summary>
-    private void SetSelectedImage(int index)
-    {
-        if (index < 0) return;
-        if (_phase == Phase.SelectRocket && index >= setting.rockets.Length) return;
-        if (_phase == Phase.SelectSatellite && index >= setting.satellites.Length) return;
+        // 첫 진입 페이드 인
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 }); // 
 
-        if (!popupImage.activeInHierarchy) popupImage.SetActive(true);
-        
+        // 입력 루프(좌/우/확인)
+        while (_phase != Phase.Done)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftArrow))      MoveSelection(-1);
+            else if (Input.GetKeyDown(KeyCode.RightArrow)) MoveSelection(+1);
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                if (await ConfirmAsync()) break; // Location 진입 시 true로 탈출
+            }
+
+            await Task.Yield();
+        }
+    }
+
+    private void MoveSelection(int delta)
+    {
+        if (!canInput) return;
+
         if (_phase == Phase.SelectRocket)
         {
-            SettingImageObject(popupImage, setting.rockets[index]);
+            int max = Mathf.Max(0, setting.rockets.Length - 1);
+            
+            int baseIndex = (_selectedRocket < 0) ? 0 : _selectedRocket;
+            _selectedRocket = Mathf.Clamp(baseIndex + ((_selectedRocket < 0) ? 0 : delta), 0, max);
+
+            SetSelectedImage(_selectedRocket, isRocket: true);
         }
         else if (_phase == Phase.SelectSatellite)
-        {   
+        {
+            int max = Mathf.Max(0, setting.satellites.Length - 1);
+            _selectedSatellite = Mathf.Clamp((_selectedSatellite < 0 ? 0 : _selectedSatellite) + delta, 0, max);
+            SetSelectedImage(_selectedSatellite, isRocket: false);
+        }
+    }
+
+    private void SetSelectedImage(int index, bool isRocket)
+    {
+        if (!popupImage) return;
+        if (!popupImage.activeInHierarchy) popupImage.SetActive(true);
+
+        if (isRocket)
+        {
+            if (index < 0 || index >= setting.rockets.Length) return;
+            SettingImageObject(popupImage, setting.rockets[index]);
+        }
+        else
+        {
+            if (index < 0 || index >= setting.satellites.Length) return;
             SettingImageObject(popupImage, setting.satellites[index]);
         }
     }
-    
-    /// <summary> 엔터(가운데 버튼)를 눌렀을 때 메서드 </summary>
-    private void EnterConfirm()
+
+    private async Task<bool> ConfirmAsync()
     {
+        if (!canInput) return false;
+
         if (_phase == Phase.SelectRocket)
         {
+            // 수정: 선택이 아직 없으면(= -1) 0번을 강제로 보여주고 계속 Rocket 단계 유지
+            if (_selectedRocket < 0)
+            {
+                _selectedRocket = 0;
+                SetSelectedImage(_selectedRocket, isRocket: true);
+                return false; // 위성 단계로 넘어가지 않음
+            }
+
+            // 이미 선택된 상태면 위성 단계로 전환
             _phase = Phase.SelectSatellite;
-            _selectedSatellite = 0;
-            SettingImageObject(popupImage, setting.satellites[_selectedSatellite]);
+
+            // 위성도 초기 표시는 0번으로 (선택이 없을 때)
+            _selectedSatellite = Mathf.Clamp(_selectedSatellite, 0, Mathf.Max(0, setting.satellites.Length - 1));
+            SetSelectedImage(_selectedSatellite, isRocket: false);
+            return false;
         }
-        else if (_phase == Phase.SelectSatellite)
+
+        if (_phase == Phase.SelectSatellite)
         {
             _phase = Phase.Location;
-            StartCoroutine(ActivateLocationVideo());
+            await PlayLocationThenMakeAsync(); // 장소 -> 제작 영상 시퀀스
+            return true;
         }
+
+        return false;
     }
-    
-    /// <summary> 발사 장소 표시 비디오 재생 </summary>
-    private IEnumerator ActivateLocationVideo()
+
+    /// <summary> 장소 영상 페이드 인 재생 → 종료 시 제작 영상으로 전환 </summary>
+    private async Task PlayLocationThenMakeAsync()
     {
         canInput = false;
 
+        // RawImage 투명으로, 오브젝트 활성화
         if (_raw)
         {
-            Color c = _raw.color;
+            var c = _raw.color;
             _raw.color = new Color(c.r, c.g, c.b, 0f);
         }
-
         videoPlayerObject.SetActive(true);
+
+        // 장소 영상 재생 설정 및 재생 시작 (원본 ActivateLocationVideo 기준) 
         _vp.isLooping = false;
         _vp.loopPointReached -= OnLocationEnded;
         _vp.loopPointReached += OnLocationEnded;
         _vp.Play();
 
-        yield return StartCoroutine(FadeRawImage(_raw, 0f, 1f, _videoFadeTime));
+        // RawImage 알파 페이드 인
+        float t = 0f;
+        while (t < _videoFadeTime)
+        {
+            t += Time.deltaTime;
+            float a = Mathf.Clamp01(t / _videoFadeTime);
+            var c = _raw.color; _raw.color = new Color(c.r, c.g, c.b, a);
+            await Task.Yield();
+        }
     }
 
-    /// <summary> 발사 장소 표시 비디오가 끝나면 발사체 다단 제작 이유 비디오 재생 </summary>
+    /// <summary> 장소 영상 종료 → 화면 페이드 → 제작 영상 세팅·재생 → 화면 복원 </summary>
     private async void OnLocationEnded(VideoPlayer vp)
     {
+        _vp.loopPointReached -= OnLocationEnded;
+
         try
         {
-            await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
-            _vp.loopPointReached -= OnLocationEnded;
-            
-            await SettingVideoObject(videoPlayerObject, setting.rocketMakeVideo, _vp, _raw, _audioSource);
+            // 화면 덮기
+            await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 }); // 
+
+            // 제작 영상으로 세팅/재생
+            await SettingVideoObject(videoPlayerObject, setting.rocketMakeVideo, _vp, _raw, _audio);
             _vp.isLooping = false;
-            _vp.loopPointReached -= OnRocketMakeEnded;
-            _vp.loopPointReached += OnRocketMakeEnded;
+            _vp.loopPointReached -= OnMakeEnded;
+            _vp.loopPointReached += OnMakeEnded;
             _vp.Play();
-            
+
+            // 화면 복원
             await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+            _phase = Phase.PlayingMake;
         }
         catch (Exception e)
         {
             Debug.LogError($"[RMManager] Failed to set rocketMakeVideo: {e}");
-
             canInput = true;
         }
     }
 
-    /// <summary> 발사체 다단 제작 이유 비디오 종료 후 다음 씬 전환 </summary>
-    private void OnRocketMakeEnded(VideoPlayer vp)
+    /// <summary> 제작 영상 종료 → 다음 씬 </summary>
+    private void OnMakeEnded(VideoPlayer vp)
     {
-        _vp.loopPointReached -= OnRocketMakeEnded;
-        StartCoroutine(FadeAndLoadScene(5, new[] { fadeImage1, fadeImage2, fadeImage3 }));
-    }
+        _vp.loopPointReached -= OnMakeEnded;
 
-    /// <summary> Raw Image 페이드 </summary>
-    private IEnumerator FadeRawImage(RawImage raw, float start, float end, float duration)
-    {
-        if (!raw || duration <= 0f)
-        {
-            if (raw)
-            {
-                Color color = raw.color;
-                raw.color = new Color(color.r, color.g, color.b, end);
-            }
-
-            yield break;
-        }
-
-        float elapsed = 0f;
-        while (elapsed < duration)
-        {
-            elapsed += Time.deltaTime;
-            float time = Mathf.Clamp01(elapsed / duration);
-            float alpha = Mathf.Lerp(start, end, time);
-            Color color = raw.color;
-            raw.color = new Color(color.r, color.g, color.b, alpha);
-            yield return null;
-        }
-
-        Color c = raw.color;
-        raw.color = new Color(c.r, c.g, c.b, end);
+        int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 5; // 원본: 씬 5로 이동 
+        _ = LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 }); // 공통 씬 전환
+        _phase = Phase.Done;
     }
 }
