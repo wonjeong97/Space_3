@@ -9,6 +9,7 @@ public class TitleSetting
     public TextSetting infoText;
 }
 
+/// <summary> 타이틀 씬 관리 클래스 </summary>
 public class TitleManager : SceneManager_Base<TitleSetting>
 {
     [Header("UI")]
@@ -24,19 +25,25 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         {
             Debug.LogError("[TitleManager] Text UI is not assigned");
         }
+        inputReceived = false;
 
-        // 타이틀 / 안내 문구 세팅
+        // 텍스트 세팅
         await SettingTextObject(titleText, setting.titleText);
         await SettingTextObject(infoText, setting.infoText);
 
+        // 연출
         StartCoroutine(TurnCamera3());
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
 
-        // 입력 대기
-        while (!TryConsumeSingleInput())
+        while (true)
+        {       
+            if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+            if (TryConsumeSingleInput()) break;
+            
             await Task.Yield();
+        }
 
-        // 입력 후 씬 전환
+        // 씬 전환
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 1;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
     }

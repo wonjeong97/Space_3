@@ -1,5 +1,5 @@
 using System;
-using System.Collections;
+using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,9 +16,10 @@ public class FuelSetting
     public ImageSetting fuelPopup;
     public ImageSetting sub1;
 
-    public ImageSetting[] fuelImage;
+    public ImageSetting[] fuelImage; // 3개 예상
 }
 
+/// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
 public class FuelManager : SceneManager_Base<FuelSetting>
 {
     [Header("UI")] 
@@ -32,9 +33,8 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject fuelImage3;
 
     protected override string JsonPath => "JSON/FuelSetting.json";
-    private Coroutine _popupFadeCoroutine;
-    private float _popupFadeTime, _fuelFillSpeed;
 
+    private float _popupFadeTime, _fuelFillSpeed;
     private Image _fuel1Image, _fuel2Image, _fuel3Image;
 
     private enum Phase
@@ -42,90 +42,162 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         RocketMove,
         FuelInjection1,
         FuelInjection2,
-        FuelInjection3
+        FuelInjection3,
+        Done
     }
 
     private Phase _phase = Phase.RocketMove;
 
+    private CancellationTokenSource _popupFadeCts;
+
     protected override void OnDisable()
     {
-        _popupFadeCoroutine = null;
-    }
-
-    private void Update()
-    {
-        if (!canInput) return;
-
-        if (_phase == Phase.FuelInjection1)
+        try
         {
-            if (Input.GetKeyDown(KeyCode.LeftArrow) && _popupFadeCoroutine == null)
-            {
-                _popupFadeCoroutine = StartCoroutine(PopupFade(_popupFadeTime));
-            }
+            _popupFadeCts?.Cancel();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError($"[FuelManager] OnDisable error: {e}");
+        }
 
-            // 누르고 있는 동안 지속 증가
-            if (Input.GetKey(KeyCode.LeftArrow))
-            {
-                bool completed = IncreaseFill(_fuel1Image, _fuelFillSpeed * Time.deltaTime);
-                if (completed)
-                {
-                    _phase = Phase.FuelInjection2;
-                }
-            }
-        }
-        else if (_phase == Phase.FuelInjection2)
-        {
-            if (Input.GetKey(KeyCode.DownArrow))
-            {
-                bool completed = IncreaseFill(_fuel2Image, _fuelFillSpeed * Time.deltaTime);
-                if (completed)
-                {
-                    _phase = Phase.FuelInjection3;
-                }
-            }
-        }
-        else if (_phase == Phase.FuelInjection3)
-        {
-            if (Input.GetKey(KeyCode.RightArrow))
-            {
-                bool completed = IncreaseFill(_fuel3Image, _fuelFillSpeed * Time.deltaTime);
-                if (completed)
-                {
-                    Debug.Log("fuel fill completed");
-                }
-            }
-        }
+        _popupFadeCts?.Dispose();
+        _popupFadeCts = null;
     }
 
     protected override async Task Init()
     {
-        _popupFadeTime = setting.popupFadeTime;
-        _fuelFillSpeed = setting.fuelFillSpeed;
+        _popupFadeTime = Mathf.Max(0f, setting.popupFadeTime);
+        _fuelFillSpeed = Mathf.Max(0f, setting.fuelFillSpeed);
 
+        // 고정 이미지 세팅
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(popupImage, setting.fuelPopup);
         SettingImageObject(subImage, setting.sub1);
 
+        // 게이지 이미지 세팅
         SettingImageObject(fuelImage1, setting.fuelImage[0]);
         SettingImageObject(fuelImage2, setting.fuelImage[1]);
         SettingImageObject(fuelImage3, setting.fuelImage[2]);
 
-        InitFuelImage();
-        //popupImage.SetActive(false);
-
-        _phase = Phase.FuelInjection1;
+        InitFuelImage(); // fillAmount 0으로 초기화
+        
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
+        
+        _phase = Phase.FuelInjection1;
+        await RunFlowAsync(); // 시작
     }
 
+    /// <summary> 단계별 입력/증가 루프를 비동기로 진행 </summary>
+    private async Task RunFlowAsync()
+    {
+        if (!ArduinoInputManager.instance)
+        {
+            Debug.LogError("[FuelManager] RunFlowAsync: ArduinoInputManager is null");
+            return;
+        }
+            
+        // 1단계: ← 키
+        while (canInput && _phase == Phase.FuelInjection1)
+        {
+            // 첫 KeyDown 시 팝업 페이드 아웃
+            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                 btn == ArduinoInputManager.ButtonId.Button1) ||
+                Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                if (_popupFadeCts == null)
+                {
+                    _popupFadeCts = new CancellationTokenSource();
+                    _ = PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token);
+                }
+            }
+
+            if (btn == ArduinoInputManager.ButtonId.Button1 || Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                if (IncreaseFill(_fuel1Image, _fuelFillSpeed * Time.deltaTime))
+                {
+                    _phase = Phase.FuelInjection2;
+                    break;
+                }
+            }
+            
+            ArduinoInputManager.instance.FlushAll();
+            await Task.Yield();
+        }
+
+        // 2단계: ↓ 키
+        while (canInput && _phase == Phase.FuelInjection2)
+        {   
+            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                 btn == ArduinoInputManager.ButtonId.Button2) ||
+                Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                if (IncreaseFill(_fuel2Image, _fuelFillSpeed * Time.deltaTime))
+                {
+                    _phase = Phase.FuelInjection3;
+                    break;
+                }
+            }
+
+            await Task.Yield();
+        }
+
+        // 3단계: → 키
+        while (canInput && _phase == Phase.FuelInjection3)
+        {
+            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                 btn == ArduinoInputManager.ButtonId.Button3) ||
+                Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                if (IncreaseFill(_fuel3Image, _fuelFillSpeed * Time.deltaTime))
+                {
+                    _phase = Phase.Done;
+                    break;
+                }
+            }
+
+            await Task.Yield();
+        }
+
+        // 완료 처리
+        if (_phase == Phase.Done)
+        {   
+            // 작업 중인 팝업 페이드 태스크 취소
+            try
+            {
+                _popupFadeCts?.Cancel();
+            }
+            catch(Exception e)
+            {
+                Debug.LogError($"[FuelManager] PopupFade Cancel error: {e}");
+            }
+            
+            // 토큰 메모리/리소스 정리
+            _popupFadeCts?.Dispose();
+            _popupFadeCts = null;
+
+            // 다음 씬 지정 시 전환
+            if (nextSceneBuildIndex >= 0)
+            {
+                await LoadSceneAsync(nextSceneBuildIndex, new[] { fadeImage1, fadeImage2, fadeImage3 });
+            }
+            else
+            {
+                Debug.Log("[FuelManager] Fuel fill completed (no next scene set).");
+            }
+        }
+    }
+
+    /// <summary> 연료 게이지 이미지 초기화 </summary>
     private void InitFuelImage()
     {
         if (fuelImage1.TryGetComponent(out _fuel1Image))
         {
             _fuel1Image.type = Image.Type.Filled;
             _fuel1Image.fillMethod = Image.FillMethod.Horizontal;
-            _fuel1Image.fillOrigin = 0; // Left: 0, Right: 1
+            _fuel1Image.fillOrigin = 0; // Left
             _fuel1Image.fillAmount = 0f;
         }
 
@@ -146,30 +218,34 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         }
     }
 
-    private IEnumerator PopupFade(float duration)
+    /// <summary> 팝업 이미지를 지정 시간 동안 서서히 알파 1->0으로 </summary>
+    private async Task PopupFadeAsync(float duration, CancellationToken token)
     {
-        if (!popupImage) yield break;
+        if (!popupImage) return;
+
+        Image img = popupImage.GetComponent<Image>();
+        if (!img) return;
+        
+        SetAlpha(img, 1f);
+
         float elapsed = 0f;
-        float alpha = 0f;
-        Image image = popupImage.GetComponent<Image>();
-
-        while (elapsed < duration)
+        while (elapsed < duration && !token.IsCancellationRequested)
         {
-            alpha = Mathf.Lerp(1f, 0f, elapsed / duration);
-            SetAlpha(image, alpha);
-
+            float t = Mathf.Clamp01(elapsed / duration);
+            SetAlpha(img, Mathf.Lerp(1f, 0f, t));
             elapsed += Time.deltaTime;
-            yield return null;
+            await Task.Yield();
         }
 
-        SetAlpha(image, alpha);
+        SetAlpha(img, 0f);
     }
 
+    /// <summary> 게이지 증가 (delta만큼), 처음 1.0 도달 시 true 반환 </summary>
     private bool IncreaseFill(Image img, float delta)
     {
         if (!img) return false;
         float before = img.fillAmount;
-        img.fillAmount = Mathf.Clamp01(img.fillAmount + delta);
+        img.fillAmount = Mathf.Clamp01(before + delta);
         return (before < 1f && img.fillAmount >= 1f);
     }
 }

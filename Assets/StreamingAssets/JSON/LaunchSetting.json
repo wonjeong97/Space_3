@@ -1,0 +1,23 @@
+{
+  "rocketCountdown": 10,
+  "main1": {
+	"position": { "x": "400", "y": 540 },
+	"size": { "x": 500, "y": 800 },
+	"sourceImage": "Image/RocketLaunch/1.png"
+  },
+  "main2": {
+	"position": { "x": "960", "y": 540 },
+	"size": { "x": 500, "y": 800 },
+	"sourceImage": "Image/RocketLaunch/2.png"
+  },
+  "main3": {
+	"position": { "x": "1520", "y": 540 },
+	"size": { "x": 500, "y": 800 },
+	"sourceImage": "Image/RocketLaunch/3.png"
+  },
+  "sub1": {
+	"position": { "x": "720", "y": 240 },
+	"size": { "x": 1440, "y": 480 },
+	"sourceImage": "Image/RocketLaunch/sub1.png"
+  }
+}

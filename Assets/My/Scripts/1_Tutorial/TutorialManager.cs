@@ -11,6 +11,7 @@ public class TutorialSetting
     public ImageSetting[] tutorialImages;
 }
 
+/// <summary> 튜토리얼 씬 관리 매니저 </summary>
 public class TutorialManager : SceneManager_Base<TutorialSetting>
 {
     [Header("UI")]
@@ -26,8 +27,11 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
     {
         if (!infoTextObj)
             Debug.LogError("[TutorialManager] infoTextObj is not assigned");
-
+        
+        _step = 0;
+        
         // 설정 개수와 오브젝트 개수 동기화
+        // 오브젝트 or 세팅 중 더 작은 개수를 사용하여 null 에러 방지
         int count = Mathf.Min(tutorialImageObjs.Count, setting.tutorialImages.Length);
         for (int i = 0; i < count; i++)
             SettingImageObject(tutorialImageObjs[i], setting.tutorialImages[i]);
@@ -35,21 +39,25 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
         // 1번만 보이게 초기화, 나머지는 알파값 0, 비활성화
         for (int i = 0; i < tutorialImageObjs.Count; i++)
             SetActiveWithAlpha(tutorialImageObjs[i], i == 0, i == 0 ? 1f : 0f);
-
-        _step = 0;
-
-        // 안내 텍스트 세팅
-        await SettingTextObject(infoTextObj, setting.infoText);
-
-        // 첫 진입 페이드 인
+        
+        await SettingTextObject(infoTextObj, setting.infoText); // 안내 텍스트 세팅
+        
+        StartCoroutine(TurnCamera3());
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
 
         // 입력마다 다음 단계 진행
         while (true)
         {
             // 입력 대기
-            while (!TryConsumeSingleInput()) await Task.Yield();
-            inputReceived = false; // 즉시 초기화
+            while (true)
+            {
+                if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+                if (TryConsumeSingleInput()) break;
+                
+                await Task.Yield();
+            }
+            if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+            inputReceived = false; // 연속 입력 설정
 
             if (_step < count - 1)
             {
@@ -65,7 +73,7 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
         }
     }
 
-    /// <summary> 게임 오브젝트 이미지의 활성화와 알파값을 설정함 </summary>
+    /// <summary> 게임 오브젝트의 활성화 여부 및 이미지의 알파 설정 </summary>
     private void SetActiveWithAlpha(GameObject go, bool active, float alpha)
     {
         if (!go) return;

@@ -12,7 +12,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 {
     #region Serialized Refs
 
-    [Header("Camera")] 
+    [Header("Camera")]
     [SerializeField] protected Camera mainCamera; // Display1
     [SerializeField] protected Camera camera2; // Display2
     [SerializeField] protected Camera camera3; // Display3
@@ -28,15 +28,17 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     [SerializeField] protected Image fadeImage3; // Display3 Fade
 
     [Header("Scene Flow")] 
-    [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")]
+    [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")] 
     [SerializeField] protected int nextSceneBuildIndex = -1;
 
-    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")]
-    [SerializeField] private bool useInactivityTimeout = true;
+    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] [SerializeField]
+    private bool useInactivityTimeout = true;
 
     #endregion
 
     #region Settings / State
+
+    private static bool s_IsLoading;
 
     [NonSerialized] protected T setting;
     private Settings _globalSettings; // JsonLoader.Instance.settings 캐시
@@ -126,8 +128,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         {
             _cts?.Cancel();
         }
-        catch
+        catch (Exception e)
         {
+            Debug.LogError($"[SceneManager_Base] OnDisable exception Error: {e}");
         }
 
         _cts?.Dispose();
@@ -140,6 +143,18 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     /// <summary> 자식에서 구현할 실제 초기화. 안전 래핑은 InitSafe가 담당. </summary>
     protected abstract Task Init();
+
+    // 씬 로드 직후 초기화용
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        // 로드 완료 후 공통 상태 초기화
+        s_IsLoading = false;
+        _inactivityTimer = 0f; // 타임아웃 카운터 리셋
+        inputReceived = false; // 입력 래치 리셋
+        canInput = false; // 자식 Init에서 true로 열리게
+
+        SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
 
     /// <summary> 입력 1회 트리거를 받고 싶을 때 호출할 헬퍼 </summary>
     protected bool TryConsumeSingleInput()
@@ -159,7 +174,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     {
         canInput = false;
         inputReceived = false;
-
+        
+        // 씬 전환 시 이전 씬에서 받았던 버튼 입력 큐 초기화
+        if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
         await Init(); // 자식 초기화
         canInput = true;
     }
@@ -238,9 +255,31 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 페이드 후 씬 로드 (async) </summary>
     protected async Task LoadSceneAsync(int buildIndex, Image[] fades)
     {
+        if (s_IsLoading) return; // 중복 전환 방지
+        s_IsLoading = true;
+        canInput = false; // 씬 전환 중 입력 차단
+
+        StopAllCoroutines();
+        
+        // 파생 클래스에서 생성한 취소토큰이 있다면 정리
+        try
+        {
+            OnBeforeSceneUnload();
+        }
+        catch(Exception e)
+        {
+            Debug.LogError($"[SceneManager_Base] OnBeforeSceneUnload exception Error: {e}]");
+        }
+        
         await FadeImageAsync(0f, 1f, fadeTime, fades);
-        SceneManager.LoadSceneAsync(buildIndex);
+        SceneManager.sceneLoaded += OnSceneLoaded;
+        AsyncOperation op = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
         await Task.Yield();
+    }
+
+    /// <summary> 씬 전환 직전 클래스의 비동기/이벤트 정리 </summary>
+    protected virtual void OnBeforeSceneUnload()
+    {
     }
 
     #endregion

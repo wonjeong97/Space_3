@@ -12,6 +12,7 @@ public class RSSetting
     public ImageSetting[] explainImages;
 }
 
+/// <summary> 우주발사체의 구조와 기능 씬 관리 매니저 </summary>
 public class RSManager : SceneManager_Base<RSSetting>
 {
     [Header("UI")]
@@ -26,12 +27,14 @@ public class RSManager : SceneManager_Base<RSSetting>
     {   
         _crossTime = Mathf.Max(0f, setting.transitionTime);
         
-        // 세팅 개수와 오브젝트 개수 동기화
+        // 설정 개수와 오브젝트 개수 동기화
+        // 오브젝트 or 세팅 중 더 작은 개수를 사용하여 null 에러 방지
         int count = Mathf.Min(explainImageObjs.Count, setting.explainImages.Length);
         for (int i = 0; i < count; i++)
         {
-            SettingImageObject(explainImageObjs[i], setting.explainImages[i]); // 부모 공통 메서드
-            if (explainImageObjs[i]) explainImageObjs[i].SetActive(false);
+            // 이미지 세팅 후 숨김
+            SettingImageObject(explainImageObjs[i], setting.explainImages[i]);
+            if (explainImageObjs[i]) explainImageObjs[i].SetActive(false); 
         }
         
         // 첫 번째 이미지만 활성화
@@ -49,22 +52,26 @@ public class RSManager : SceneManager_Base<RSSetting>
         
         StartCoroutine(TurnCamera3());
         while (true)
-        {
-            // 단발 입력 대기(부모 헬퍼)
-            while (!TryConsumeSingleInput())
+        {   
+            // 입력 대기
+            while (true)
+            {
+                if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+                if (TryConsumeSingleInput()) break;
+                
                 await Task.Yield();
-
-            // 이 씬 내에서 연속 입력 허용 위해 플래그 해제
-            inputReceived = false;
+            }
+            if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+            inputReceived = false; // 연속 입력 설정
 
             if (_index >= count - 1) break; // 마지막이면 루프 종료 → 씬 전환
 
-            // 현재 -> 다음으로 크로스페이드 (async 버전)
+            // 현재 이미지 -> 다음 이미지로 크로스페이드
             await CrossFadeAsync(explainImageObjs[_index], explainImageObjs[_index + 1], _crossTime);
             _index++;
         }
 
-        // 다음 씬 전환 (인스펙터에서 미지정 시 원래 흐름대로 4번 씬)
+        // 다음 씬 전환
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 4;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
     }

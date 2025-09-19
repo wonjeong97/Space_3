@@ -23,5 +23,11 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/5_RocketFuel.unity
     guid: b15631d7717547848ad1117252316195
+  - enabled: 1
+    path: Assets/Scenes/6_RocketLaunch.unity
+    guid: 68e0ba706c7f64849b0dafa0730b09ca
+  - enabled: 1
+    path: Assets/Scenes/7_RocketRecycle.unity
+    guid: 92b69c99a4dca1442860809fd80f081b
   m_configObjects:
     com.unity.addressableassets: {fileID: 11400000, guid: 03f8c8bbc67fc7a42bc8b00eacb97860, type: 2}

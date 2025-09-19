@@ -1,6 +1,6 @@
 {
   "popupFadeTime": 1,
-  "fuelFillSpeed": 0.5,
+  "fuelFillSpeed": 5,
   "main1": {
 	"position": { "x": "400", "y": 540 },
 	"size": { "x": 500, "y": 800 },

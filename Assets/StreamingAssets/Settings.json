@@ -1,5 +1,7 @@
 {
-  "inactivityTime": 300.0,
+  "portName": "COM4",
+  "baudRate": 9600,  
+  "inactivityTime": 15000.0,
   "fadeTime": 1,
   "closeSetting": {
 	"position": { "x": 1, "y": 0 },
