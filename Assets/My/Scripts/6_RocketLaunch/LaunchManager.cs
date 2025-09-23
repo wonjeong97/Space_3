@@ -59,7 +59,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         // 입력 대기
         while (true)
         {
-            if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+            if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
             if (TryConsumeSingleInput()) break;
             
             await Task.Yield();

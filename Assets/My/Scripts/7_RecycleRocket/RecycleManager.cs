@@ -47,12 +47,12 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
         // 입력 대기
         while (true)
         {
-            if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+            if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
             if (TryConsumeSingleInput()) break;
                 
             await Task.Yield();
         }
-        if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
         
         // 팝업과 미션 종료 이미지 크로스페이드
         await CrossFadeAsync(popupImage1, popupImage2, _popupFadeTime);

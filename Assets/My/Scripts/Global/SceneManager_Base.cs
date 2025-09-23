@@ -38,7 +38,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #region Settings / State
 
-    private static bool s_IsLoading;
+    [SerializeField] private bool sIsLoading;
 
     [NonSerialized] protected T setting;
     private Settings _globalSettings; // JsonLoader.Instance.settings 캐시
@@ -50,6 +50,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     private float _inactivityTimer; // 무입력 시간 누적
     private float _inactivityThreshold; // Scene0로 복귀 임계값
     private float _camera3TurnSpeed; // 회전 속도
+
+    protected int buttonDelayTime;
 
     protected abstract string JsonPath { get; }
 
@@ -83,6 +85,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             _camera3TurnSpeed = _globalSettings.camera3TurnSpeed;
             fadeTime = _globalSettings.fadeTime;
             _inactivityThreshold = _globalSettings.inactivityTime;
+            buttonDelayTime = _globalSettings.buttonDelayTime;
 
             // 윈도우 디스플레이 순서가 바뀌어도 JSON으로 지정 가능
             mainCamera.targetDisplay = _globalSettings.canvas1TargetMonitorIndex;
@@ -148,7 +151,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         // 로드 완료 후 공통 상태 초기화
-        s_IsLoading = false;
+        sIsLoading = false;
         _inactivityTimer = 0f; // 타임아웃 카운터 리셋
         inputReceived = false; // 입력 래치 리셋
         canInput = false; // 자식 Init에서 true로 열리게
@@ -176,7 +179,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         inputReceived = false;
         
         // 씬 전환 시 이전 씬에서 받았던 버튼 입력 큐 초기화
-        if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
         await Init(); // 자식 초기화
         canInput = true;
     }
@@ -255,8 +258,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 페이드 후 씬 로드 (async) </summary>
     protected async Task LoadSceneAsync(int buildIndex, Image[] fades)
     {
-        if (s_IsLoading) return; // 중복 전환 방지
-        s_IsLoading = true;
+        if (sIsLoading) return; // 중복 전환 방지
+        sIsLoading = true;
         canInput = false; // 씬 전환 중 입력 차단
 
         StopAllCoroutines();

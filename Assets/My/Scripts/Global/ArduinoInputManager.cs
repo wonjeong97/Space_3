@@ -8,12 +8,13 @@ using Debug = UnityEngine.Debug;
 
 public class ArduinoInputManager : MonoBehaviour
 {
-    public static ArduinoInputManager instance;
+    public static ArduinoInputManager Instance;
     
     public enum ButtonId { Button1 = 1, Button2 = 2, Button3 = 3 }
     
     private string _portName; 
     private int _baudRate;   
+    private int _buttonDelayTime;
 
     private SerialPort _serialPort;
     private Thread _readThread;
@@ -30,8 +31,8 @@ public class ArduinoInputManager : MonoBehaviour
     private void Awake()
     {   
         if (_clock == null) _clock = Stopwatch.StartNew();
-        if (instance == null) instance = this;
-        else if  (instance != this) Destroy(gameObject);
+        if (Instance == null) Instance = this;
+        else if  (Instance != this) Destroy(gameObject);
         DontDestroyOnLoad(gameObject);
     }
 
@@ -51,7 +52,7 @@ public class ArduinoInputManager : MonoBehaviour
             _readThread = new Thread(ReadSerial); 
             _readThread.Start();
 
-            Debug.Log($"[ArduinoInputManager] 포트: {_portName} @ {_baudRate}");
+            Debug.Log($"[ArduinoInputManager] 포트 : {_portName} @ {_baudRate}");
         }
         catch (Exception e)
         {
@@ -123,6 +124,16 @@ public class ArduinoInputManager : MonoBehaviour
         }
         id = default; return false;
     }
-    
-    public bool HasPendingPress => !_pressQueue.IsEmpty;
+
+    public void SendButtonDelay(int ms)
+    {
+        if (_serialPort != null && _serialPort.IsOpen)
+        {
+            _serialPort.WriteLine(ms.ToString());
+        }
+        else
+        {
+            Debug.LogError($"[ArduinoInputManager] SendButtonDelay _serialPort is null or closed.");
+        }
+    }
 }

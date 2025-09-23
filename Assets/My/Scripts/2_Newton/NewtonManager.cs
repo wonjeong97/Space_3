@@ -210,7 +210,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         long skipEnableMs = ArduinoInputManager.NowMs;
 
         // 직전까지 들어온 잔여 이벤트 플러시
-        if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
         
         // 잔상 방지용으로 한 프레임 양보
         await Task.Yield();
@@ -221,7 +221,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             if (token.IsCancellationRequested) return;
 
             // 아두이노: 허용 시각 이후 이벤트만 소비
-            if (ArduinoInputManager.instance != null && ArduinoInputManager.instance.TryConsumePressNewerThan(skipEnableMs, out _)) break;
+            if (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumePressNewerThan(skipEnableMs, out _)) break;
 
             // 키/마우스/터치
             if (TryConsumeSingleInput()) break;

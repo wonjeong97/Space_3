@@ -94,9 +94,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         // 입력 루프(좌/우/확인)
         while (_phase != Phase.Done)
         {
-            if (!ArduinoInputManager.instance) return;
+            if (!ArduinoInputManager.Instance) return;
 
-            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
                  btn == ArduinoInputManager.ButtonId.Button1) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 MoveSelection(-1);
@@ -109,7 +109,7 @@ public class RMManager : SceneManager_Base<RMSetting>
             {
                 if (await ConfirmAsync()) break; // Location 진입 시 true로 탈출
             }
-            ArduinoInputManager.instance.FlushAll();
+            ArduinoInputManager.Instance.FlushAll();
             
             await Task.Yield();
         }

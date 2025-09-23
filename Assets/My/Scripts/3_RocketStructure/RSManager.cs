@@ -56,12 +56,12 @@ public class RSManager : SceneManager_Base<RSSetting>
             // 입력 대기
             while (true)
             {
-                if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+                if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
                 if (TryConsumeSingleInput()) break;
                 
                 await Task.Yield();
             }
-            if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+            if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
             inputReceived = false; // 연속 입력 설정
 
             if (_index >= count - 1) break; // 마지막이면 루프 종료 → 씬 전환

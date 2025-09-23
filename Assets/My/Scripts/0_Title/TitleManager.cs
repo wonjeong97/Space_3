@@ -37,7 +37,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
 
         while (true)
         {       
-            if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+            if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
             if (TryConsumeSingleInput()) break;
             
             await Task.Yield();

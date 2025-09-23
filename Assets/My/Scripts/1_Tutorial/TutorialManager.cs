@@ -51,12 +51,12 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
             // 입력 대기
             while (true)
             {
-                if (ArduinoInputManager.instance && ArduinoInputManager.instance.TryConsumeAnyPress(out _)) break;
+                if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
                 if (TryConsumeSingleInput()) break;
                 
                 await Task.Yield();
             }
-            if (ArduinoInputManager.instance) ArduinoInputManager.instance.FlushAll();
+            if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
             inputReceived = false; // 연속 입력 설정
 
             if (_step < count - 1)

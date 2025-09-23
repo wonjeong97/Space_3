@@ -216,6 +216,7 @@ public class Settings
 {
     public string portName;
     public int baudRate;
+    public int buttonDelayTime;
     
     public float inactivityTime; // 입력이 없을 시 타이틀로 되돌아가는 시간
     public float fadeTime;

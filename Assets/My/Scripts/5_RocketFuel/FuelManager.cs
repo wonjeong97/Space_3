@@ -50,6 +50,14 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
     private CancellationTokenSource _popupFadeCts;
 
+    private void OnEnable()
+    {
+        if (ArduinoInputManager.Instance)
+        {
+            ArduinoInputManager.Instance.SendButtonDelay(buttonDelayTime);
+        }
+    }
+
     protected override void OnDisable()
     {
         try
@@ -63,6 +71,11 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
         _popupFadeCts?.Dispose();
         _popupFadeCts = null;
+        
+        if (ArduinoInputManager.Instance)
+        {
+            ArduinoInputManager.Instance.SendButtonDelay(200);
+        }
     }
 
     protected override async Task Init()
@@ -87,13 +100,13 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
         
         _phase = Phase.FuelInjection1;
-        await RunFlowAsync(); // 시작
+        await FuelFillAsync(); // 시작
     }
 
     /// <summary> 단계별 입력/증가 루프를 비동기로 진행 </summary>
-    private async Task RunFlowAsync()
+    private async Task FuelFillAsync()
     {
-        if (!ArduinoInputManager.instance)
+        if (!ArduinoInputManager.Instance)
         {
             Debug.LogError("[FuelManager] RunFlowAsync: ArduinoInputManager is null");
             return;
@@ -103,7 +116,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         while (canInput && _phase == Phase.FuelInjection1)
         {
             // 첫 KeyDown 시 팝업 페이드 아웃
-            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
                  btn == ArduinoInputManager.ButtonId.Button1) ||
                 Input.GetKeyDown(KeyCode.LeftArrow))
             {
@@ -123,14 +136,14 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
             
-            ArduinoInputManager.instance.FlushAll();
-            await Task.Yield();
+            ArduinoInputManager.Instance.FlushAll();
+            //await Task.Yield();
         }
 
         // 2단계: ↓ 키
         while (canInput && _phase == Phase.FuelInjection2)
         {   
-            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
                  btn == ArduinoInputManager.ButtonId.Button2) ||
                 Input.GetKeyDown(KeyCode.DownArrow))
             {
@@ -141,13 +154,13 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await Task.Yield();
+            //await Task.Yield();
         }
 
         // 3단계: → 키
         while (canInput && _phase == Phase.FuelInjection3)
         {
-            if ((ArduinoInputManager.instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
                  btn == ArduinoInputManager.ButtonId.Button3) ||
                 Input.GetKeyDown(KeyCode.RightArrow))
             {
@@ -158,7 +171,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await Task.Yield();
+            //await Task.Yield();
         }
 
         // 완료 처리
