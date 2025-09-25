@@ -1,85 +1,91 @@
 {
   "videoFadeTime": 1,
+  "background": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"sourceImage": "Image/RocketMake/0_BG.png",
+	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+  },  
   "main1": {
-	"position": { "x": "400", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketMake/1.png"
+	"position": { "x": 375, "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketMake/1_Guide.png"
   },
   "main2": {
-	"position": { "x": "960", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketMake/2.png"
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketMake/2_Guide.png"
   },
   "main3": {
-	"position": { "x": "1520", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketMake/3.png"
+	"position": { "x": 1545, "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketMake/3_Guide.png"
   },
   "sub1": {
-	"position": { "x": "720", "y": 240 },
+	"position": { "x": 720, "y": 240 },
 	"size": { "x": 1440, "y": 480 },
 	"sourceImage": "Image/RocketMake/sub1.png"
   },
   "rockets": [
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/rocket1.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/rocket2.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/rocket3.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/rocket4.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/rocket5.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/rocket6.png"
 	}
   ],
   "satellites": [
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/satellite1.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/satellite2.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/satellite3.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/satellite4.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/satellite5.png"
 	},
 	{
-	  "position": { "x": "960", "y": 540 },
+	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1500, "y": 800 },
 	  "sourceImage": "Image/RocketMake/satellite6.png"
 	}

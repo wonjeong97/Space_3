@@ -8,22 +8,24 @@ using UnityEngine.Video;
 [Serializable]
 public class NewtonSetting
 {
+    public ImageSetting background;
+    public ImageSetting infoImage1;
+    public ImageSetting infoImage2;
+    
     public VideoSetting introVideo;
     public VideoSetting newtonsRule1Video;
     public VideoSetting newtonsRule2Video;
     public VideoSetting newtonsRule3Video;
-
-    public TextSetting titleText;
-    public TextSetting infoText;
 }
 
 /// <summary> 뉴턴의 제 1~3법칙 씬 관리 매니저 </summary>
 public class NewtonManager : SceneManager_Base<NewtonSetting>
 {
-    [Header("UI")] 
+    [Header("UI")]
+    [SerializeField] private GameObject titleImage;
+    [SerializeField] private GameObject infoImage1;
+    [SerializeField] private GameObject infoImage2;
     [SerializeField] private GameObject videoPlayerObject;
-    [SerializeField] private GameObject titleTextObj;
-    [SerializeField] private GameObject infoTextObj;
 
     protected override string JsonPath => "JSON/NewtonSetting.json";
 
@@ -81,10 +83,11 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _raw = videoPlayerObject.GetComponent<RawImage>();
         _audio = videoPlayerObject.GetComponent<AudioSource>(); 
 
-        // 타이틀/안내 텍스트 설정
-        await SettingTextObject(titleTextObj, setting.titleText);
-        await SettingTextObject(infoTextObj, setting.infoText);
-        if (infoTextObj) infoTextObj.SetActive(false);
+        // 타이틀/안내 이미지 설정
+        SettingImageObject(titleImage, setting.background);
+        SettingImageObject(infoImage1, setting.infoImage1);
+        SettingImageObject(infoImage2, setting.infoImage2);
+        if (infoImage2) infoImage2.SetActive(false);
 
         // 뉴턴의 법칙 비디오 저장
         _ruleSeq = new[] { setting.newtonsRule1Video, setting.newtonsRule2Video, setting.newtonsRule3Video };
@@ -146,7 +149,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         CancelAndDispose(ref _skipCts);
 
         // 비디오 재생 관렵 변수 초기화
-        if (infoTextObj) infoTextObj.SetActive(false); // 스킵 메시지 비활성화
+        if (infoImage2) infoImage2.SetActive(false); // 스킵 메시지 비활성화
         _infoShown = false;
         _awaitingSkip = false; // 스킵 비활성화
         inputReceived = false; // 입력을 받지 않음
@@ -186,7 +189,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                 double ratio = _vp.time / _vp.length;
                 if (ratio >= 0.5)
                 {
-                    if (infoTextObj) infoTextObj.SetActive(true);
+                    if (infoImage2) infoImage2.SetActive(true);
                     _infoShown = true;
                     inputReceived = false; // 입력 받았음을 한번 더 초기화
 
@@ -238,7 +241,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
         }
-        if (infoTextObj) infoTextObj.SetActive(false);
+        if (infoImage2)infoImage2.SetActive(false);
         if (_phase != Phase.RuleSeq) return;
 
         // 모니터/스킵 태스크 중단 및 정리
@@ -298,6 +301,6 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _vp.Stop();
         }
         
-        if (infoTextObj) infoTextObj.SetActive(false);
+        if (infoImage2) infoImage2.SetActive(false);
     }
 }

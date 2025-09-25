@@ -2,19 +2,19 @@
   "popupFadeTime": 1,
   "fuelFillSpeed": 5,
   "main1": {
-	"position": { "x": "400", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketFuel/1.png"
+	"position": { "x": "375", "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketFuel/1_Guide.png"
   },
   "main2": {
 	"position": { "x": "960", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketFuel/2.png"
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketFuel/2_Guide.png"
   },
   "main3": {
-	"position": { "x": "1520", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketFuel/3.png"
+	"position": { "x": "1545", "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketFuel/3_Guide.png"
   },
   "fuelPopup": {
 	"position": { "x": "960", "y": 540 },

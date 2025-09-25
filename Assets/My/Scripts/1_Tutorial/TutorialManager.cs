@@ -7,6 +7,12 @@ using UnityEngine.UI;
 [Serializable]
 public class TutorialSetting
 {
+    public ImageSetting background;
+    
+    public ImageSetting infoImage1;
+    public ImageSetting infoImage2;
+    public ImageSetting infoImage3;
+    
     public TextSetting infoText;
     public ImageSetting[] tutorialImages;
 }
@@ -15,7 +21,10 @@ public class TutorialSetting
 public class TutorialManager : SceneManager_Base<TutorialSetting>
 {
     [Header("UI")]
-    [SerializeField] private GameObject infoTextObj; // 안내 텍스트
+    [SerializeField] private GameObject backgroundImage; // 배경 팝업 이미지
+    [SerializeField] private GameObject infoImage1; // "조작 안내"
+    [SerializeField] private GameObject infoImage2; // "모니터에 출력되는 내용을 보고 따라해주세요!"
+    [SerializeField] private GameObject infoImage3; // "컨트롤러의 아무 버튼을 누르면 다음 화면으로 진행됩니다."
     [SerializeField] private List<GameObject> tutorialImageObjs; // 튜토리얼 이미지
 
     protected override string JsonPath => "JSON/TutorialSetting.json";
@@ -25,9 +34,6 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
 
     protected override async Task Init()
     {
-        if (!infoTextObj)
-            Debug.LogError("[TutorialManager] infoTextObj is not assigned");
-        
         _step = 0;
         
         // 설정 개수와 오브젝트 개수 동기화
@@ -40,7 +46,12 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
         for (int i = 0; i < tutorialImageObjs.Count; i++)
             SetActiveWithAlpha(tutorialImageObjs[i], i == 0, i == 0 ? 1f : 0f);
         
-        await SettingTextObject(infoTextObj, setting.infoText); // 안내 텍스트 세팅
+        SettingImageObject(backgroundImage, setting.background); // 배경 팝업
+        SettingImageObject(infoImage1, setting.infoImage1);
+        SettingImageObject(infoImage2, setting.infoImage2);
+        SettingImageObject(infoImage3, setting.infoImage3);
+        
+        await Task.Yield(); // 이미지 세팅을 위해 한 프레임 멈춤
         
         StartCoroutine(TurnCamera3());
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });

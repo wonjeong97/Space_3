@@ -2,30 +2,38 @@
   "popupFadeTime": 1,
   "gameCloseTime": 5,
   "main1": {
-	"position": { "x": "400", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketRecycle/1.png"
+	"position": { "x": 375, "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketRecycle/1_Guide.png"
   },
   "main2": {
-	"position": { "x": "960", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketRecycle/2.png"
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketRecycle/2_Guide.png"
   },
   "main3": {
-	"position": { "x": "1520", "y": 540 },
-	"size": { "x": 500, "y": 800 },
-	"sourceImage": "Image/RocketRecycle/3.png"
+	"position": { "x": 1545, "y": 540 },
+	"size": { "x": 550, "y": 800 },
+	"sourceImage": "Image/RocketRecycle/3_Guide.png"
   },
-  "popup1":
-  {
-	"position": { "x": "960", "y": 540 },
+  "popup1": {
+	"position": { "x": 960, "y": 540 },
 	"size": { "x": 1000, "y": 900 },
 	"sourceImage": "Image/RocketRecycle/popup1.png"
   },
-  "popup2":
-  {
-	"position": { "x": "960", "y": 540 },
-	"size": { "x": 600, "y": 720 },
-	"sourceImage": "Image/RocketRecycle/end.png"
+  "endBackground": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"sourceImage": "Image/RocketRecycle/4_EndBG.png"
+  },
+  "endImage1": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 900, "y": 800 },
+	"sourceImage": "Image/RocketRecycle/5_Finish.png"
+  },
+  "endImage2": {
+	"position": { "x": 960, "y": 930 },
+	"size": { "x": 950, "y": 100 },
+	"sourceImage": "Image/RocketRecycle/6_End.png"
   }
 }

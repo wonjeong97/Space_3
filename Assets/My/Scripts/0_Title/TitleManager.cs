@@ -1,36 +1,40 @@
 using System;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
 
 [Serializable]
 public class TitleSetting
 {
-    public TextSetting titleText;
-    public TextSetting infoText;
+    public ImageSetting titleImage;
+    public ImageSetting infoImage;
 }
 
 /// <summary> 타이틀 씬 관리 클래스 </summary>
 public class TitleManager : SceneManager_Base<TitleSetting>
 {
     [Header("UI")]
-    [SerializeField] private GameObject titleText; // Display1 Title Text
-    [SerializeField] private GameObject infoText; // Display1 Info Text
+    [SerializeField] private GameObject titleImage; // 우주발사체 타이틀 이미지
+    [SerializeField] private GameObject infoImage;  // 시작하려면 아무 버튼이나 누르세요 이미지
 
     protected override string JsonPath => "JSON/TitleSetting.json";
 
     /// <summary> 씬 초기화 메서드 </summary>
     protected override async Task Init()
     {
-        if (!titleText || !infoText)
+        if (!titleImage)
         {
-            Debug.LogError("[TitleManager] Text UI is not assigned");
+            Debug.LogError("[TitleManager] titleImage is not assigned");
         }
         inputReceived = false;
 
-        // 텍스트 세팅
-        await SettingTextObject(titleText, setting.titleText);
-        await SettingTextObject(infoText, setting.infoText);
+        // 타이틀 이미지 세팅
+        SettingImageObject(titleImage, setting.titleImage); 
+        SettingImageObject(infoImage, setting.infoImage);
 
+        // 이미지 세팅까지 한 프레임 늦춤
+        await Task.Yield();
+        
         // 연출
         StartCoroutine(TurnCamera3());
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });

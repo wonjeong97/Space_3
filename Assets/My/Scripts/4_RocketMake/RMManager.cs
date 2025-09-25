@@ -8,6 +8,8 @@ using UnityEngine.Video;
 public class RMSetting
 {
     public float videoFadeTime;
+
+    public ImageSetting background;
     public ImageSetting main1;
     public ImageSetting main2;
     public ImageSetting main3;
@@ -27,6 +29,7 @@ public class RMSetting
 public class RMManager : SceneManager_Base<RMSetting>
 {
     [Header("UI")]
+    [SerializeField] private GameObject backgroundImage;
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
@@ -74,6 +77,8 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         _videoFadeTime = Mathf.Max(0f, setting.videoFadeTime);
 
+        SettingImageObject(backgroundImage, setting.background);
+        
         // 고정 이미지/서브 디스플레이 세팅
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);

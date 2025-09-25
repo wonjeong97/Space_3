@@ -1,15 +1,12 @@
 {
-  "camera3TurnSpeed": 5.0,
-  "titleText": {
-	"position": { "x": 960, "y": 290 },
-	"text": "우주발사체",
-	"fontName": "font1",
-	"fontSize": 130
+  "titleImage": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"sourceImage": "Image/Title/1_Title.png"
   },
-  "infoText": {
-	"position": { "x": 960, "y": 980 },
-	"text": "시작하려면 아무 버튼이나 누르세요",
-	"fontName": "font1",
-	"fontSize": 60
+  "infoImage": {
+	"position": { "x": 960, "y": 925 },
+	"size": { "x": 1920, "y": 225 },
+	"sourceImage": "Image/Title/1_Start.png"
   }
 }
