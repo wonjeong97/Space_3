@@ -94,6 +94,8 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _ruleIndex = 0;
         _phase = Phase.Intro;
 
+        ArduinoInputManager.Instance?.SetLedAll(false);
+        
         // 인트로 세팅 및 재생  
         await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
         _vp.loopPointReached -= OnVideoEnded;
@@ -154,6 +156,9 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _awaitingSkip = false; // 스킵 비활성화
         inputReceived = false; // 입력을 받지 않음
         
+        // 영상 시작 전 LED OFF
+        ArduinoInputManager.Instance?.SetLedAll(false);
+        
         await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
 
         if (_vp) _vp.Stop();
@@ -196,6 +201,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                     if (!_awaitingSkip)
                     {
                         _awaitingSkip = true;
+                        ArduinoInputManager.Instance?.SetLedAll(true);
                         _skipCts = new CancellationTokenSource();
                         _ = WaitSkipThenProceedAsync(_skipCts.Token, ruleIndexAtStart);
                     }
@@ -224,7 +230,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             if (token.IsCancellationRequested) return;
 
             // 아두이노: 허용 시각 이후 이벤트만 소비
-            if (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumePressNewerThan(skipEnableMs, out _)) break;
+            //if (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumePressNewerThan(skipEnableMs, out _)) break;
 
             // 키/마우스/터치
             if (TryConsumeSingleInput()) break;
@@ -241,6 +247,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
         }
+        ArduinoInputManager.Instance?.SetLedAll(false);
         if (infoImage2)infoImage2.SetActive(false);
         if (_phase != Phase.RuleSeq) return;
 
