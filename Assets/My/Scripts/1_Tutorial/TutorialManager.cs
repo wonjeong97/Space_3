@@ -62,25 +62,28 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
             // 입력 대기
             while (true)
             {
-                if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
-                if (TryConsumeSingleInput()) break;
+                if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) 
+                    || TryConsumeSingleInput()) break;
                 
                 await Task.Yield();
             }
-            if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
-            inputReceived = false; // 연속 입력 설정
-
+            
             if (_step < count - 1)
             {
-                await CrossFadeAsync(tutorialImageObjs[_step], tutorialImageObjs[_step + 1], CrossFadeTime);
+                await AdvanceStepAsync(tutorialImageObjs[_step], tutorialImageObjs[_step + 1], CrossFadeTime);
                 _step++;
             }
             else
-            {
+            {   
+                canInput = false;
+                if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
+                inputReceived = false;
+                
                 int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 2;
                 await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
                 break;
             }
+  
         }
     }
 

@@ -29,7 +29,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
 
-    private int rocketCountdown;
+    private int _rocketCountdown;
     private RocketLaunch _rocketLaunch;
 
     protected override void Awake()
@@ -47,20 +47,26 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(subImage,  setting.sub1);
 
-        rocketCountdown = Mathf.Max(1, setting.rocketCountdown);
+        _rocketCountdown = Mathf.Max(1, setting.rocketCountdown);
         if (countdownText && countdownText.TryGetComponent(out TextMeshProUGUI tmp))
         {
-            tmp.text = rocketCountdown.ToString();
+            tmp.text = _rocketCountdown.ToString();
             SetAlpha(tmp, 0f);
         }
-
+        
+        ArduinoInputManager.Instance?.SetLedAll(true);
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
         // 입력 대기
         while (true)
         {
-            if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
-            if (TryConsumeSingleInput()) break;
+            if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
+                || TryConsumeSingleInput())
+            {   
+                ArduinoInputManager.Instance?.SetLedAll(false);
+                break;
+            }
+            
             
             await Task.Yield();
         }
@@ -87,7 +93,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         // 안전장치
         float duration = Mathf.Max(0.01f, 1.0f);
 
-        for (int n = rocketCountdown; n > 0; n--)
+        for (int n = _rocketCountdown; n > 0; n--)
         {
             // 숫자 갱신 및 완전 표시
             tmp.text = n.ToString();

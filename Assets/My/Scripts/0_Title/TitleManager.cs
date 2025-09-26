@@ -34,12 +34,11 @@ public class TitleManager : SceneManager_Base<TitleSetting>
 
         // 이미지 세팅까지 한 프레임 늦춤
         await Task.Yield();
+        ArduinoInputManager.Instance?.SetLedAll(true);    
         
         // 연출
         StartCoroutine(TurnCamera3());
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
-    
-        ArduinoInputManager.Instance?.SetLedAll(true);
         
         while (true)
         {       

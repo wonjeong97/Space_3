@@ -46,7 +46,7 @@ public class GameManager : MonoBehaviour
 
     private void Update()
     {
-        if (reporter != null && Input.GetKeyDown(KeyCode.D))
+        if (reporter&& Input.GetKeyDown(KeyCode.D))
         {
             reporter.showGameManagerControl = !reporter.showGameManagerControl;
             if (reporter.show) reporter.show = false;

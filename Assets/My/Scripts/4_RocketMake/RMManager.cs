@@ -187,6 +187,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         if (_phase == Phase.SelectSatellite)
         {
             _phase = Phase.Location;
+            ArduinoInputManager.Instance?.SetLedAll(false);
             await PlayLocationThenMakeAsync(); // 장소 -> 제작 영상 시퀀스
             return true;
         }

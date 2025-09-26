@@ -373,6 +373,24 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         if (Input.touchCount > 0) return true;
         return false;
     }
+    
+    /// <summary> 크로스 페이드 도중 입력을 막아 바로 다음 이미지로 넘어가는 것을 방지함 </summary>
+    protected async Task AdvanceStepAsync(GameObject fromGo, GameObject toGo, float duration)
+    {
+        // 입력 잠금 및 큐 비우기(전환 직전)
+        canInput = false;
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
+        inputReceived = false;
 
+        await CrossFadeAsync(fromGo, toGo, duration);
+
+        // 전환 직후 다시 한 번 큐 비우기(전환 중 누적분 제거)
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
+        inputReceived = false;
+
+        // 입력 재개
+        canInput = true;
+    }
+    
     #endregion
 }

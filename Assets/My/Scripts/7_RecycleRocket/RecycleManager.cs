@@ -48,13 +48,18 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
         SettingImageObject(endImage2, setting.endImage2);
         
         endBackgroundImage.gameObject.SetActive(false);
+        ArduinoInputManager.Instance?.SetLedAll(true);
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
 
         // 입력 대기
         while (true)
         {
-            if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
-            if (TryConsumeSingleInput()) break;
+            if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
+                || TryConsumeSingleInput())
+            {   
+                ArduinoInputManager.Instance?.SetLedAll(false);
+                break;
+            }
                 
             await Task.Yield();
         }

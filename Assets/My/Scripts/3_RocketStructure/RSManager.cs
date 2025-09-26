@@ -48,6 +48,7 @@ public class RSManager : SceneManager_Base<RSSetting>
             }
         }
         
+        ArduinoInputManager.Instance?.SetLedAll(true);    
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
         
         StartCoroutine(TurnCamera3());
@@ -61,13 +62,10 @@ public class RSManager : SceneManager_Base<RSSetting>
                 
                 await Task.Yield();
             }
-            if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
-            inputReceived = false; // 연속 입력 설정
-
             if (_index >= count - 1) break; // 마지막이면 루프 종료 → 씬 전환
 
             // 현재 이미지 -> 다음 이미지로 크로스페이드
-            await CrossFadeAsync(explainImageObjs[_index], explainImageObjs[_index + 1], _crossTime);
+            await AdvanceStepAsync(explainImageObjs[_index], explainImageObjs[_index + 1], _crossTime);
             _index++;
         }
 

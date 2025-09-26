@@ -214,10 +214,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
 
     /// <summary> 사용자 입력을 받고, 현재 영상을 스킵하여 다음으로 진행 </summary>
     private async Task WaitSkipThenProceedAsync(CancellationToken token, int ruleIndexAtStart)
-    {
-        // 스킵 허용 시점 기록
-        long skipEnableMs = ArduinoInputManager.NowMs;
-
+    {   
         // 직전까지 들어온 잔여 이벤트 플러시
         if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
         
@@ -230,7 +227,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             if (token.IsCancellationRequested) return;
 
             // 아두이노: 허용 시각 이후 이벤트만 소비
-            //if (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumePressNewerThan(skipEnableMs, out _)) break;
+            if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
 
             // 키/마우스/터치
             if (TryConsumeSingleInput()) break;

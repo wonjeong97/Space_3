@@ -15,10 +15,13 @@ using Debug = UnityEngine.Debug;
 public class ArduinoInputManager : MonoBehaviour
 {
     public static ArduinoInputManager Instance;
-    // 과거 코드 호환용
-    public static ArduinoInputManager instance => Instance;
 
-    public enum ButtonId { Button1 = 1, Button2 = 2, Button3 = 3 }
+    public enum ButtonId
+    {
+        Button1 = 1,
+        Button2 = 2,
+        Button3 = 3
+    }
 
     // Settings.json에서 가져올 포트/보레이트
     private string _portName;
@@ -48,7 +51,11 @@ public class ArduinoInputManager : MonoBehaviour
         if (_clock == null) _clock = Stopwatch.StartNew();
 
         if (Instance == null) Instance = this;
-        else if (Instance != this) { Destroy(gameObject); return; }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         DontDestroyOnLoad(gameObject);
     }
@@ -67,6 +74,9 @@ public class ArduinoInputManager : MonoBehaviour
                 NewLine = "\n"
             };
             _serialPort.Open();
+
+            Thread.Sleep(2000); // 아두이노 리셋 안정화 대기
+            _serialPort.DiscardInBuffer(); // 부트메시지/쓰레기 제거
 
             _running = true;
             _readThread = new Thread(ReadSerial) { IsBackground = true };
@@ -106,7 +116,9 @@ public class ArduinoInputManager : MonoBehaviour
                 }
                 // 아두이노가 "OK" 같은 응답을 보내는 경우가 있어도 무시해도 됨
             }
-            catch (TimeoutException) { }
+            catch (TimeoutException)
+            {
+            }
             catch (Exception e)
             {
                 Debug.LogWarning($"[ArduinoInputManager] 수신 오류: {e.Message}");
@@ -137,14 +149,18 @@ public class ArduinoInputManager : MonoBehaviour
             if (_readThread != null && _readThread.IsAlive)
                 _readThread.Join(200);
         }
-        catch { }
+        catch
+        {
+        }
 
         try
         {
             if (_serialPort != null && _serialPort.IsOpen)
                 _serialPort.Close();
         }
-        catch { }
+        catch
+        {
+        }
     }
 
     // 한 번만 소비하는 입력: 누적된 눌림 중 하나를 반환하고, 해당 비트를 클리어
@@ -159,12 +175,24 @@ public class ArduinoInputManager : MonoBehaviour
             if (bits == 0) return false;
 
             int consumeBit;
-            if ((bits & BIT_B1) != 0) { id = ButtonId.Button1; consumeBit = BIT_B1; }
-            else if ((bits & BIT_B2) != 0) { id = ButtonId.Button2; consumeBit = BIT_B2; }
-            else { id = ButtonId.Button3; consumeBit = BIT_B3; }
+            if ((bits & BIT_B1) != 0)
+            {
+                id = ButtonId.Button1;
+                consumeBit = BIT_B1;
+            }
+            else if ((bits & BIT_B2) != 0)
+            {
+                id = ButtonId.Button2;
+                consumeBit = BIT_B2;
+            }
+            else
+            {
+                id = ButtonId.Button3;
+                consumeBit = BIT_B3;
+            }
 
             int newBits = bits & ~consumeBit;
-            if (System.Threading.Interlocked.CompareExchange(ref _pressedBits, newBits, bits) == bits)
+            if (Interlocked.CompareExchange(ref _pressedBits, newBits, bits) == bits)
                 return true;
         }
     }
@@ -173,8 +201,8 @@ public class ArduinoInputManager : MonoBehaviour
     public bool TryConsumePress(ButtonId target)
     {
         int bit = target == ButtonId.Button1 ? BIT_B1
-                : target == ButtonId.Button2 ? BIT_B2
-                : BIT_B3;
+            : target == ButtonId.Button2 ? BIT_B2
+            : BIT_B3;
 
         while (true)
         {
@@ -182,7 +210,7 @@ public class ArduinoInputManager : MonoBehaviour
             if ((bits & bit) == 0) return false;
 
             int newBits = bits & ~bit;
-            if (System.Threading.Interlocked.CompareExchange(ref _pressedBits, newBits, bits) == bits)
+            if (Interlocked.CompareExchange(ref _pressedBits, newBits, bits) == bits)
                 return true;
         }
     }
@@ -191,7 +219,7 @@ public class ArduinoInputManager : MonoBehaviour
     public int FlushAll()
     {
         // 원자적으로 비트를 0으로
-        int bits = System.Threading.Interlocked.Exchange(ref _pressedBits, 0);
+        int bits = Interlocked.Exchange(ref _pressedBits, 0);
         // 몇 개를 지웠는지 대략 계산
         int count = 0;
         if ((bits & BIT_B1) != 0) count++;

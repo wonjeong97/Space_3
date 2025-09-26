@@ -47,41 +47,26 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     }
 
     private Phase _phase = Phase.RocketMove;
-
     private CancellationTokenSource _popupFadeCts;
-
-    protected override void Awake()
-    {
-        Debug.Log("fuelManager Awake");
-        base.Awake();
-    }
-    private void OnEnable()
-    {   
-        Debug.Log("fuelManager OnEnable");
-        // if (ArduinoInputManager.Instance)
-        // {
-        //     ArduinoInputManager.Instance.SendButtonDelay(buttonDelayTime);
-        // }
-    }
+    private CancellationTokenSource _blinkCts;
 
     protected override void OnDisable()
     {
         try
         {
             _popupFadeCts?.Cancel();
+            _blinkCts?.Cancel();
+            ArduinoInputManager.Instance?.SetLedAll(false);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"[FuelManager] OnDisable error: {e}");
         }
 
         _popupFadeCts?.Dispose();
         _popupFadeCts = null;
-        
-        // if (ArduinoInputManager.Instance)
-        // {
-        //     ArduinoInputManager.Instance.SendButtonDelay(200);
-        // }
+        _blinkCts?.Dispose();
+        _blinkCts = null;
     }
 
     protected override async Task Init()
@@ -102,63 +87,73 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(fuelImage3, setting.fuelImage[2]);
 
         InitFuelImage(); // fillAmount 0으로 초기화
-        
+        ArduinoInputManager.Instance?.SetLedAll(true);
+
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
-        
+
         _phase = Phase.FuelInjection1;
+        _blinkCts = new CancellationTokenSource();
+
         await FuelFillAsync(); // 시작
     }
 
     /// <summary> 단계별 입력/증가 루프를 비동기로 진행 </summary>
     private async Task FuelFillAsync()
     {
-        /*if (!ArduinoInputManager.Instance)
-        {
-            Debug.LogError("[FuelManager] RunFlowAsync: ArduinoInputManager is null");
-            return;
-        }*/
-            
         // 1단계: ← 키
         while (canInput && _phase == Phase.FuelInjection1)
         {
-            Debug.Log("Press left");
             // 첫 KeyDown 시 팝업 페이드 아웃
-            if (/*(ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
-                 btn == ArduinoInputManager.ButtonId.Button1) ||*/
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                 btn == ArduinoInputManager.ButtonId.Button1) ||
                 Input.GetKey(KeyCode.LeftArrow))
             {
                 if (_popupFadeCts == null)
                 {
                     _popupFadeCts = new CancellationTokenSource();
+                    ArduinoInputManager.Instance.SetLedAll(false);
                     _ = PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token);
                 }
             }
 
-            if (/*btn == ArduinoInputManager.ButtonId.Button1 ||*/ Input.GetKeyDown(KeyCode.LeftArrow))
+            if (btn == ArduinoInputManager.ButtonId.Button1 || Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 if (IncreaseFill(_fuel1Image, _fuelFillSpeed * Time.deltaTime))
                 {
+                    // LED1 블링크 종료
+                    _blinkCts?.Cancel(); _blinkCts?.Dispose(); _blinkCts = null;
+                    ArduinoInputManager.Instance.SetLed(1, false);
+
+                    // LED2 블링크 시작
+                    _blinkCts = new CancellationTokenSource();
+                    _ = BlinkLedAsync(2, 300, 300, _blinkCts.Token);
+
                     _phase = Phase.FuelInjection2;
                     break;
                 }
             }
-            
-            //ArduinoInputManager.Instance.FlushAll();
+
             await Task.Yield();
         }
 
         // 2단계: ↓ 키
         while (canInput && _phase == Phase.FuelInjection2)
-        {   
-            Debug.Log("Press Down");
-            if (/*(ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
-                 btn == ArduinoInputManager.ButtonId.Button2) ||*/
-                Input.GetKey(KeyCode.DownArrow))
+        {
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                 btn == ArduinoInputManager.ButtonId.Button2) ||
+                Input.GetKeyDown(KeyCode.DownArrow))
             {
                 if (IncreaseFill(_fuel2Image, _fuelFillSpeed * Time.deltaTime))
                 {
+                    // LED2 블링크 종료
+                    _blinkCts?.Cancel(); _blinkCts?.Dispose(); _blinkCts = null;
+                    ArduinoInputManager.Instance.SetLed(2, false);
+
+                    // LED3 블링크 시작
+                    _blinkCts = new CancellationTokenSource();
+                    _ = BlinkLedAsync(3, 300, 300, _blinkCts.Token);
+
                     _phase = Phase.FuelInjection3;
-                    break;
                 }
             }
 
@@ -167,14 +162,17 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
         // 3단계: → 키
         while (canInput && _phase == Phase.FuelInjection3)
-        {   
-            Debug.Log("Press Right");
-            if (/*(ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
-                 btn == ArduinoInputManager.ButtonId.Button3) ||*/
-                Input.GetKey(KeyCode.RightArrow))
+        {
+            if ((ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                 btn == ArduinoInputManager.ButtonId.Button3) ||
+                Input.GetKeyDown(KeyCode.RightArrow))
             {
                 if (IncreaseFill(_fuel3Image, _fuelFillSpeed * Time.deltaTime))
-                {
+                {   
+                    // LED3 블링크 종료
+                    _blinkCts?.Cancel(); _blinkCts?.Dispose(); _blinkCts = null;
+                    ArduinoInputManager.Instance.SetLed(3, false);
+                    
                     _phase = Phase.Done;
                     break;
                 }
@@ -185,20 +183,23 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
         // 완료 처리
         if (_phase == Phase.Done)
-        {   
+        {
             // 작업 중인 팝업 페이드 태스크 취소
             try
             {
                 _popupFadeCts?.Cancel();
+                _blinkCts?.Cancel();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 Debug.LogError($"[FuelManager] PopupFade Cancel error: {e}");
             }
-            
+
             // 토큰 메모리/리소스 정리
             _popupFadeCts?.Dispose();
             _popupFadeCts = null;
+            _blinkCts?.Dispose();
+            _blinkCts = null;
 
             // 다음 씬 지정 시 전환
             if (nextSceneBuildIndex >= 0)
@@ -247,7 +248,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
         Image img = popupImage.GetComponent<Image>();
         if (!img) return;
-        
+
         SetAlpha(img, 1f);
 
         float elapsed = 0f;
@@ -260,6 +261,9 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         }
 
         SetAlpha(img, 0f);
+
+        // 팝업이 모두 사라지고 버튼 1 블링크
+        _ = BlinkLedAsync(ledIndex: 1, onMs: 300, offMs: 300, token: _blinkCts.Token);
     }
 
     /// <summary> 게이지 증가 (delta만큼), 처음 1.0 도달 시 true 반환 </summary>
@@ -269,5 +273,28 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         float before = img.fillAmount;
         img.fillAmount = Mathf.Clamp01(before + delta);
         return (before < 1f && img.fillAmount >= 1f);
+    }
+    
+    /// <summary> LED 블링크 메서드 </summary>
+    private async Task BlinkLedAsync(int ledIndex, int onMs, int offMs, CancellationToken token)
+    {
+        var mgr = ArduinoInputManager.Instance;
+        if (mgr == null) return;
+
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                mgr.SetLed(ledIndex, true);
+                try { await Task.Delay(onMs, token); } catch { break; }
+
+                mgr.SetLed(ledIndex, false);
+                try { await Task.Delay(offMs, token); } catch { break; }
+            }
+        }
+        finally
+        {
+            mgr.SetLed(ledIndex, false); // 종료 시 확실히 꺼줌
+        }
     }
 }
