@@ -4,9 +4,8 @@ using UnityEngine;
 
 public class RocketLaunch : MonoBehaviour
 {
-
     public GameObject rocketLaunchAnim;
-    public GameObject jetEngineVFX;
+    public List<GameObject> jetEngineVFX = new List<GameObject>();
 
     public GameObject flamesLight;
 
@@ -15,17 +14,20 @@ public class RocketLaunch : MonoBehaviour
     public ParticleSystem flames_B_Particles;
     public ParticleSystem sparks_Particles;
     public ParticleSystem takeOff_Smoke_Particles;
+    public ParticleSystem launch_Smoke_Particles;
 
-    public int startDelay = 1;
+    public int startDelay = 10;
     public int engineWarmupTime = 6;
     public int launchEndTimer = 8;
 
     private void Start()
     {
-
         flamesLight.SetActive(false);
-        jetEngineVFX.SetActive(false);
 
+        foreach (GameObject vfx in jetEngineVFX)
+        {
+            vfx.SetActive(false);
+        }
     }
 
     public void Call()
@@ -35,6 +37,7 @@ public class RocketLaunch : MonoBehaviour
 
     private IEnumerator LaunchRocket()
     {
+        launch_Smoke_Particles.Play();
         yield return new WaitForSeconds(startDelay);
 
         flamesLight.SetActive(true);
@@ -42,13 +45,16 @@ public class RocketLaunch : MonoBehaviour
         flames_A_Particles.Play();
         flames_B_Particles.Play();
         sparks_Particles.Play();
-        
         yield return new WaitForSeconds(engineWarmupTime);
 
         takeOff_Smoke_Particles.Play();
         rocketLaunchAnim.GetComponent<Animation>().Play();
-        jetEngineVFX.SetActive(true);
-
+        launch_Smoke_Particles.Stop();
+        
+        foreach (GameObject vfx in jetEngineVFX)
+        {
+            vfx.SetActive(true);
+        }
         yield return new WaitForSeconds(launchEndTimer);
 
         flamesLight.SetActive(false);

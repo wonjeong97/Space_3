@@ -67,7 +67,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 break;
             }
             
-            
             await Task.Yield();
         }
        

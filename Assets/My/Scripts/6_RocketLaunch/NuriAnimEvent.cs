@@ -1,28 +1,57 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 public class NuriAnimEvent : MonoBehaviour
 {
+    [Header("Fairing")]
     [SerializeField] private GameObject fairing1;
     [SerializeField] private GameObject fairing2;
+    
+    [Header("Stage1")]
     [SerializeField] private GameObject stage1;
+    [SerializeField] private List<GameObject> stage1VFXs = new List<GameObject>();
+    
+    [Header("Stage2")]
     [SerializeField] private GameObject stage2;
+    
+    [Header("Stage3")]
     [SerializeField] private GameObject stage3;
     
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
     
-    public void DropStage1()
+    public async Task DropStage1()
     {
-        if (!stage1) return;
+        try
+        {
+            if (!stage1) return;
+
+            foreach (GameObject vfx in stage1VFXs)
+            {   
+                if (vfx.TryGetComponent(out JetVFXAnim anim))
+                {
+                    anim.Shrink();   
+                }
+            }
         
-        stage1.transform.SetParent(null, true);
-        var rb = stage1.GetComponent<Rigidbody>();
+            await Task.Delay(2000);
         
-        // 물리 시뮬
-        rb.isKinematic = false;                    
-        rb.useGravity = true;
-        rb.collisionDetectionMode = collisionMode;
-        rb.interpolation = interpolation;
+            stage1.transform.SetParent(null, true);
+            var rb = stage1.GetComponent<Rigidbody>();
+        
+            // 물리 시뮬
+            rb.isKinematic = false;                    
+            rb.useGravity = true;
+            rb.collisionDetectionMode = collisionMode;
+            rb.interpolation = interpolation;
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e);
+            throw;
+        }
     }
 
     public void SeparateFairing()
