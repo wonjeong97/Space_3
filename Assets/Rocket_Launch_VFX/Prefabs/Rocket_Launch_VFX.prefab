@@ -26,9 +26,9 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276198589573785047}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.7071068, y: -0, z: -0, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 3.84, z: -0}
-  m_LocalScale: {x: 7, y: 7, z: 7}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 3.91, y: 7.22, z: -0.15}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 2637224698219718493}
@@ -41,7 +41,7 @@ ParticleSystem:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 276198589573785047}
   serializedVersion: 8
-  lengthInSec: 10
+  lengthInSec: 20
   simulationSpeed: 0.8
   stopAction: 0
   cullingMode: 3
@@ -116,7 +116,7 @@ ParticleSystem:
     startLifetime:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 4
+      scalar: 5
       minScalar: 3
       maxCurve:
         serializedVersion: 2
@@ -251,8 +251,8 @@ ParticleSystem:
     startSize:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 5
-      minScalar: 3
+      scalar: 15
+      minScalar: 15
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -460,15 +460,15 @@ ParticleSystem:
         m_RotationOrder: 0
     randomizeRotationDirection: 0
     gravitySource: 0
-    maxNumParticles: 80
+    maxNumParticles: 30
     customEmitterVelocity: {x: 0, y: 0, z: 0}
     size3D: 0
-    rotation3D: 0
+    rotation3D: 1
     gravityModifier:
       serializedVersion: 2
       minMaxState: 3
       scalar: -0
-      minScalar: -0.01
+      minScalar: -1
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -4611,7 +4611,7 @@ ParticleSystemRenderer:
   m_MeshDistribution: 0
   m_SortMode: 1
   m_MinParticleSize: 0
-  m_MaxParticleSize: 100
+  m_MaxParticleSize: 80
   m_CameraVelocityScale: 0
   m_VelocityScale: 0
   m_LengthScale: 2
@@ -28334,13 +28334,15 @@ MonoBehaviour:
   - {fileID: 0}
   - {fileID: 0}
   flamesLight: {fileID: 2637224697841280718}
+  canyon: {fileID: 0}
   turbulence_Smoke_Particles: {fileID: 2637224696865392093}
   flames_A_Particles: {fileID: 2637224697826280020}
   flames_B_Particles: {fileID: 2637224698015649626}
   sparks_Particles: {fileID: 2637224697120242204}
   takeOff_Smoke_Particles: {fileID: 2637224696594147864}
-  startDelay: 1
-  engineWarmupTime: 10
+  launch_Smoke_Particles: {fileID: 2713272617048710831}
+  startDelay: 8
+  engineWarmupTime: 3
   launchEndTimer: 8
 --- !u!1001 &2637224696578083897
 PrefabInstance:

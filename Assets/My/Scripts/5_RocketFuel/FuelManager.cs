@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -69,7 +69,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         _blinkCts = null;
     }
 
-    protected override async Task Init()
+    protected override async UniTask Init()
     {
         _popupFadeTime = Mathf.Max(0f, setting.popupFadeTime);
         _fuelFillSpeed = Mathf.Max(0f, setting.fuelFillSpeed);
@@ -98,7 +98,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     }
 
     /// <summary> 단계별 입력/증가 루프를 비동기로 진행 </summary>
-    private async Task FuelFillAsync()
+    private async UniTask FuelFillAsync()
     {
         // 1단계: ← 키
         while (canInput && _phase == Phase.FuelInjection1)
@@ -133,7 +133,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         // 2단계: ↓ 키
@@ -157,7 +157,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         // 3단계: → 키
@@ -178,7 +178,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         // 완료 처리
@@ -242,7 +242,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     }
 
     /// <summary> 팝업 이미지를 지정 시간 동안 서서히 알파 1->0으로 </summary>
-    private async Task PopupFadeAsync(float duration, CancellationToken token)
+    private async UniTask PopupFadeAsync(float duration, CancellationToken token)
     {
         if (!popupImage) return;
 
@@ -257,7 +257,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             float t = Mathf.Clamp01(elapsed / duration);
             SetAlpha(img, Mathf.Lerp(1f, 0f, t));
             elapsed += Time.deltaTime;
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         SetAlpha(img, 0f);
@@ -276,7 +276,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     }
     
     /// <summary> LED 블링크 메서드 </summary>
-    private async Task BlinkLedAsync(int ledIndex, int onMs, int offMs, CancellationToken token)
+    private async UniTask BlinkLedAsync(int ledIndex, int onMs, int offMs, CancellationToken token)
     {
         var mgr = ArduinoInputManager.Instance;
         if (mgr == null) return;
@@ -286,10 +286,10 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             while (!token.IsCancellationRequested)
             {
                 mgr.SetLed(ledIndex, true);
-                try { await Task.Delay(onMs, token); } catch { break; }
+                try { await UniTask.Delay(onMs, cancellationToken: token); } catch { break; }
 
                 mgr.SetLed(ledIndex, false);
-                try { await Task.Delay(offMs, token); } catch { break; }
+                try { await UniTask.Delay(offMs, cancellationToken: token); } catch { break; }
             }
         }
         finally

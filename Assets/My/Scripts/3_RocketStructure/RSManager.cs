@@ -1,7 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,7 +22,7 @@ public class RSManager : SceneManager_Base<RSSetting>
     private int _index;
     private float _crossTime;
     
-    protected override async Task Init()
+    protected override async UniTask Init()
     {   
         _crossTime = Mathf.Max(0f, setting.transitionTime);
         
@@ -60,7 +59,7 @@ public class RSManager : SceneManager_Base<RSSetting>
                 if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
                 if (TryConsumeSingleInput()) break;
                 
-                await Task.Yield();
+                await UniTask.Yield();
             }
             if (_index >= count - 1) break; // 마지막이면 루프 종료 → 씬 전환
 

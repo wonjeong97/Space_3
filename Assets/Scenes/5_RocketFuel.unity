@@ -1033,6 +1033,7 @@ MonoBehaviour:
   fadeImage3: {fileID: 638666639}
   nextSceneBuildIndex: 6
   useInactivityTimeout: 1
+  sIsLoading: 0
   mainImage1: {fileID: 2103544916}
   mainImage2: {fileID: 1897131097}
   mainImage3: {fileID: 1902434241}
@@ -2053,7 +2054,7 @@ MonoBehaviour:
   m_UiScaleMode: 1
   m_ReferencePixelsPerUnit: 100
   m_ScaleFactor: 1
-  m_ReferenceResolution: {x: 1440, y: 480}
+  m_ReferenceResolution: {x: 1920, y: 540}
   m_ScreenMatchMode: 0
   m_MatchWidthOrHeight: 0
   m_PhysicalUnit: 3

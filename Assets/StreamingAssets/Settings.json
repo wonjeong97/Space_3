@@ -1,5 +1,5 @@
 {
-  "portName": "COM4",
+  "portName": "COM6",
   "baudRate": 9600,  
   "buttonDelayTime": 1,
   "inactivityTime": 15000.0,

@@ -1,6 +1,6 @@
 using System;
 using System.Threading;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -75,7 +75,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         }
     }
 
-    protected override async Task Init()
+    protected override async UniTask Init()
     {
         if (!videoPlayerObject) Debug.LogError("[NewtonManager] videoPlayerObject is not assigned");
 
@@ -145,7 +145,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     }
 
     /// <summary> 다음 비디오로 전환 및 비디오 재생 50% 모니터링 </summary>
-    private async Task SwitchAndPlayNextAsync(VideoSetting next)
+    private async UniTask SwitchAndPlayNextAsync(VideoSetting next)
     {
         CancelAndDispose(ref _progressCts);
         CancelAndDispose(ref _skipCts);
@@ -176,11 +176,11 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     }
 
     /// <summary> 영상 대기, 재생률 50% 도달 시 안내 메시지 표시 및 스킵 입력 대기 시작 </summary>
-    private async Task MonitorProgressAndEnableSkipAsync(CancellationToken token, int ruleIndexAtStart)
+    private async UniTask MonitorProgressAndEnableSkipAsync(CancellationToken token, int ruleIndexAtStart)
     {
         // 비디오가 준비될 때까지 대기 (isPrepared == true)
         while (!token.IsCancellationRequested && _vp && !_vp.isPrepared)
-            await Task.Yield();
+            await UniTask.Yield();
 
         // 재생 중 50% 모니터링
         while (!token.IsCancellationRequested && _vp && _vp.isPlaying)
@@ -208,18 +208,18 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                 }
             }
 
-            await Task.Yield();
+            await UniTask.Yield();
         }
     }
 
     /// <summary> 사용자 입력을 받고, 현재 영상을 스킵하여 다음으로 진행 </summary>
-    private async Task WaitSkipThenProceedAsync(CancellationToken token, int ruleIndexAtStart)
+    private async UniTask WaitSkipThenProceedAsync(CancellationToken token, int ruleIndexAtStart)
     {   
         // 직전까지 들어온 잔여 이벤트 플러시
         if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
         
         // 잔상 방지용으로 한 프레임 양보
-        await Task.Yield();
+        await UniTask.Yield();
 
         // 입력 대기 루프: 아두이노(허용 시점 이후) 또는 키/마우스/터치 중 먼저 들어온 1건 소비
         while (true)
@@ -232,7 +232,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             // 키/마우스/터치
             if (TryConsumeSingleInput()) break;
             
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         if (token.IsCancellationRequested) return;
@@ -266,7 +266,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     }
     
     /// <summary> 다음 씬으로 전환 </summary>
-    private Task GoNextSceneAsync()
+    private UniTask GoNextSceneAsync()
     {
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 3;
         return LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });

@@ -8,6 +8,7 @@ public class RocketLaunch : MonoBehaviour
     public List<GameObject> jetEngineVFX = new List<GameObject>();
 
     public GameObject flamesLight;
+    public GameObject canyon;
 
     public ParticleSystem turbulence_Smoke_Particles;
     public ParticleSystem flames_A_Particles;
@@ -49,20 +50,27 @@ public class RocketLaunch : MonoBehaviour
 
         takeOff_Smoke_Particles.Play();
         rocketLaunchAnim.GetComponent<Animation>().Play();
-        launch_Smoke_Particles.Stop();
-        
+
+
         foreach (GameObject vfx in jetEngineVFX)
         {
             vfx.SetActive(true);
         }
-        yield return new WaitForSeconds(launchEndTimer);
 
+        yield return new WaitForSeconds(launchEndTimer);
+        launch_Smoke_Particles.Stop();
         flamesLight.SetActive(false);
         turbulence_Smoke_Particles.Stop();
         flames_A_Particles.Stop();
         flames_B_Particles.Stop();
         sparks_Particles.Stop();
 
+        Destroy(launch_Smoke_Particles);
+        Destroy(flamesLight);
+        Destroy(turbulence_Smoke_Particles);
+        Destroy(flames_A_Particles);
+        Destroy(flames_B_Particles);
+        Destroy(sparks_Particles);
+        Destroy(canyon);
     }
-
 }

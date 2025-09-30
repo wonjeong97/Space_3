@@ -4,22 +4,22 @@ using UnityEngine;
 public class JetVFXAnim : MonoBehaviour
 {
     [SerializeField] private float duration = 2.5f; // 애니메이션 시간
-    private Vector3 originalScale;
+    private Vector3 _originalScale;
 
     private void Awake()
     {
         // 최초 스케일 저장
-        originalScale = transform.localScale;
+        _originalScale = transform.localScale;
     }
 
     private void OnEnable()
     {
         // 시작 시 0에서 원래 크기로 복원
-        Vector3 startScale = originalScale;
+        Vector3 startScale = _originalScale;
         startScale.x = 0f;
         transform.localScale = startScale;
 
-        StartCoroutine(ScaleXAnim(0f, originalScale.x, duration));
+        StartCoroutine(ScaleXAnim(0f, _originalScale.x, duration));
     }
 
     /// <summary> X축 스케일을 from → to 로 time 동안 변화 </summary>
@@ -47,14 +47,14 @@ public class JetVFXAnim : MonoBehaviour
     /// <summary> 외부에서 호출: 원래 크기 → 0 으로 줄어들기 </summary>
     public void Shrink()
     {
-        StopAllCoroutines(); // 진행 중 애니메이션 중지
-        StartCoroutine(ScaleXAnim(originalScale.x, 0f, duration)); 
+        StopAllCoroutines();
+        StartCoroutine(ScaleXAnim(_originalScale.x, 0f, duration)); 
     }
 
     /// <summary> 외부에서 호출: 0 → 원래 크기로 늘어나기 </summary>
     public void Expand()
     {
         StopAllCoroutines();
-        StartCoroutine(ScaleXAnim(0f, originalScale.x, duration));
+        StartCoroutine(ScaleXAnim(0f, _originalScale.x, duration));
     }
 }

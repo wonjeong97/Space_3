@@ -5,7 +5,7 @@
 	"size": { "x": 1920, "y": 1080 },
 	"sourceImage": "Image/RocketMake/0_BG.png",
 	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },  
+  },
   "main1": {
 	"position": { "x": 375, "y": 540 },
 	"size": { "x": 550, "y": 800 },
@@ -22,72 +22,188 @@
 	"sourceImage": "Image/RocketMake/3_Guide.png"
   },
   "sub1": {
-	"position": { "x": 720, "y": 240 },
-	"size": { "x": 1440, "y": 480 },
+	"position": { "x": 960, "y": 270 },
+	"size": { "x": 1920, "y": 540 },
 	"sourceImage": "Image/RocketMake/sub1.png"
   },
   "rockets": [
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/rocket1.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/rocket1.png"
+	  },
+	  "velocity": 20,
+	  "maxVelocity": 100,
+	  "altitude": 90,
+	  "slope": 45,
+	  "remainDistance": 150
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/rocket2.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/rocket2.png"
+	  },
+	  "velocity": 30,
+	  "maxVelocity": 900,
+	  "altitude": 80,
+	  "slope": 75,
+	  "remainDistance": 130
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/rocket3.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/rocket3.png"
+	  },
+	  "velocity": 25,
+	  "maxVelocity": 105,
+	  "altitude": 95,
+	  "slope": 35,
+	  "remainDistance": 180
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/rocket4.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/rocket4.png"
+	  },
+	  "velocity": 10,
+	  "maxVelocity": 180,
+	  "altitude": 30,
+	  "slope": 105,
+	  "remainDistance": 350
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/rocket5.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/rocket5.png"
+	  },
+	  "velocity": 90,
+	  "maxVelocity": 900,
+	  "altitude": 99,
+	  "slope": 95,
+	  "remainDistance": 950
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/rocket6.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/rocket6.png"
+	  },
+	  "velocity": 80,
+	  "maxVelocity": 180,
+	  "altitude": 80,
+	  "slope": 48,
+	  "remainDistance": 158
 	}
   ],
   "satellites": [
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/satellite1.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/satellite1.png"
+	  },
+	  "velocity": 27,
+	  "maxVelocity": 170,
+	  "altitude": 70,
+	  "slope": 75,
+	  "remainDistance": 750
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/satellite2.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/satellite2.png"
+	  },
+	  "velocity": 60,
+	  "maxVelocity": 160,
+	  "altitude": 60,
+	  "slope": 65,
+	  "remainDistance": 650
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/satellite3.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/satellite3.png"
+	  },
+	  "velocity": 50,
+	  "maxVelocity": 500,
+	  "altitude": 50,
+	  "slope": 55,
+	  "remainDistance": 550
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/satellite4.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/satellite4.png"
+	  },
+	  "velocity": 40,
+	  "maxVelocity": 140,
+	  "altitude": 94,
+	  "slope": 44,
+	  "remainDistance": 140
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/satellite5.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/satellite5.png"
+	  },
+	  "velocity": 23,
+	  "maxVelocity": 130,
+	  "altitude": 30,
+	  "slope": 35,
+	  "remainDistance": 350
 	},
 	{
-	  "position": { "x": 960, "y": 540 },
-	  "size": { "x": 1500, "y": 800 },
-	  "sourceImage": "Image/RocketMake/satellite6.png"
+	  "rocketImage": {
+		"position": { "x": 290, "y": 250 },
+		"size": { "x": 425, "y": 350 },
+		"sourceImage": "Image/RocketMake/satellite6.png"
+	  },
+	  "velocity": 80,
+	  "maxVelocity": 700,
+	  "altitude": 60,
+	  "slope": 55,
+	  "remainDistance": 450
+	}
+  ],
+  "progressBars": [
+	{
+	  "name": "velocityBar",
+	  "position": { "x": 50, "y": 113 },
+	  "size": { "x": 250, "y": 20 },
+	  "sourceImage": "Image/test.png"
+	},
+	{
+	  "name": "maxVelocityBar",
+	  "position": { "x": 50, "y": 167 },
+	  "size": { "x": 250, "y": 20 },
+	  "sourceImage": "Image/test.png"
+	},
+	{
+	  "name": "altitudeBar",
+	  "position": { "x": 50, "y": 221 },
+	  "size": { "x": 250, "y": 20 },
+	  "sourceImage": "Image/test.png"
+	},
+	{
+	  "name": "slopeBar",
+	  "position": { "x": 50, "y": 275 },
+	  "size": { "x": 250, "y": 20 },
+	  "sourceImage": "Image/test.png"
+	},
+	{
+	  "name": "remainDistanceBar",
+	  "position": { "x": 50, "y": 329 },
+	  "size": { "x": 250, "y": 20 },
+	  "sourceImage": "Image/test.png"
 	}
   ],
   "locationVideo": {
@@ -96,7 +212,7 @@
 	"fileName": "Video/RocketMake/201.mp4",
 	"volume": 1.0
   },
-  "rocketMakeVideo":  {
+  "rocketMakeVideo": {
 	"position": { "x": 960, "y": 540 },
 	"size": { "x": 1920, "y": 1080 },
 	"fileName": "Video/RocketMake/202.mp4",

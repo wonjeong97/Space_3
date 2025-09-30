@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -33,7 +33,7 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
     private float _popupFadeTime;
     private float _gameCloseTime;
 
-    protected override async Task Init()
+    protected override async UniTask Init()
     {
         _popupFadeTime = setting.popupFadeTime;
         _gameCloseTime = setting.gameCloseTime;
@@ -61,7 +61,7 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
                 break;
             }
                 
-            await Task.Yield();
+            await UniTask.Yield();
         }
         if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
         
@@ -69,7 +69,7 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
         await CrossFadeAsync(popupImage1, endBackgroundImage, _popupFadeTime);
         
         // 설정한 시간이 지난 후 타이틀로 전환
-        await Task.Delay(TimeSpan.FromSeconds(_gameCloseTime));
+        await UniTask.Delay(TimeSpan.FromSeconds(_gameCloseTime));
         await LoadSceneAsync(0, new[] { fadeImage1, fadeImage3 });
     }
 }

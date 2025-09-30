@@ -1,6 +1,5 @@
 using System;
-using System.Threading.Tasks;
-using Unity.VisualScripting;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 [Serializable]
@@ -20,7 +19,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
     protected override string JsonPath => "JSON/TitleSetting.json";
 
     /// <summary> 씬 초기화 메서드 </summary>
-    protected override async Task Init()
+    protected override async UniTask Init()
     {
         if (!titleImage)
         {
@@ -33,7 +32,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         SettingImageObject(infoImage, setting.infoImage);
 
         // 이미지 세팅까지 한 프레임 늦춤
-        await Task.Yield();
+        await UniTask.Yield();
         ArduinoInputManager.Instance?.SetLedAll(true);    
         
         // 연출
@@ -45,7 +44,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
             if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
             if (TryConsumeSingleInput()) break;
             
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         // 씬 전환

@@ -1,12 +1,12 @@
 using System;
 using System.Collections;
 using System.Threading;
-using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
+using Cysharp.Threading.Tasks; // UniTask
 
 public abstract class SceneManager_Base<T> : MonoBehaviour
 {
@@ -31,8 +31,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")] 
     [SerializeField] protected int nextSceneBuildIndex = -1;
 
-    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] [SerializeField]
-    private bool useInactivityTimeout = true;
+    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")]
+    [SerializeField] private bool useInactivityTimeout = true;
 
     #endregion
 
@@ -75,8 +75,10 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         _cts = new CancellationTokenSource();
     }
 
-    protected virtual async void Start()
+    // UniTask 권장: Start를 UniTaskVoid로
+    protected virtual async UniTaskVoid Start()
     {
+        var token = this.GetCancellationTokenOnDestroy();
         try
         {
             _globalSettings ??= JsonLoader.Instance.settings;
@@ -97,8 +99,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             camera3.targetDisplay = _globalSettings.canvas3TargetMonitorIndex;
             verticalCanvas.targetDisplay = _globalSettings.canvas3TargetMonitorIndex;
 
-            await InitSafe(); // 자식 초기화
+            await InitSafe(token);
         }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -145,7 +148,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     #region Template Methods (for children)
 
     /// <summary> 자식에서 구현할 실제 초기화. 안전 래핑은 InitSafe가 담당. </summary>
-    protected abstract Task Init();
+    protected abstract UniTask Init();
 
     // 씬 로드 직후 초기화용
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
@@ -173,14 +176,16 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #region Init Wrapper
 
-    private async Task InitSafe()
+    private async UniTask InitSafe(CancellationToken token)
     {
         canInput = false;
         inputReceived = false;
-        
+
         // 씬 전환 시 이전 씬에서 받았던 버튼 입력 큐 초기화
         if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
-        await Init(); // 자식 초기화
+
+        await Init();
+
         canInput = true;
     }
 
@@ -214,7 +219,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     /// <summary> 씬 시작/종료 페이드용 </summary>
-    protected async Task FadeImageAsync(float start, float end, float duration, Image[] targets)
+    protected async UniTask FadeImageAsync(float start, float end, float duration, Image[] targets)
     {
         canInput = false;
         float elapsed = 0f;
@@ -224,7 +229,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             float a = Mathf.Lerp(start, end, elapsed / duration);
             foreach (Image img in targets) SetAlpha(img, a);
             elapsed += Time.deltaTime;
-            await Task.Yield();
+            await UniTask.Yield();
         }
 
         foreach (Image img in targets) SetAlpha(img, end);
@@ -232,7 +237,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     /// <summary> 두 UI 이미지 간 크로스 페이드 </summary>
-    protected async Task CrossFadeAsync(GameObject fromGo, GameObject toGo, float duration)
+    protected async UniTask CrossFadeAsync(GameObject fromGo, GameObject toGo, float duration)
     {
         if (!fromGo || !toGo) return;
         if (!fromGo.TryGetComponent(out Image from) || !toGo.TryGetComponent(out Image to)) return;
@@ -247,7 +252,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             SetAlpha(from, 1f - alpha);
             SetAlpha(to, alpha);
             time += Time.deltaTime;
-            await Task.Yield(); // 다음 프레임까지 양보
+            await UniTask.Yield(); // 다음 프레임까지 양보
         }
 
         SetAlpha(from, 0f);
@@ -256,28 +261,31 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     /// <summary> 페이드 후 씬 로드 (async) </summary>
-    protected async Task LoadSceneAsync(int buildIndex, Image[] fades)
+    protected async UniTask LoadSceneAsync(int buildIndex, Image[] fades)
     {
         if (sIsLoading) return; // 중복 전환 방지
         sIsLoading = true;
         canInput = false; // 씬 전환 중 입력 차단
 
         StopAllCoroutines();
-        
-        // 파생 클래스에서 생성한 취소토큰이 있다면 정리
+
+        // 파생 클래스에서 생성한 비동기/이벤트 정리
         try
         {
             OnBeforeSceneUnload();
         }
-        catch(Exception e)
+        catch (Exception e)
         {
             Debug.LogError($"[SceneManager_Base] OnBeforeSceneUnload exception Error: {e}]");
         }
-        
+
         await FadeImageAsync(0f, 1f, fadeTime, fades);
+
         SceneManager.sceneLoaded += OnSceneLoaded;
         AsyncOperation op = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
-        await Task.Yield();
+
+        // Unity AsyncOperation은 await 불가 → 다음 프레임까지 양보
+        await UniTask.Yield();
     }
 
     /// <summary> 씬 전환 직전 클래스의 비동기/이벤트 정리 </summary>
@@ -290,7 +298,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     #region UI Builders
 
     /// <summary> TextObject 설정: 폰트/문구/색/정렬/RectTransform 반영 </summary>
-    protected async Task SettingTextObject(GameObject textObject, TextSetting ts)
+    protected async UniTask SettingTextObject(GameObject textObject, TextSetting ts)
     {
         if (!textObject || ts == null) return;
         if (textObject.TryGetComponent(out TextMeshProUGUI tmp) &&
@@ -304,7 +312,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
                 ts.fontColor,
                 ts.alignment,
                 CancellationToken.None
-            );
+            ).AsUniTask(); // 외부 Task → UniTask
 
             UIUtility.ApplyRect(
                 rt,
@@ -340,7 +348,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     /// <summary> VideoObject 설정: RT 바인딩, URL 해석, Prepare & Play </summary>
-    protected async Task SettingVideoObject(GameObject vpObject, VideoSetting vs, VideoPlayer vp, RawImage raw, AudioSource audioSource)
+    protected async UniTask SettingVideoObject(GameObject vpObject, VideoSetting vs, VideoPlayer vp, RawImage raw, AudioSource audioSource)
     {
         if (!vpObject || vs == null || !vp || !raw) return;
 
@@ -358,7 +366,11 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             vp, raw, new Vector2Int(Mathf.RoundToInt(vs.size.x), Mathf.RoundToInt(vs.size.y)));
 
         string url = VideoManager.Instance.ResolvePlayableUrl(vs.fileName);
-        await VideoManager.Instance.PrepareAndPlayAsync(vp, url, audioSource, vs.volume, CancellationToken.None);
+
+        // 외부 Task를 UniTask로 변환해 await
+        await VideoManager.Instance.PrepareAndPlayAsync(
+            vp, url, audioSource, vs.volume, CancellationToken.None
+        ).AsUniTask();
     }
 
     #endregion
@@ -373,9 +385,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         if (Input.touchCount > 0) return true;
         return false;
     }
-    
+
     /// <summary> 크로스 페이드 도중 입력을 막아 바로 다음 이미지로 넘어가는 것을 방지함 </summary>
-    protected async Task AdvanceStepAsync(GameObject fromGo, GameObject toGo, float duration)
+    protected async UniTask AdvanceStepAsync(GameObject fromGo, GameObject toGo, float duration)
     {
         // 입력 잠금 및 큐 비우기(전환 직전)
         canInput = false;
@@ -391,6 +403,6 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         // 입력 재개
         canInput = true;
     }
-    
+
     #endregion
 }

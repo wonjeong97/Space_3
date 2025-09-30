@@ -1,5 +1,5 @@
 using System;
-using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 
@@ -40,7 +40,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         else if (Instance != this) Destroy(this);
     }
     
-    protected override async Task Init()
+    protected override async UniTask Init()
     {
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
@@ -67,7 +67,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 break;
             }
             
-            await Task.Yield();
+            await UniTask.Yield();
         }
        
         if (rocketVFX.TryGetComponent(out _rocketLaunch))
@@ -84,7 +84,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     }
 
     /// <summary> 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 부드럽게 페이드 </summary>
-    private async Task RunCountdownAsync()
+    private async UniTask RunCountdownAsync()
     {
         if (!countdownText || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) 
             return;
@@ -105,7 +105,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 t += Time.deltaTime;
                 float a = 1f - Mathf.Clamp01(t / duration);
                 SetAlpha(tmp, a);
-                await Task.Yield();
+                await UniTask.Yield();
             }
 
             // 다음 숫자 전환 직전 완전 투명 보장
@@ -113,7 +113,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
     }
 
-    public async Task LoadNextSceneAsync()
+    public async UniTask LoadNextSceneAsync()
     {
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 0;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
