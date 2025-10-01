@@ -1,16 +1,21 @@
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 
+/// <summary>
+/// - StreamingAssets/Audio 폴더에서 JSON 설정에 따라 오디오 파일 로드
+/// - key 기반 PlayOneShot 지원
+/// </summary>
 public class AudioManager : MonoBehaviour
 {
     public static AudioManager Instance { get; private set; }
 
-    private readonly Dictionary<string, AudioClip> soundMap = new Dictionary<string, AudioClip>();
-    private readonly Dictionary<string, float> soundVolumeMap = new Dictionary<string, float>();
-    private AudioSource sfxSource;
+    private readonly Dictionary<string, AudioClip> _soundMap = new Dictionary<string, AudioClip>();
+    private readonly Dictionary<string, float> _soundVolumeMap = new Dictionary<string, float>();
+    private AudioSource _sfxSource;
 
     private void Awake()
     {
@@ -18,33 +23,34 @@ public class AudioManager : MonoBehaviour
         {
             Instance = this;
             //DontDestroyOnLoad(gameObject);
-            sfxSource = gameObject.GetComponent<AudioSource>();
-            if (sfxSource == null) sfxSource = gameObject.AddComponent<AudioSource>();
-            sfxSource.playOnAwake = false;
+
+            _sfxSource = gameObject.GetComponent<AudioSource>();
+            if (_sfxSource == null) _sfxSource = gameObject.AddComponent<AudioSource>();
+            _sfxSource.playOnAwake = false;
+
+            // UniTask fire-and-forget
+            LoadSoundsFromSettingsAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
         else if (Instance != this)
         {
             Destroy(gameObject);
             return;
         }
-
-        StartCoroutine(LoadSoundsFromSettings());
     }
 
-    /// <summary>
-    /// JSON(Settings.sounds) �������� StreamingAssets/Audio���� ���� ���� �ε�.
-    /// WAV/OGG/MP3 Ȯ���� �ڵ� �Ǻ�.
-    /// </summary>
-    private IEnumerator LoadSoundsFromSettings()
+    /// <summary> JSON Settings에서 사운드 목록을 읽어와 로드 (UniTask) </summary>
+    private async UniTaskVoid LoadSoundsFromSettingsAsync(CancellationToken token)
     {
-        soundMap.Clear();
-        soundVolumeMap.Clear();
+        _soundMap.Clear();
+        _soundVolumeMap.Clear();
 
         Settings settings = JsonLoader.Instance.settings;
-        if (settings?.sounds == null) yield break;
+        if (settings?.sounds == null) return;
 
-        foreach (var entry in settings.sounds)
+        foreach (SoundSetting entry in settings.sounds)
         {
+            token.ThrowIfCancellationRequested();
+
             string fullPath = Path.Combine(Application.streamingAssetsPath, "Audio", entry.clipPath).Replace("\\", "/");
             string url = "file://" + fullPath;
             string ext = Path.GetExtension(fullPath).ToLower();
@@ -55,13 +61,15 @@ public class AudioManager : MonoBehaviour
 
             using (var www = UnityWebRequestMultimedia.GetAudioClip(url, type))
             {
-                yield return www.SendWebRequest();
+                var op = www.SendWebRequest();
+                await op.ToUniTask(cancellationToken: token); // ← UniTask로 대체
+
                 if (www.result == UnityWebRequest.Result.Success)
                 {
                     var clip = DownloadHandlerAudioClip.GetContent(www);
                     clip.name = entry.key;
-                    soundMap[entry.key] = clip;
-                    soundVolumeMap[entry.key] = entry.volume;
+                    _soundMap[entry.key] = clip;
+                    _soundVolumeMap[entry.key] = entry.volume;
                 }
                 else
                 {
@@ -71,24 +79,24 @@ public class AudioManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ���� ��� API: Ű�� ��ϵ� Ŭ���� PlayOneShot.
-    /// </summary>
+    /// <summary> 키 기반 사운드 재생 API </summary>
     public bool Play(string key, float? volumeOverride = null)
     {
-        if (!sfxSource) return false;
-        if (!soundMap.TryGetValue(key, out var clip) || clip == null)
+        if (!_sfxSource) return false;
+        if (!_soundMap.TryGetValue(key, out AudioClip clip) || clip == null)
         {
             Debug.LogWarning($"[AudioManager] Key not found: {key}");
             return false;
         }
-        float vol = volumeOverride ?? (soundVolumeMap.TryGetValue(key, out var v) ? v : 1f);
-        sfxSource.PlayOneShot(clip, Mathf.Clamp01(vol));
+
+        float vol = volumeOverride ?? (_soundVolumeMap.GetValueOrDefault(key, 1f));
+        _sfxSource.PlayOneShot(clip, Mathf.Clamp01(vol));
         return true;
     }
 
+    /// <summary> 현재 재생 중인 모든 사운드 정지 </summary>
     public void StopAll()
     {
-        if (sfxSource && sfxSource.isPlaying) sfxSource.Stop();
+        if (_sfxSource && _sfxSource.isPlaying) _sfxSource.Stop();
     }
 }

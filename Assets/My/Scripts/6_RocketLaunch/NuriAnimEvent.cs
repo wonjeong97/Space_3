@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
@@ -7,8 +8,8 @@ using Cysharp.Threading.Tasks;
 public struct JetEngine
 {
     public GameObject rootObject;
-    public ParticleSystem flame_A;
-    public ParticleSystem flame_B;
+    public ParticleSystem flameA;
+    public ParticleSystem flameB;
 }
 
 public class NuriAnimEvent : MonoBehaviour
@@ -20,17 +21,17 @@ public class NuriAnimEvent : MonoBehaviour
 
     [Header("Stage1")]
     [SerializeField] private GameObject stage1;
-    [SerializeField] private List<GameObject> stage1VFXs = new List<GameObject>();
+    [SerializeField] private List<GameObject> stage1VfXs = new List<GameObject>();
     [SerializeField] private ParticleSystem stage1Smoke;
 
     [Header("Stage2")]
     [SerializeField] private GameObject stage2;
-    [SerializeField] private List<JetEngine> stage2VFXs = new List<JetEngine>();
+    [SerializeField] private List<JetEngine> stage2VfXs = new List<JetEngine>();
     [SerializeField] private ParticleSystem stage2Smoke;
 
     [Header("Stage3")]
     [SerializeField] private GameObject stage3;
-    [SerializeField] private List<JetEngine> stage3VFXs = new List<JetEngine>();
+    [SerializeField] private List<JetEngine> stage3VfXs = new List<JetEngine>();
 
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
@@ -43,7 +44,7 @@ public class NuriAnimEvent : MonoBehaviour
         {
             if (!stage1 || !stage1Smoke) return;
 
-            foreach (GameObject vfx in stage1VFXs)
+            foreach (GameObject vfx in stage1VfXs)
             {
                 if (vfx && vfx.TryGetComponent(out JetVFXAnim anim))
                 {
@@ -66,11 +67,11 @@ public class NuriAnimEvent : MonoBehaviour
 
             await UniTask.Delay(300, cancellationToken: token);
 
-            foreach (var vfx in stage2VFXs)
+            foreach (var vfx in stage2VfXs)
             {
                 var root = vfx.rootObject;
-                var flameA = vfx.flame_A;
-                var flameB = vfx.flame_B;
+                var flameA = vfx.flameA;
+                var flameB = vfx.flameB;
 
                 if (root && root.TryGetComponent(out JetVFXAnim anim) && flameA && flameB)
                 {
@@ -170,7 +171,7 @@ public class NuriAnimEvent : MonoBehaviour
         {
             if (!stage2) return;
 
-            foreach (var vfx in stage2VFXs)
+            foreach (var vfx in stage2VfXs)
             {
                 var root = vfx.rootObject;
                 if (root && root.TryGetComponent(out JetVFXAnim anim))
@@ -192,11 +193,11 @@ public class NuriAnimEvent : MonoBehaviour
                 rb.interpolation = interpolation;
             }
 
-            foreach (var vfx in stage3VFXs)
+            foreach (var vfx in stage3VfXs)
             {
                 var root = vfx.rootObject;
-                var flameA = vfx.flame_A;
-                var flameB = vfx.flame_B;
+                var flameA = vfx.flameA;
+                var flameB = vfx.flameB;
 
                 if (root && root.TryGetComponent(out JetVFXAnim anim) && flameA && flameB)
                 {
@@ -222,7 +223,7 @@ public class NuriAnimEvent : MonoBehaviour
     /// <summary> 다음 씬 호출 </summary>
     public async UniTask CallNextScene()
     {
-        var token = this.GetCancellationTokenOnDestroy();
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
         if (LaunchManager.Instance == null) return;
 
         try
@@ -233,7 +234,7 @@ public class NuriAnimEvent : MonoBehaviour
         {
             // 씬 전환/오브젝트 파괴 시 정상 취소
         }
-        catch (System.Exception e)
+        catch (Exception e)
         {
             Debug.LogError(e);
         }

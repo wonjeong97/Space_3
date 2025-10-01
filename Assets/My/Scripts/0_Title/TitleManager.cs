@@ -36,7 +36,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         ArduinoInputManager.Instance?.SetLedAll(true);    
         
         // 연출
-        StartCoroutine(TurnCamera3());
+        TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
         
         while (true)

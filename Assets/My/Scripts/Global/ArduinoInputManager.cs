@@ -1,9 +1,8 @@
-using UnityEngine;
 using System;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Threading;
-using System.Threading.Tasks;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
@@ -135,7 +134,7 @@ public class ArduinoInputManager : MonoBehaviour
         {
             int original = _pressedBits;
             int updated = original | bit;
-            if (System.Threading.Interlocked.CompareExchange(ref _pressedBits, updated, original) == original)
+            if (Interlocked.CompareExchange(ref _pressedBits, updated, original) == original)
                 break;
         }
     }

@@ -50,7 +50,7 @@ public class RSManager : SceneManager_Base<RSSetting>
         ArduinoInputManager.Instance?.SetLedAll(true);    
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
         
-        StartCoroutine(TurnCamera3());
+        TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
         while (true)
         {   
             // 입력 대기

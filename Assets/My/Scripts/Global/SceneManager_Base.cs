@@ -76,11 +76,11 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     // UniTask 권장: Start를 UniTaskVoid로
-    protected virtual async UniTaskVoid Start()
+    protected virtual async void Start()
     {
-        var token = this.GetCancellationTokenOnDestroy();
         try
         {
+            CancellationToken token = this.GetCancellationTokenOnDestroy();
             _globalSettings ??= JsonLoader.Instance.settings;
             setting = JsonLoader.Instance.LoadJsonData<T>(JsonPath);
 
@@ -194,18 +194,25 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     #region Camera / Fade / Scene
 
     /// <summary> Display3 카메라를 일정 속도로 계속 회전시킴 </summary>
-    protected IEnumerator TurnCamera3()
+    protected async UniTaskVoid TurnCamera3Async(CancellationToken token)
     {
         if (!camera3)
         {
             Debug.LogError("[SceneManager] camera3 is not assigned");
-            yield break;
+            return;
         }
 
-        while (true)
+        try
         {
-            camera3.transform.Rotate(Vector3.up, _camera3TurnSpeed * Time.deltaTime, Space.World);
-            yield return null;
+            while (!token.IsCancellationRequested) //매 프레임마다 회전
+            {
+                camera3.transform.Rotate(Vector3.up, _camera3TurnSpeed * Time.deltaTime, Space.World);
+                await UniTask.Yield(PlayerLoopTiming.Update, token); // 다음 프레임까지 대기
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 정상 취소 시 조용히 종료
         }
     }
 
@@ -267,8 +274,6 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         sIsLoading = true;
         canInput = false; // 씬 전환 중 입력 차단
 
-        StopAllCoroutines();
-
         // 파생 클래스에서 생성한 비동기/이벤트 정리
         try
         {
@@ -291,6 +296,28 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 씬 전환 직전 클래스의 비동기/이벤트 정리 </summary>
     protected virtual void OnBeforeSceneUnload()
     {
+        canInput = false; // 입력 차단
+        inputReceived = true; // 추가 입력 방지(키보드, 마우스)
+
+        try
+        {
+            StopAllCoroutines();
+        }
+        catch
+        {
+        }
+        
+        try // 아두이노 입력 큐 비움
+        {
+            if (ArduinoInputManager.Instance)
+                ArduinoInputManager.Instance.FlushAll();
+        }
+        catch (Exception e)
+        {
+            Debug.LogWarning($"[SceneManager_Base] FlushAll failed: {e.Message}");
+        }
+        
+        if (!Mathf.Approximately(Time.timeScale, 1f)) Time.timeScale = 1f;
     }
 
     #endregion
@@ -312,7 +339,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
                 ts.fontColor,
                 ts.alignment,
                 CancellationToken.None
-            ).AsUniTask(); // 외부 Task → UniTask
+            ); // 외부 Task → UniTask
 
             UIUtility.ApplyRect(
                 rt,
@@ -324,25 +351,25 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     /// <summary> ImageObject 설정: 스트리밍 에셋 이미지 로드/타입/RectTransform 반영 </summary>
-    protected void SettingImageObject(GameObject imageObject, ImageSetting iset)
+    protected void SettingImageObject(GameObject imageObject, ImageSetting imageSet)
     {
-        if (!imageObject || iset == null) return;
+        if (!imageObject || imageSet == null) return;
         if (imageObject.TryGetComponent(out Image img) &&
             imageObject.TryGetComponent(out RectTransform rt))
         {
-            Texture2D tex = UIUtility.LoadTextureFromStreamingAssets(iset.sourceImage);
+            Texture2D tex = UIUtility.LoadTextureFromStreamingAssets(imageSet.sourceImage);
             if (tex != null)
             {
                 img.sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
-                img.color = iset.color;
-                img.type = (Image.Type)iset.type;
+                img.color = imageSet.color;
+                img.type = (Image.Type)imageSet.type;
             }
 
             UIUtility.ApplyRect(
                 rt,
-                size: iset.size,
-                anchoredPos: new Vector2(iset.position.x, -iset.position.y),
-                rotation: iset.rotation
+                size: imageSet.size,
+                anchoredPos: new Vector2(imageSet.position.x, -imageSet.position.y),
+                rotation: imageSet.rotation
             );
         }
     }
