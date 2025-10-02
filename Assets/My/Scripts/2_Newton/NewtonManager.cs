@@ -20,7 +20,8 @@ public class NewtonSetting
 /// <summary> 뉴턴의 제 1~3법칙 씬 관리 매니저 </summary>
 public class NewtonManager : SceneManager_Base<NewtonSetting>
 {
-    [Header("UI")] [SerializeField] private GameObject titleImage;
+    [Header("UI")] 
+    [SerializeField] private GameObject titleImage;
     [SerializeField] private GameObject infoImage1;
     [SerializeField] private GameObject infoImage2;
     [SerializeField] private GameObject videoPlayerObject;
@@ -162,87 +163,94 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     /// - 이름 또는 파일명이 '...Loop'로 끝나는 영상: 계속 반복 재생하며, 사용자 입력 시 다음으로 이동.
     /// </summary>
     private async UniTask SwitchAndPlayNextAsync(VideoSetting next, bool withFade)
-{
-    if (_isSwitching) return;
-    _isSwitching = true;
-
-    CancelAndDispose(ref _skipCts);
-
-    if (infoImage2) infoImage2.SetActive(false);
-    _awaitingSkip = false;
-    inputReceived = false;
-    ArduinoInputManager.Instance?.SetLedAll(false);
-
-    // 페이드가 없는 법칙→법칙 전환에서는 마지막 프레임 유지
-    bool holdLastFrame = !withFade;
-
-    if (withFade)
-        await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
-
-    // 현재 프레임 고정 (Stop 대신 Pause/속도 0)
-    if (_vp != null)
     {
-        _vp.loopPointReached -= OnVideoEnded;
-        try { _vp.Pause(); _vp.playbackSpeed = 0f; } catch { }
-    }
+        if (_isSwitching) return;
+        _isSwitching = true;
 
-    // RT 준비: 사이즈가 같으면 재사용, 다르면 새 RT를 미리 VideoPlayer에만 연결
-    Vector2Int desired = new Vector2Int(Mathf.RoundToInt(next.size.x), Mathf.RoundToInt(next.size.y));
-    RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
-    RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
+        CancelAndDispose(ref _skipCts);
 
-    // 다음 영상 준비 (RawImage는 그대로 마지막 프레임을 계속 보여줌)
-    string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
-    bool isLoop = IsLoopClip(next);
-    double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
+        if (infoImage2) infoImage2.SetActive(false);
+        _awaitingSkip = false;
+        inputReceived = false;
+        ArduinoInputManager.Instance?.SetLedAll(false);
 
-    bool ok = await VideoManager.Instance.PrepareAndPlayAsync(
-        _vp, url, _audio, next.volume, this.GetCancellationTokenOnDestroy(), timeout);
+        // 페이드가 없는 법칙→법칙 전환에서는 마지막 프레임 유지
+        bool holdLastFrame = !withFade;
 
-    if (!ok)
-    {
-        Debug.LogError($"[NewtonManager] Prepare failed: {url}");
+        if (withFade)
+            await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
+
+        // 현재 프레임 고정 (Stop 대신 Pause/속도 0)
+        if (_vp != null)
+        {
+            _vp.loopPointReached -= OnVideoEnded;
+            try
+            {
+                _vp.Pause();
+                _vp.playbackSpeed = 0f;
+            }
+            catch
+            {
+            }
+        }
+
+        // RT 준비: 사이즈가 같으면 재사용, 다르면 새 RT를 미리 VideoPlayer에만 연결
+        Vector2Int desired = new Vector2Int(Mathf.RoundToInt(next.size.x), Mathf.RoundToInt(next.size.y));
+        RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
+        RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
+
+        // 다음 영상 준비 (RawImage는 그대로 마지막 프레임을 계속 보여줌)
+        string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
+        bool isLoop = IsLoopClip(next);
+        double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
+
+        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(
+            _vp, url, _audio, next.volume, this.GetCancellationTokenOnDestroy(), timeout);
+
+        if (!ok)
+        {
+            Debug.LogError($"[NewtonManager] Prepare failed: {url}");
+            _isSwitching = false;
+            if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+            return;
+        }
+
+        // 첫 프레임이 실제로 생성될 때까지 잠깐 대기 (프레임/텍스처 체크)
+        int guard = 0;
+        while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
+            await UniTask.Yield();
+
+        // 화면에 스왑 (사이즈 동일 재사용이면 이미 보이는 중이므로 스왑 불필요)
+        if (_raw != null && rtForNext != null && keepShowing != rtForNext)
+        {
+            _raw.texture = rtForNext; // 깜빡임 없이 교체
+            _lastRT = rtForNext;
+        }
+
+        // 재생 재개/루프 설정/이벤트 재연결
+        if (_vp != null)
+        {
+            _vp.isLooping = isLoop;
+            _vp.playbackSpeed = 1f; // 재생 정상화
+            _vp.loopPointReached += OnVideoEnded;
+        }
+
+        if (isLoop)
+        {
+            if (infoImage2) infoImage2.SetActive(true);
+            _awaitingSkip = true;
+            ArduinoInputManager.Instance?.SetLedAll(true);
+
+            _skipCts = new CancellationTokenSource();
+            int capturedIndex = _ruleIndex;
+            _ = WaitSkipThenProceedAsync(_skipCts.Token, capturedIndex);
+        }
+
+        if (withFade)
+            await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+
         _isSwitching = false;
-        if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-        return;
     }
-
-    // 첫 프레임이 실제로 생성될 때까지 잠깐 대기 (프레임/텍스처 체크)
-    int guard = 0;
-    while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
-        await UniTask.Yield();
-
-    // 화면에 스왑 (사이즈 동일 재사용이면 이미 보이는 중이므로 스왑 불필요)
-    if (_raw != null && rtForNext != null && keepShowing != rtForNext)
-    {
-        _raw.texture = rtForNext; // 깜빡임 없이 교체
-        _lastRT = rtForNext;
-    }
-
-    // 재생 재개/루프 설정/이벤트 재연결
-    if (_vp != null)
-    {
-        _vp.isLooping = isLoop;
-        _vp.playbackSpeed = 1f; // 재생 정상화
-        _vp.loopPointReached += OnVideoEnded;
-    }
-
-    if (isLoop)
-    {
-        if (infoImage2) infoImage2.SetActive(true);
-        _awaitingSkip = true;
-        ArduinoInputManager.Instance?.SetLedAll(true);
-
-        _skipCts = new CancellationTokenSource();
-        int capturedIndex = _ruleIndex;
-        _ = WaitSkipThenProceedAsync(_skipCts.Token, capturedIndex);
-    }
-
-    if (withFade)
-        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-
-    _isSwitching = false;
-}
 
     /// <summary>
     /// 루프 영상에서 사용자 입력을 받으면 다음 영상으로 진행.
