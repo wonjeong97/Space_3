@@ -1,12 +1,13 @@
 using System;
-using System.Collections;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
-using Cysharp.Threading.Tasks; // UniTask
+
+// UniTask
 
 public abstract class SceneManager_Base<T> : MonoBehaviour
 {

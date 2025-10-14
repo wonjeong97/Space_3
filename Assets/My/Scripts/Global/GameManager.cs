@@ -90,6 +90,7 @@ public class GameManager : MonoBehaviour
         try
         {
             ArduinoInputManager.Instance?.SetLedAll(false);
+            LedStrip.Clear();
             Thread.Sleep(100); // 전송 마무리 대기
             Debug.Log("[GameManager] All LEDs turned off.");
         }

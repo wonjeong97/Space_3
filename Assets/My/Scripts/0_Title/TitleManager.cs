@@ -33,7 +33,10 @@ public class TitleManager : SceneManager_Base<TitleSetting>
 
         // 이미지 세팅까지 한 프레임 늦춤
         await UniTask.Yield();
-        ArduinoInputManager.Instance?.SetLedAll(true);    
+        ArduinoInputManager.Instance?.SetLedAll(true);   
+        
+        LedStrip.Fill(255, 0, 0);
+        LedStrip.Bright(128);
         
         // 연출
         TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();

@@ -6,6 +6,72 @@ using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 /// <summary>
+/// 아두이노 NeoPixel 스트립 제어 유틸리티
+/// </summary>
+public static class LedStrip
+{
+    public static void Pixel(int index, int r, int g, int b)
+    {
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null)
+        {
+            Debug.LogError("ArduinoInputManager.Instance is null.");
+            return;
+        }
+
+        inst.Send($"PIX {index} {r} {g} {b}");
+    }
+
+    public static void Range(int start, int end, int r, int g, int b)
+    {
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null)
+        {
+            Debug.LogError("ArduinoInputManager.Instance is null.");
+            return;
+        }
+
+        inst.Send($"RANGE {start} {end} {r} {g} {b}");
+    }
+
+    public static void Fill(int r, int g, int b)
+    {
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null)
+        {
+            Debug.LogError("ArduinoInputManager.Instance is null.");
+            return;
+        }
+
+        inst.Send($"FILL {r} {g} {b}");
+    }
+
+    public static void Clear()
+    {
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null)
+        {
+            Debug.LogError("ArduinoInputManager.Instance is null.");
+            return;
+        }
+
+        inst.Send("CLEAR");
+    }
+
+    public static void Bright(int brightness)
+    {
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null)
+        {
+            Debug.LogError("ArduinoInputManager.Instance is null.");
+            return;
+        }
+
+        inst.Send($"BRIGHT {brightness}");
+    }
+}
+
+/// <summary>
 /// 아두이노와 시리얼 통신을 담당하는 매니저
 /// - 버튼: 아두이노가 보내는 "Button n Pressed" 한 줄을 받아서, 한 번만 소비되는 플래그로 제공
 /// - LED: Unity에서 "LEDn ON/OFF" 문자열을 전송하여 릴레이(버튼 LED) 제어
@@ -113,7 +179,6 @@ public class ArduinoInputManager : MonoBehaviour
                 {
                     SetPressedBit(BIT_B3);
                 }
-                // 아두이노가 "OK" 같은 응답을 보내는 경우가 있어도 무시해도 됨
             }
             catch (TimeoutException)
             {
@@ -196,25 +261,7 @@ public class ArduinoInputManager : MonoBehaviour
         }
     }
 
-    // 특정 버튼만 소비하고 싶을 때 사용
-    public bool TryConsumePress(ButtonId target)
-    {
-        int bit = target == ButtonId.Button1 ? BIT_B1
-            : target == ButtonId.Button2 ? BIT_B2
-            : BIT_B3;
-
-        while (true)
-        {
-            int bits = _pressedBits;
-            if ((bits & bit) == 0) return false;
-
-            int newBits = bits & ~bit;
-            if (Interlocked.CompareExchange(ref _pressedBits, newBits, bits) == bits)
-                return true;
-        }
-    }
-
-    // 기존에 쓰던 FlushAll 대체: 모든 눌림 플래그 제거
+    // 모든 눌림 플래그 제거
     public int FlushAll()
     {
         // 원자적으로 비트를 0으로
@@ -255,7 +302,24 @@ public class ArduinoInputManager : MonoBehaviour
         SetLed(1, on);
         SetLed(2, on);
         SetLed(3, on);
-        // 필요 시 4번도 사용
-        // SetLed(4, on);
+    }
+
+    public void Send(string line)
+    {
+        try
+        {
+            if (_serialPort != null && _serialPort.IsOpen)
+            {
+                _serialPort.WriteLine(line);
+            }
+            else
+            {
+                Debug.LogError("[ArduinoInputManager] Send failed: port not open.");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError("[ArduinoInputManager] Send exception: " + e.Message);
+        }
     }
 }
