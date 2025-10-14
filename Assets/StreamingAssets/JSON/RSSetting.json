@@ -36,5 +36,11 @@
       "size": { "x": 1500, "y": 800 },
       "sourceImage": "Image/RocketStructure/7.png"
     }
-  ]
+  ],
+  "structureVideo":  {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"fileName": "Video/RocketStructure/1_Structure.webm",
+	"volume": 1.0
+  }
 }

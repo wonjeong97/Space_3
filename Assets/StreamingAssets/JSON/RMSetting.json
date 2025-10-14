@@ -26,6 +26,38 @@
 	"size": { "x": 1920, "y": 540 },
 	"sourceImage": "Image/RocketMake/sub1.png"
   },
+  "main1Children":[
+	{
+	  "position": { "x": 61.5, "y": 532 },
+	  "size": { "x": 77, "y": 53 },
+	  "sourceImage": "Image/RocketMake/1_거치.png"
+	},
+	{
+	  "position": { "x": 143, "y": 532 },
+	  "size": { "x": 107, "y": 53 },
+	  "sourceImage": "Image/RocketMake/2_연료주입.png"
+	},
+	{
+	  "position": { "x": 225, "y": 532 },
+	  "size": { "x": 77, "y": 53 },
+	  "sourceImage": "Image/RocketMake/3_대기.png"
+	},
+	{
+	  "position": { "x": 291.5, "y": 532 },
+	  "size": { "x": 77, "y": 53 },
+	  "sourceImage": "Image/RocketMake/4_발사.png"
+	},
+	{
+	  "position": { "x": 373, "y": 532 },
+	  "size": { "x": 107, "y": 53 },
+	  "sourceImage": "Image/RocketMake/5_엔진분리.png"
+	},
+	{
+	  "position": { "x": 471, "y": 532 },
+	  "size": { "x": 107, "y": 53 },
+	  "sourceImage": "Image/RocketMake/6_위성안착.png"
+	}
+  ],
   "rockets": [
 	{
 	  "rocketImage": {
@@ -206,16 +238,44 @@
 	  "sourceImage": "Image/test.png"
 	}
   ],
-  "locationVideo": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"fileName": "Video/RocketMake/201.mp4",
-	"volume": 1.0
-  },
-  "rocketMakeVideo": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"fileName": "Video/RocketMake/202.mp4",
-	"volume": 1.0
-  }
+  "locationVideo": [
+	{
+	  "position": { "x": 960, "y": 540 },
+	  "size": { "x": 1920, "y": 1080 },
+	  "fileName": "Video/RocketMake/1_Location.webm",
+	  "volume": 1.0
+	},
+	{
+	  "position": { "x": 960, "y": 540 },
+	  "size": { "x": 1920, "y": 1080 },
+	  "fileName": "Video/RocketMake/1_Location-Loop.webm",
+	  "volume": 1.0
+	}
+  ],
+  "rocketMakeVideo": [
+	{
+	  "position": { "x": 960, "y": 540 },
+	  "size": { "x": 1920, "y": 1080 },
+	  "fileName": "Video/RocketMake/1-1_Make.webm",
+	  "volume": 1.0
+	},
+	{
+	  "position": { "x": 960, "y": 540 },
+	  "size": { "x": 1920, "y": 1080 },
+	  "fileName": "Video/RocketMake/1-2_Make-Loop.webm",
+	  "volume": 1.0
+	},
+	{
+	  "position": { "x": 960, "y": 540 },
+	  "size": { "x": 1920, "y": 1080 },
+	  "fileName": "Video/RocketMake/2_Make.webm",
+	  "volume": 1.0
+	},
+	{
+	  "position": { "x": 960, "y": 540 },
+	  "size": { "x": 1920, "y": 1080 },
+	  "fileName": "Video/RocketMake/3_Make.webm",
+	  "volume": 1.0
+	}
+  ]
 }
