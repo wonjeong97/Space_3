@@ -56,11 +56,13 @@ public class GameManager : MonoBehaviour
             Cursor.visible = !Cursor.visible;
         }
     }
-
+    
+#if !UNITY_EDITOR
     private void OnApplicationQuit()
     {
         TurnOffAllLeds();
     }
+#endif
 
 #if UNITY_EDITOR
     private void OnPlayModeStateChanged(PlayModeStateChange state)

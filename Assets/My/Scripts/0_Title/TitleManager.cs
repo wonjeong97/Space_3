@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -17,7 +18,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
     [SerializeField] private GameObject infoImage;  // 시작하려면 아무 버튼이나 누르세요 이미지
 
     protected override string JsonPath => "JSON/TitleSetting.json";
-
+    
     /// <summary> 씬 초기화 메서드 </summary>
     protected override async UniTask Init()
     {
@@ -33,10 +34,9 @@ public class TitleManager : SceneManager_Base<TitleSetting>
 
         // 이미지 세팅까지 한 프레임 늦춤
         await UniTask.Yield();
-        ArduinoInputManager.Instance?.SetLedAll(true);   
         
-        LedStrip.Fill(255, 0, 0);
-        LedStrip.Bright(128);
+        ArduinoInputManager.Instance?.SetLedAll(true);   
+        StartBlinkGreenAsync(300, 160);
         
         // 연출
         TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
@@ -46,9 +46,11 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         {       
             if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
             if (TryConsumeSingleInput()) break;
-            
             await UniTask.Yield();
         }
+        
+        StopLedEffects();
+        SetAllGreen(255);
 
         // 씬 전환
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 1;

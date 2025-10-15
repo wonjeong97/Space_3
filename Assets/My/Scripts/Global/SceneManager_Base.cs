@@ -7,8 +7,6 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
-// UniTask
-
 public abstract class SceneManager_Base<T> : MonoBehaviour
 {
     #region Serialized Refs
@@ -18,7 +16,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     [SerializeField] protected Camera camera2; // Display2
     [SerializeField] protected Camera camera3; // Display3
 
-    [Header("Canvas")]
+    [Header("Canvas")] 
     [SerializeField] protected Canvas mainCanvas;
     [SerializeField] protected Canvas subCanvas;
     [SerializeField] protected Canvas verticalCanvas;
@@ -28,12 +26,16 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     [SerializeField] protected Image fadeImage2; // Display2 Fade
     [SerializeField] protected Image fadeImage3; // Display3 Fade
 
-    [Header("Scene Flow")] 
+    [Header("Scene Flow")]
     [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")] 
     [SerializeField] protected int nextSceneBuildIndex = -1;
 
-    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")]
+    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] 
     [SerializeField] private bool useInactivityTimeout = true;
+
+    // ========= LED Effects (공통) =========
+    private CancellationTokenSource _ledCts;
+    private int _blinkHalfPeriodMs = 300; // 초록 깜빡임 반주기(기본 300ms)
 
     #endregion
 
@@ -77,7 +79,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     // UniTask 권장: Start를 UniTaskVoid로
-    protected virtual async void Start()
+    protected virtual async UniTaskVoid Start()
     {
         try
         {
@@ -102,7 +104,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
             await InitSafe(token);
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -142,6 +146,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         _cts?.Dispose();
         _cts = null;
+        StopLedEffects();
     }
 
     #endregion
@@ -297,8 +302,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 씬 전환 직전 클래스의 비동기/이벤트 정리 </summary>
     protected virtual void OnBeforeSceneUnload()
     {
-        canInput = false; // 입력 차단
-        inputReceived = true; // 추가 입력 방지(키보드, 마우스)
+        canInput = false;
+        inputReceived = true;
 
         try
         {
@@ -307,8 +312,11 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         catch
         {
         }
-        
-        try // 아두이노 입력 큐 비움
+
+        // LED 효과 안전 중지
+        StopLedEffects();
+
+        try
         {
             if (ArduinoInputManager.Instance)
                 ArduinoInputManager.Instance.FlushAll();
@@ -317,7 +325,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         {
             Debug.LogWarning($"[SceneManager_Base] FlushAll failed: {e.Message}");
         }
-        
+
         if (!Mathf.Approximately(Time.timeScale, 1f)) Time.timeScale = 1f;
     }
 
@@ -430,6 +438,84 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         // 입력 재개
         canInput = true;
+    }
+
+    #endregion
+
+    #region LED Effects (public helpers for children)
+
+    protected void StartBlinkGreenAsync(int periodMsHalf = 300, int onBrightness = 160)
+    {
+        _blinkHalfPeriodMs = Mathf.Max(50, periodMsHalf);
+        StopLedEffects();
+
+        _ledCts = new CancellationTokenSource();
+        _ = BlinkGreenLoopAsync(_ledCts.Token, onBrightness);
+    }
+
+    protected void StopLedEffects()
+    {
+        if (_ledCts != null)
+        {
+            try
+            {
+                _ledCts.Cancel();
+            }
+            catch
+            {
+            }
+
+            _ledCts.Dispose();
+            _ledCts = null;
+        }
+    }
+
+    protected void SetAllGreen(int brightness = 255)
+    {
+        StopLedEffects();
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.SetLedAll(true);
+        LedStrip.Fill(0, 255, 0);
+        LedStrip.Bright(Mathf.Clamp(brightness, 0, 255));
+    }
+
+    protected void SetAllRed(int brightness = 255)
+    {
+        StopLedEffects();
+        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.SetLedAll(true);
+        LedStrip.Fill(255, 0, 0);
+        LedStrip.Bright(Mathf.Clamp(brightness, 0, 255));
+    }
+
+    protected void SetAllOff()
+    {
+        StopLedEffects();
+        LedStrip.Clear();
+    }
+
+    private async UniTaskVoid BlinkGreenLoopAsync(CancellationToken token, int onBrightness)
+    {
+        bool on = true;
+
+        while (!token.IsCancellationRequested)
+        {
+            if (on)
+            {
+                // 켬: 초록으로 채우고(필요시 밝기도 지정)
+                LedStrip.Fill(0, 255, 0);
+                if (onBrightness < 255)
+                    LedStrip.Bright(Mathf.Clamp(onBrightness, 1, 255));
+            }
+            else
+            {
+                // 끔: 전체 소등
+                LedStrip.Clear();
+            }
+
+            on = !on;
+
+            try { await UniTask.Delay(_blinkHalfPeriodMs, cancellationToken: token); }
+            catch (OperationCanceledException) { break; }
+        }
     }
 
     #endregion
