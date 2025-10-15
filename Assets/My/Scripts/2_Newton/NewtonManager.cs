@@ -89,8 +89,10 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _ruleSeq = setting.newtonsRuleVideos;
         _ruleIndex = 0;
         _phase = Phase.Intro;
-
+        
+        StopLedEffects();
         ArduinoInputManager.Instance?.SetLedAll(false);
+        LedStrip.Range(0, 9, 255, 0, 0);
 
         // 인트로 세팅 및 재생  
         await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
@@ -172,7 +174,10 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         if (infoImage2) infoImage2.SetActive(false);
         _awaitingSkip = false;
         inputReceived = false;
+        
+        StopLedEffects();
         ArduinoInputManager.Instance?.SetLedAll(false);
+        LedStrip.Range(0, 9, 255, 0, 0);
 
         // 페이드가 없는 법칙→법칙 전환에서는 마지막 프레임 유지
         bool holdLastFrame = !withFade;
@@ -240,6 +245,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             if (infoImage2) infoImage2.SetActive(true);
             _awaitingSkip = true;
             ArduinoInputManager.Instance?.SetLedAll(true);
+            StartBlinkGreenAsync(500, 160);
 
             _skipCts = new CancellationTokenSource();
             int capturedIndex = _ruleIndex;
@@ -283,8 +289,11 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
         }
-
+    
+        StopLedEffects();
         ArduinoInputManager.Instance?.SetLedAll(false);
+        LedStrip.Range(0, 9, 255, 0, 0);
+        
         if (infoImage2) infoImage2.SetActive(false);
         _awaitingSkip = false;
 

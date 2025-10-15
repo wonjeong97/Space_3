@@ -109,6 +109,8 @@ public class RMManager : SceneManager_Base<RMSetting>
     
     // RT 최적화
     private RenderTexture _lastRT;
+    
+    private CancellationTokenSource _main1AlphaCts;
 
     #region Unity
 
@@ -128,6 +130,13 @@ public class RMManager : SceneManager_Base<RMSetting>
             _skipCts = null;
         }
 
+        if (_main1AlphaCts != null)
+        {
+            try { _main1AlphaCts.Cancel(); } catch { }
+            _main1AlphaCts.Dispose();
+            _main1AlphaCts = null;
+        }
+
         _velBarCts?.Cancel();
         _velBarCts?.Dispose();
         _maxBarCts?.Cancel();
@@ -138,6 +147,8 @@ public class RMManager : SceneManager_Base<RMSetting>
         _slopeBarCts?.Dispose();
         _remainBarCts?.Cancel();
         _remainBarCts?.Dispose();
+        _main1AlphaCts?.Cancel();
+        _main1AlphaCts?.Dispose();
     }
 
     protected override async UniTask Init()
@@ -166,6 +177,11 @@ public class RMManager : SceneManager_Base<RMSetting>
             }
         }
         
+        if (main1ChildrenImages != null && main1ChildrenImages.Length > 0 && main1ChildrenImages[0] != null)
+        {
+            StartAlphaPingPong(main1ChildrenImages[0], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
+        }
+        
         InitializeProgressBar();
         if (rocketImage) rocketImage.SetActive(false);
 
@@ -181,7 +197,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         _makeIndex = 0;
 
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
-
+        ArduinoInputManager.Instance?.SetLedAll(true);
+        StartBlinkGreenAsync(500, 160);
+        
         // 입력 루프(좌/우/확인)
         while (_phase != Phase.Done)
         {
@@ -299,7 +317,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         if (_phase == Phase.SelectSatellite)
         {
             _phase = Phase.Location;
+            StopLedEffects();
             ArduinoInputManager.Instance?.SetLedAll(false);
+            LedStrip.Range(0, 9, 255, 0, 0);
             await StartLocationSequenceAsync();
             return true;
         }
@@ -313,7 +333,9 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     /// <summary> 장소 영상 배열 시퀀스 시작 </summary>
     private async UniTask StartLocationSequenceAsync()
-    {
+    {   
+        // '거치' 알파 애니메이션 해제
+        StopCtsSafe(ref _main1AlphaCts);
         _locIndex = 0;
         
         // 영상 재생 전 뒷배경 청소
@@ -464,6 +486,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         {
             _awaitingSkip = true;
             ArduinoInputManager.Instance?.SetLedAll(true);
+            StartBlinkGreenAsync(500, 160);
 
             _skipCts = new CancellationTokenSource();
             int loc = _locIndex;
@@ -513,7 +536,10 @@ public class RMManager : SceneManager_Base<RMSetting>
             _vp.Stop();
         }
 
+        StopLedEffects();
         ArduinoInputManager.Instance?.SetLedAll(false);
+        LedStrip.Range(0, 9, 255, 0, 0);
+        
         _awaitingSkip = false;
 
         if (_skipCts != null)

@@ -13,6 +13,9 @@ public class FuelSetting
     public ImageSetting main1;
     public ImageSetting main2;
     public ImageSetting main3;
+    
+    public ImageSetting[] main1Children;
+    
     public ImageSetting fuelPopup;
     public ImageSetting sub1;
 
@@ -31,6 +34,9 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject fuelImage1;
     [SerializeField] private GameObject fuelImage2;
     [SerializeField] private GameObject fuelImage3;
+    
+    [Header("mainImage1")]
+    [SerializeField] private Image[] main1ChildrenImages;
 
     protected override string JsonPath => "JSON/FuelSetting.json";
 
@@ -49,6 +55,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     private Phase _phase = Phase.RocketMove;
     private CancellationTokenSource _popupFadeCts;
     private CancellationTokenSource _blinkCts;
+    private CancellationTokenSource _main1AlphaCts;
 
     protected override void OnDisable()
     {
@@ -56,6 +63,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         {
             _popupFadeCts?.Cancel();
             _blinkCts?.Cancel();
+            _main1AlphaCts?.Cancel();
             ArduinoInputManager.Instance?.SetLedAll(false);
         }
         catch (Exception e)
@@ -67,6 +75,9 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         _popupFadeCts = null;
         _blinkCts?.Dispose();
         _blinkCts = null;
+        _main1AlphaCts?.Dispose();
+        _main1AlphaCts = null;
+        
     }
 
     protected override async UniTask Init()
@@ -80,6 +91,22 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(popupImage, setting.fuelPopup);
         SettingImageObject(subImage, setting.sub1);
+        
+        // mainImage1의 자식 이미지들 세팅
+        if (setting.main1Children != null && main1ChildrenImages != null)
+        {
+            int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
+            for (int i = 0; i < count; i++)
+            {
+                if (main1ChildrenImages[i] == null) continue;
+                SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
+            }
+        }
+        
+        if (main1ChildrenImages != null && main1ChildrenImages.Length > 0 && main1ChildrenImages[0] != null)
+        {
+            StartAlphaPingPong(main1ChildrenImages[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
+        }
 
         // 게이지 이미지 세팅
         SettingImageObject(fuelImage1, setting.fuelImage[0]);
@@ -90,6 +117,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         ArduinoInputManager.Instance?.SetLedAll(true);
 
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
+        StartBlinkGreenAsync(500, 160);
 
         _phase = Phase.FuelInjection1;
         _blinkCts = new CancellationTokenSource();

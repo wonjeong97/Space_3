@@ -470,28 +470,6 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         }
     }
 
-    protected void SetAllGreen(int brightness = 255)
-    {
-        StopLedEffects();
-        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.SetLedAll(true);
-        LedStrip.Fill(0, 255, 0);
-        LedStrip.Bright(Mathf.Clamp(brightness, 0, 255));
-    }
-
-    protected void SetAllRed(int brightness = 255)
-    {
-        StopLedEffects();
-        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.SetLedAll(true);
-        LedStrip.Fill(255, 0, 0);
-        LedStrip.Bright(Mathf.Clamp(brightness, 0, 255));
-    }
-
-    protected void SetAllOff()
-    {
-        StopLedEffects();
-        LedStrip.Clear();
-    }
-
     private async UniTaskVoid BlinkGreenLoopAsync(CancellationToken token, int onBrightness)
     {
         bool on = true;
@@ -519,4 +497,52 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     #endregion
+    
+    /// <summary>
+    /// Graphic 알파를 minA~maxA로 왕복(ping-pong) 애니메이션.
+    /// periodSec: 내려갔다 올라오는 왕복 한 번의 시간(초)
+    /// </summary>
+    protected async UniTask AnimateAlphaPingPongAsync(Graphic g, float minA, float maxA, float periodSec, CancellationToken token)
+    {
+        if (!g) return;
+        if (periodSec <= 0f) periodSec = 1f;
+
+        Color baseColor = g.color;
+        float speed = 2f / periodSec; // 0→1→0이 periodSec 동안
+        float phase = 0f;
+
+        // 초기 알파를 범위 안으로 강제
+        float clamped = Mathf.Clamp(baseColor.a, minA, maxA);
+        g.color = new Color(baseColor.r, baseColor.g, baseColor.b, clamped);
+
+        while (!token.IsCancellationRequested)
+        {
+            phase += Time.deltaTime * speed;
+            float t = Mathf.PingPong(phase, 1f);             // 0..1..0
+            float a = Mathf.Lerp(minA, maxA, t);             // minA..maxA..minA
+            g.color = new Color(baseColor.r, baseColor.g, baseColor.b, a);
+            await UniTask.Yield();
+        }
+    }
+
+    /// <summary>
+    /// 알파 핑퐁 애니메이션 시작. 기존 토큰이 있으면 취소/해제 후 새로 시작.
+    /// </summary>
+    protected void StartAlphaPingPong(Graphic g, float minA, float maxA, float periodSec, ref CancellationTokenSource cts)
+    {
+        StopCtsSafe(ref cts);
+        cts = new CancellationTokenSource();
+        _ = AnimateAlphaPingPongAsync(g, minA, maxA, periodSec, cts.Token);
+    }
+
+    /// <summary>
+    /// CTS 안전 정리 헬퍼
+    /// </summary>
+    protected void StopCtsSafe(ref CancellationTokenSource cts)
+    {
+        if (cts == null) return;
+        try { cts.Cancel(); } catch { }
+        cts.Dispose();
+        cts = null;
+    }
 }

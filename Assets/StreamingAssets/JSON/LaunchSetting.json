@@ -19,5 +19,43 @@
 	"position": { "x": 960, "y": 270 },
 	"size": { "x": 1920, "y": 540 },
 	"sourceImage": "Image/RocketLaunch/sub1.png"
-  }
+  },
+  "main1Children":[
+	{
+	  "position": { "x": 61.5, "y": 532 },
+	  "size": { "x": 77, "y": 53 },
+	  "sourceImage": "Image/RocketMake/1_거치.png",
+	  "color": {"r": 1, "g": 1, "b": 1, "a": 1}
+	},
+	{
+	  "position": { "x": 143, "y": 532 },
+	  "size": { "x": 107, "y": 53 },
+	  "sourceImage": "Image/RocketMake/2_연료주입.png",
+	  "color": {"r": 1, "g": 1, "b": 1, "a": 1}
+	},
+	{
+	  "position": { "x": 225, "y": 532 },
+	  "size": { "x": 77, "y": 53 },
+	  "sourceImage": "Image/RocketMake/3_대기.png",
+	  "color": {"r": 1, "g": 1, "b": 1, "a": 1}
+	},
+	{
+	  "position": { "x": 291.5, "y": 532 },
+	  "size": { "x": 77, "y": 53 },
+	  "sourceImage": "Image/RocketMake/4_발사.png",
+	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	},
+	{
+	  "position": { "x": 373, "y": 532 },
+	  "size": { "x": 107, "y": 53 },
+	  "sourceImage": "Image/RocketMake/5_엔진분리.png",
+	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	},
+	{
+	  "position": { "x": 471, "y": 532 },
+	  "size": { "x": 107, "y": 53 },
+	  "sourceImage": "Image/RocketMake/6_위성안착.png",
+	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	}
+  ]
 }

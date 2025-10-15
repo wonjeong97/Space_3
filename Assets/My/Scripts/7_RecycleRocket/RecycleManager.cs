@@ -1,6 +1,7 @@
 using System;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class RecycleSetting
@@ -14,6 +15,8 @@ public class RecycleSetting
     public ImageSetting endBackground;
     public ImageSetting endImage1;
     public ImageSetting endImage2;
+    
+    public ImageSetting[] main1Children;
 }
 
 /// <summary> 발사체 회수 팝업을 띄우고 체험을 종료한다. </summary>
@@ -28,6 +31,9 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
     [SerializeField] private GameObject endImage1;
     [SerializeField] private GameObject endImage2;
 
+    [Header("mainImage1")]
+    [SerializeField] private Image[] main1ChildrenImages;
+    
     protected override string JsonPath => "JSON/RecycleSetting.json";
 
     private float _popupFadeTime;
@@ -47,8 +53,22 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
         SettingImageObject(endImage1, setting.endImage1);
         SettingImageObject(endImage2, setting.endImage2);
         
+        // mainImage1의 자식 이미지들 세팅
+        if (setting.main1Children != null && main1ChildrenImages != null)
+        {
+            int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
+            for (int i = 0; i < count; i++)
+            {
+                if (main1ChildrenImages[i] == null) continue;
+                SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
+            }
+        }
+        
         endBackgroundImage.gameObject.SetActive(false);
+        
         ArduinoInputManager.Instance?.SetLedAll(true);
+        StartBlinkGreenAsync(500, 160);
+        
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
 
         // 입력 대기
@@ -57,7 +77,9 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
             if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
                 || TryConsumeSingleInput())
             {   
+                StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
+                LedStrip.Range(0, 9, 255, 0, 0);
                 break;
             }
                 

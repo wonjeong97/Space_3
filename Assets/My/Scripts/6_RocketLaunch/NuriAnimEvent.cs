@@ -43,7 +43,9 @@ public class NuriAnimEvent : MonoBehaviour
         try
         {
             if (!stage1 || !stage1Smoke) return;
-
+            
+            LaunchManager.Instance?.FocusImage3ThenPingPong4();
+            
             foreach (GameObject vfx in stage1VfXs)
             {
                 if (vfx && vfx.TryGetComponent(out JetVFXAnim anim))
@@ -170,7 +172,9 @@ public class NuriAnimEvent : MonoBehaviour
         try
         {
             if (!stage2) return;
-
+            // 4 고정, 5 핑퐁
+            LaunchManager.Instance?.FocusImage4ThenPingPong5();
+            
             foreach (var vfx in stage2VfXs)
             {
                 var root = vfx.rootObject;

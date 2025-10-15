@@ -1,7 +1,9 @@
 using System;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 [Serializable]
 public class LaunchSetting
@@ -11,6 +13,8 @@ public class LaunchSetting
     public ImageSetting main2;
     public ImageSetting main3;
     public ImageSetting sub1;
+    
+    public ImageSetting[] main1Children;
 }
 
 public class LaunchManager : SceneManager_Base<LaunchSetting>
@@ -23,6 +27,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject mainImage3;
     [SerializeField] private GameObject subImage;
     [SerializeField] private GameObject countdownText;
+    
+    [Header("mainImage1")]
+    [SerializeField] private Image[] main1ChildrenImages;
 
     [Header("Rocket")]
     [SerializeField] private GameObject rocketVFX;
@@ -31,6 +38,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     private int _rocketCountdown;
     private RocketLaunch _rocketLaunch;
+    private CancellationTokenSource[] _alphaCts;
 
     protected override void Awake()
     {
@@ -40,12 +48,41 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         else if (Instance != this) Destroy(this);
     }
     
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+
+        if (_alphaCts != null)
+        {
+            for (int i = 0; i < _alphaCts.Length; i++)
+            {
+                StopCtsSafe(ref _alphaCts[i]);
+            }
+        }
+    }
+    
     protected override async UniTask Init()
     {
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(subImage,  setting.sub1);
+        
+        // mainImage1의 자식 이미지들 세팅
+        if (setting.main1Children != null && main1ChildrenImages != null)
+        {
+            int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
+            for (int i = 0; i < count; i++)
+            {
+                if (main1ChildrenImages[i] == null) continue;
+                SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
+            }
+        }
+        
+        if (main1ChildrenImages != null)
+        {
+            _alphaCts = new CancellationTokenSource[main1ChildrenImages.Length];
+        }
 
         _rocketCountdown = Mathf.Max(1, setting.rocketCountdown);
         if (countdownText && countdownText.TryGetComponent(out TextMeshProUGUI tmp))
@@ -54,7 +91,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             SetAlpha(tmp, 0f);
         }
         
+        StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
+        
         ArduinoInputManager.Instance?.SetLedAll(true);
+        StartBlinkGreenAsync(500, 160);
+
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
         // 입력 대기
@@ -63,13 +104,19 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
                 || TryConsumeSingleInput())
             {   
+                StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
+                LedStrip.Range(0, 9, 255, 0, 0);
+                
+                StopPingPongAndSetAlpha(2, 1.0f); // 2번 고정 1
+                StartPingPongAt(3, 0.28f, 1.0f, 2.0f); // 3번 핑퐁
+                
                 break;
             }
             
             await UniTask.Yield();
         }
-       
+        
         if (rocketVFX.TryGetComponent(out _rocketLaunch))
         {
             _rocketLaunch.Call();    
@@ -117,5 +164,67 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     {
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 0;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
+    }
+    
+    /// <summary> 인덱스 범위/널 체크 후 Graphic 반환 </summary>
+    private bool TryGetChildGraphic(int index, out Graphic g)
+    {
+        g = null;
+        if (main1ChildrenImages == null) return false;
+        if (index < 0 || index >= main1ChildrenImages.Length) return false;
+        if (main1ChildrenImages[index] == null) return false;
+        g = main1ChildrenImages[index];
+        return true;
+    }
+
+    /// <summary> 특정 인덱스의 핑퐁을 중지하고 알파를 고정값으로 설정 </summary>
+    private void StopPingPongAndSetAlpha(int index, float alpha)
+    {
+        if (_alphaCts != null && index >= 0 && index < _alphaCts.Length)
+        {
+            StopCtsSafe(ref _alphaCts[index]);
+        }
+
+        Graphic g;
+        if (TryGetChildGraphic(index, out g))
+        {
+            SetAlpha(g, alpha);
+        }
+    }
+
+    /// <summary> 특정 인덱스의 핑퐁 시작(기존 실행 중이면 교체) </summary>
+    private void StartPingPongAt(int index, float minA = 0.28f, float maxA = 1.0f, float periodSec = 2.0f)
+    {
+        if (main1ChildrenImages == null) return;
+        if (index < 0 || index >= main1ChildrenImages.Length) return;
+        if (main1ChildrenImages[index] == null) return;
+
+        // 배열 초기화
+        if (_alphaCts == null || _alphaCts.Length != main1ChildrenImages.Length)
+        {
+            int len = main1ChildrenImages.Length;
+            _alphaCts = new CancellationTokenSource[len];
+        }
+
+        // 시작
+        StartAlphaPingPong(main1ChildrenImages[index], minA, maxA, periodSec, ref _alphaCts[index]);
+    }
+    
+    /// <summary>
+    /// 외부 호출: 3번 알파 1로 고정, 4번 핑퐁 시작
+    /// </summary>
+    public void FocusImage3ThenPingPong4()
+    {
+        StopPingPongAndSetAlpha(3, 1.0f);
+        StartPingPongAt(4, 0.28f, 1.0f, 2.0f);
+    }
+
+    /// <summary>
+    /// 외부 호출: 4번 알파 1로 고정, 5번 핑퐁 시작
+    /// </summary>
+    public void FocusImage4ThenPingPong5()
+    {
+        StopPingPongAndSetAlpha(4, 1.0f);
+        StartPingPongAt(5, 0.28f, 1.0f, 2.0f);
     }
 }

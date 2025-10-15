@@ -36,7 +36,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         await UniTask.Yield();
         
         ArduinoInputManager.Instance?.SetLedAll(true);   
-        StartBlinkGreenAsync(300, 160);
+        StartBlinkGreenAsync(500, 160);
         
         // 연출
         TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
@@ -48,9 +48,6 @@ public class TitleManager : SceneManager_Base<TitleSetting>
             if (TryConsumeSingleInput()) break;
             await UniTask.Yield();
         }
-        
-        StopLedEffects();
-        SetAllGreen(255);
 
         // 씬 전환
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 1;

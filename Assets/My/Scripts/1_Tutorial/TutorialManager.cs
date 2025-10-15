@@ -53,6 +53,7 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
         // 이미지 세팅 반영을 위해 한 프레임 양보
         await UniTask.Yield();
 
+        StartBlinkGreenAsync(500, 160);
         TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
 
