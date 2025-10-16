@@ -27,7 +27,7 @@ public class RMSetting
     public ImageSetting main2;
     public ImageSetting main3;
     public ImageSetting sub1;
-
+    
     public ImageSetting[] main1Children;
 
     public RocketSetting[] rockets;

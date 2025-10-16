@@ -14,6 +14,7 @@ public class LaunchSetting
     public ImageSetting main3;
     public ImageSetting sub1;
     
+    public ImageSetting[] stages;
     public ImageSetting[] main1Children;
 }
 
@@ -29,6 +30,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject countdownText;
     
     [Header("mainImage1")]
+    [SerializeField] private Image[] stages;
     [SerializeField] private Image[] main1ChildrenImages;
 
     [Header("Rocket")]
@@ -39,6 +41,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     private int _rocketCountdown;
     private RocketLaunch _rocketLaunch;
     private CancellationTokenSource[] _alphaCts;
+    private CancellationTokenSource[] _stageCts;
 
     protected override void Awake()
     {
@@ -67,6 +70,17 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(subImage,  setting.sub1);
+        
+        // stage 이미지 세팅
+        if (setting.stages != null && stages != null)
+        {
+            int count = Mathf.Min(setting.stages.Length, stages.Length);
+            for (int i = 0; i < count; i++)
+            {
+                if (stages[i] == null) continue;
+                SettingImageObject(stages[i].gameObject, setting.stages[i]);
+            }
+        }
         
         // mainImage1의 자식 이미지들 세팅
         if (setting.main1Children != null && main1ChildrenImages != null)
@@ -127,6 +141,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
         
         // 카운트다운 시작
+        await FadeInStageAsync(1);
         await RunCountdownAsync();
     }
 
@@ -226,5 +241,50 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     {
         StopPingPongAndSetAlpha(4, 1.0f);
         StartPingPongAt(5, 0.28f, 1.0f, 2.0f);
+    }
+    
+    private async UniTask FadeInStageAsync(int index, float duration = 0.6f)
+    {
+        if (!TryGetStageGraphic(index, out Graphic g)) return;
+
+        // 기존 진행 중이면 취소
+        if (_stageCts != null && index >= 0 && index < _stageCts.Length)
+        {
+            StopCtsSafe(ref _stageCts[index]);
+            _stageCts[index] = new CancellationTokenSource();
+        }
+        CancellationToken token = (_stageCts != null && index >= 0 && index < _stageCts.Length)
+            ? _stageCts[index].Token
+            : CancellationToken.None;
+
+        float d = Mathf.Max(0.01f, duration);
+        float t = 0f;
+
+        // 시작 알파 보정
+        float startA = g.color.a;
+        while (t < d)
+        {
+            if (token.IsCancellationRequested) return;
+            t += Time.deltaTime;
+            float a = Mathf.Lerp(startA, 1f, t / d);
+            SetAlpha(g, a);
+            await UniTask.Yield();
+        }
+        SetAlpha(g, 1f);
+    }
+    
+    public UniTask FadeInStagePublicAsync(int index, float duration = 0.6f)
+    {
+        return FadeInStageAsync(index, duration);
+    }
+    
+    private bool TryGetStageGraphic(int index, out Graphic g)
+    {
+        g = null;
+        if (stages == null) return false;
+        if (index < 0 || index >= stages.Length) return false;
+        if (stages[index] == null) return false;
+        g = stages[index];
+        return true;
     }
 }

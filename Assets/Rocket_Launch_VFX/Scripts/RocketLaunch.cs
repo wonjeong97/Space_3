@@ -65,6 +65,8 @@ public class RocketLaunch : MonoBehaviour
         flames_B_Particles.Stop();
         sparks_Particles.Stop();
 
+        LaunchManager.Instance?.FadeInStagePublicAsync(2);
+
         Destroy(launch_Smoke_Particles);
         Destroy(flamesLight);
         Destroy(turbulence_Smoke_Particles);
