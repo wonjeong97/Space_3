@@ -103,7 +103,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             }
         }
         
-        if (main1ChildrenImages != null && main1ChildrenImages.Length > 0 && main1ChildrenImages[0] != null)
+        if (main1ChildrenImages != null && main1ChildrenImages.Length > 1 && main1ChildrenImages[1] != null)
         {
             StartAlphaPingPong(main1ChildrenImages[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
@@ -323,6 +323,42 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         finally
         {
             mgr.SetLed(ledIndex, false); // 종료 시 확실히 꺼줌
+        }
+    }
+    
+    /// <summary>
+    /// 디버그 스킵 입력 처리
+    /// - 모든 연료 주입 과정을 중단하고 즉시 다음 씬으로 이동
+    /// </summary>
+    protected override void OnDebugSkip()
+    {
+        try
+        {
+            // 진행 중 태스크 모두 취소
+            _popupFadeCts?.Cancel();
+            _blinkCts?.Cancel();
+            _main1AlphaCts?.Cancel();
+
+            // LED 및 효과 정리
+            ArduinoInputManager.Instance.SetLedAll(false);
+            StopLedEffects();
+
+            // 상태 정리
+            _phase = Phase.Done;
+
+            // 다음 씬 전환
+            if (nextSceneBuildIndex >= 0)
+            {
+                _ = LoadSceneAsync(nextSceneBuildIndex, new[] { fadeImage1, fadeImage2, fadeImage3 });
+            }
+            else
+            {
+                Debug.Log("[FuelManager] Debug skip pressed, but nextSceneBuildIndex is not set.");
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[FuelManager] OnDebugSkip Exception: {e}");
         }
     }
 }

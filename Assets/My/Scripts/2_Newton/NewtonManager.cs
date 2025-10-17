@@ -48,26 +48,27 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     private VideoSetting[] _ruleSeq; // 뉴턴의 법칙 비디오를 저장하는 배열
     private int _ruleIndex;
 
-    private bool _awaitingSkip; // 루프 영상에서 사용자 입력 대기 중인지
+    
 
     // 루프 영상에서 사용자 입력을 감시하는 태스크를 제어하기 위한 토큰
     private CancellationTokenSource _skipCts;
 
     protected override void OnDisable()
     {
-        try
-        {
-            CancelAndDispose(ref _skipCts);
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[NewtonManager] OnDisable Exception: {e.Message}\n{e}");
-        }
+        CancelAndDispose(ref _skipCts);
 
         if (_vp != null)
         {
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
+        }
+
+        // 마지막 RenderTexture 해제
+        if (_lastRT != null)
+        {
+            if (_lastRT.IsCreated()) _lastRT.Release();
+            Destroy(_lastRT);
+            _lastRT = null;
         }
     }
 
@@ -165,98 +166,104 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     /// - 이름 또는 파일명이 '...Loop'로 끝나는 영상: 계속 반복 재생하며, 사용자 입력 시 다음으로 이동.
     /// </summary>
     private async UniTask SwitchAndPlayNextAsync(VideoSetting next, bool withFade)
+{
+    if (_isSwitching) return;
+    _isSwitching = true;
+
+    CancelAndDispose(ref _skipCts);
+
+    if (infoImage2) infoImage2.SetActive(false);
+    inputReceived = false;
+
+    StopLedEffects();
+    ArduinoInputManager.Instance?.SetLedAll(false);
+    LedStrip.Range(0, 9, 255, 0, 0);
+
+    bool holdLastFrame = !withFade;
+
+    if (withFade)
+        await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
+
+    // 현재 프레임 고정
+    if (_vp != null)
     {
-        if (_isSwitching) return;
-        _isSwitching = true;
-
-        CancelAndDispose(ref _skipCts);
-
-        if (infoImage2) infoImage2.SetActive(false);
-        _awaitingSkip = false;
-        inputReceived = false;
-        
-        StopLedEffects();
-        ArduinoInputManager.Instance?.SetLedAll(false);
-        LedStrip.Range(0, 9, 255, 0, 0);
-
-        // 페이드가 없는 법칙→법칙 전환에서는 마지막 프레임 유지
-        bool holdLastFrame = !withFade;
-
-        if (withFade)
-            await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
-
-        // 현재 프레임 고정 (Stop 대신 Pause/속도 0)
-        if (_vp != null)
+        _vp.loopPointReached -= OnVideoEnded;
+        try
         {
-            _vp.loopPointReached -= OnVideoEnded;
-            try
-            {
-                _vp.Pause();
-                _vp.playbackSpeed = 0f;
-            }
-            catch
-            {
-            }
+            _vp.Pause();
+            _vp.playbackSpeed = 0f;
         }
-
-        // RT 준비: 사이즈가 같으면 재사용, 다르면 새 RT를 미리 VideoPlayer에만 연결
-        Vector2Int desired = new Vector2Int(Mathf.RoundToInt(next.size.x), Mathf.RoundToInt(next.size.y));
-        RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
-        RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
-
-        // 다음 영상 준비 (RawImage는 그대로 마지막 프레임을 계속 보여줌)
-        string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
-        bool isLoop = IsLoopClip(next);
-        double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
-
-        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(
-            _vp, url, _audio, next.volume, this.GetCancellationTokenOnDestroy(), timeout);
-
-        if (!ok)
+        catch (ObjectDisposedException)
         {
-            Debug.LogError($"[NewtonManager] Prepare failed: {url}");
-            _isSwitching = false;
-            if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-            return;
+            // 이미 파괴/해제된 경우 무시
         }
-
-        // 첫 프레임이 실제로 생성될 때까지 잠깐 대기 (프레임/텍스처 체크)
-        int guard = 0;
-        while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
-            await UniTask.Yield();
-
-        // 화면에 스왑 (사이즈 동일 재사용이면 이미 보이는 중이므로 스왑 불필요)
-        if (_raw != null && rtForNext != null && keepShowing != rtForNext)
+        catch (Exception e)
         {
-            _raw.texture = rtForNext; // 깜빡임 없이 교체
-            _lastRT = rtForNext;
+            Debug.LogWarning($"[NewtonManager] Pause/playbackSpeed guard failed: {e.Message}");
         }
-
-        // 재생 재개/루프 설정/이벤트 재연결
-        if (_vp != null)
-        {
-            _vp.isLooping = isLoop;
-            _vp.playbackSpeed = 1f; // 재생 정상화
-            _vp.loopPointReached += OnVideoEnded;
-        }
-
-        if (isLoop)
-        {
-            if (infoImage2) infoImage2.SetActive(true);
-            _awaitingSkip = true;
-            ArduinoInputManager.Instance?.SetLedAll(true);
-            StartBlinkGreenAsync(500, 160);
-
-            _skipCts = new CancellationTokenSource();
-            int capturedIndex = _ruleIndex;
-            _ = WaitSkipThenProceedAsync(_skipCts.Token, capturedIndex);
-        }
-
-        if (withFade)
-            await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-
-        _isSwitching = false;
     }
+
+    Vector2Int desired = new Vector2Int(Mathf.RoundToInt(next.size.x), Mathf.RoundToInt(next.size.y));
+    RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
+    RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
+
+    string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
+    bool isLoop = IsLoopClip(next);
+    double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
+
+    bool ok = await VideoManager.Instance.PrepareAndPlayAsync(
+        _vp, url, _audio, next.volume, this.GetCancellationTokenOnDestroy(), timeout);
+
+    if (!ok)
+    {
+        Debug.LogError($"[NewtonManager] Prepare failed: {url}");
+        _isSwitching = false;
+        if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+        return;
+    }
+
+    int guard = 0;
+    while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
+        await UniTask.Yield();
+
+    // 화면 스왑 + 이전 RT 해제
+    if (_raw != null && rtForNext != null && keepShowing != rtForNext)
+    {
+        // 이전에 트래킹하던 RT가 있고, 이번에 보여줄 텍스처와도 다르면 해제
+        if (_lastRT != null && _lastRT != rtForNext && _lastRT != keepShowing)
+        {
+            if (_lastRT.IsCreated()) _lastRT.Release();
+            Destroy(_lastRT);
+        }
+
+        _raw.texture = rtForNext;  // 스왑
+        _lastRT = rtForNext;       // 새 RT 기억
+    }
+
+    if (_vp != null)
+    {
+        _vp.isLooping = isLoop;
+        _vp.playbackSpeed = 1f;
+        _vp.loopPointReached += OnVideoEnded;
+    }
+
+    if (isLoop)
+    {
+        if (infoImage2) infoImage2.SetActive(true);
+        ArduinoInputManager.Instance?.SetLedAll(true);
+        StartBlinkGreenAsync(500, 160);
+
+        _skipCts = new CancellationTokenSource();
+        int capturedIndex = _ruleIndex;
+        _ = WaitSkipThenProceedAsync(_skipCts.Token, capturedIndex);
+    }
+
+    if (withFade)
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+
+    _isSwitching = false;
+}
+
 
     /// <summary>
     /// 루프 영상에서 사용자 입력을 받으면 다음 영상으로 진행.
@@ -295,8 +302,6 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         LedStrip.Range(0, 9, 255, 0, 0);
         
         if (infoImage2) infoImage2.SetActive(false);
-        _awaitingSkip = false;
-
         CancelAndDispose(ref _skipCts);
 
         _ruleIndex++;
@@ -316,22 +321,6 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     {
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 3;
         return LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
-    }
-
-    /// <summary> 실행 중인 태스크를 취소하고 메모리/리소스 해제 </summary>
-    private void CancelAndDispose(ref CancellationTokenSource cts)
-    {
-        if (cts == null) return;
-        try
-        {
-            cts.Cancel();
-        }
-        catch
-        {
-        }
-
-        cts.Dispose();
-        cts = null;
     }
 
     // 씬 전환 직전 클래스의 비동기/이벤트 정리
@@ -366,5 +355,42 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         string fn = string.IsNullOrEmpty(vs.fileName) ? string.Empty : vs.fileName;
         string stem = string.IsNullOrEmpty(fn) ? string.Empty : Path.GetFileNameWithoutExtension(fn);
         return stem.EndsWith("Loop", StringComparison.OrdinalIgnoreCase);
+    }
+    
+    /// <summary>
+    /// 디버그 스킵 입력 처리
+    /// - 모든 영상 재생/대기 상태를 종료하고 바로 다음 씬으로 이동
+    /// </summary>
+    protected override void OnDebugSkip()
+    {
+        try
+        {
+            // 루프 입력 대기 태스크 취소
+            CancelAndDispose(ref _skipCts);
+
+            // VideoPlayer 이벤트 해제 및 정지
+            if (_vp)
+            {
+                _vp.loopPointReached -= OnVideoEnded;
+                if (_vp.isPlaying) _vp.Stop();
+            }
+
+            // 안내 UI 및 LED 효과 정리
+            if (infoImage2) infoImage2.SetActive(false);
+            
+            StopLedEffects();
+            ArduinoInputManager.Instance?.SetLedAll(false);
+            LedStrip.Range(0, 9, 255, 0, 0);
+
+            // 상태 플래그 정리 후 다음 씬
+            _isSwitching = false;
+            _phase = Phase.Done;
+
+            _ = GoNextSceneAsync();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[NewtonManager] OnDebugSkip Exception: {e}");
+        }
     }
 }

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -61,12 +62,11 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
         while (true)
         {
             // 입력 대기 루프
-            while (true)
+            CancellationToken cancel = this.GetCancellationTokenOnDestroy();
+            while (!cancel.IsCancellationRequested && isActiveAndEnabled)
             {
-                if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
-                    || TryConsumeSingleInput())
-                    break;
-
+                if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
+                if (TryConsumeSingleInput()) break;
                 await UniTask.Yield();
             }
 

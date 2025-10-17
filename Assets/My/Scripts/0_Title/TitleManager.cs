@@ -6,6 +6,7 @@ using UnityEngine;
 [Serializable]
 public class TitleSetting
 {
+    public ImageSetting background;
     public ImageSetting titleImage;
     public ImageSetting infoImage;
 }
@@ -14,6 +15,7 @@ public class TitleSetting
 public class TitleManager : SceneManager_Base<TitleSetting>
 {
     [Header("UI")]
+    [SerializeField] private GameObject backgroundImage;
     [SerializeField] private GameObject titleImage; // 우주발사체 타이틀 이미지
     [SerializeField] private GameObject infoImage;  // 시작하려면 아무 버튼이나 누르세요 이미지
 
@@ -29,6 +31,7 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         inputReceived = false;
 
         // 타이틀 이미지 세팅
+        SettingImageObject(backgroundImage, setting.background);
         SettingImageObject(titleImage, setting.titleImage); 
         SettingImageObject(infoImage, setting.infoImage);
 
@@ -42,8 +45,9 @@ public class TitleManager : SceneManager_Base<TitleSetting>
         TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
         
-        while (true)
-        {       
+        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
+        while (!cancel.IsCancellationRequested && isActiveAndEnabled)
+        {
             if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
             if (TryConsumeSingleInput()) break;
             await UniTask.Yield();

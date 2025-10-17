@@ -48,7 +48,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         base.Awake();
 
         if (Instance == null) Instance = this;
-        else if (Instance != this) Destroy(this);
+        else if (Instance != this) Destroy(gameObject);
     }
     
     protected override void OnDisable()
@@ -59,7 +59,14 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             for (int i = 0; i < _alphaCts.Length; i++)
             {
-                StopCtsSafe(ref _alphaCts[i]);
+                CancelAndDispose(ref _alphaCts[i]);
+            }
+        }
+        if (_stageCts != null)
+        {
+            for (int i = 0; i < _stageCts.Length; i++)
+            {
+                CancelAndDispose(ref _stageCts[i]);
             }
         }
     }
@@ -97,6 +104,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             _alphaCts = new CancellationTokenSource[main1ChildrenImages.Length];
         }
+        
+        if (stages != null)
+        {
+            _stageCts = new CancellationTokenSource[stages.Length];
+        }
 
         _rocketCountdown = Mathf.Max(1, setting.rocketCountdown);
         if (countdownText && countdownText.TryGetComponent(out TextMeshProUGUI tmp))
@@ -113,7 +125,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
         // 입력 대기
-        while (true)
+        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
+        while (!cancel.IsCancellationRequested && isActiveAndEnabled)
         {
             if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
                 || TryConsumeSingleInput())
@@ -121,23 +134,23 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
-                
+        
                 StopPingPongAndSetAlpha(2, 1.0f); // 2번 고정 1
                 StartPingPongAt(3, 0.28f, 1.0f, 2.0f); // 3번 핑퐁
-                
+        
                 break;
             }
-            
+    
             await UniTask.Yield();
         }
         
-        if (rocketVFX.TryGetComponent(out _rocketLaunch))
+        if (rocketVFX != null && rocketVFX.TryGetComponent(out _rocketLaunch))
         {
-            _rocketLaunch.Call();    
+            _rocketLaunch.Call();
         }
         else
         {
-            Debug.LogError("[LaunchManager] Failed to _rocketLaunch.Call");
+            Debug.LogError("[LaunchManager] rocketVFX not assigned or missing RocketLaunch component");
         }
         
         // 카운트다운 시작
@@ -151,19 +164,20 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         if (!countdownText || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) 
             return;
 
-        // 안전장치
+        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
         float duration = Mathf.Max(0.01f, 1.0f);
 
         for (int n = _rocketCountdown; n > 0; n--)
         {
-            // 숫자 갱신 및 완전 표시
-            tmp.text = n.ToString();
+            if (cancel.IsCancellationRequested) return;
+            
+            tmp.text = n.ToString(); // 숫자 갱신 및 완전 표시
             SetAlpha(tmp, 1f);
-
-            // 알파 1 -> 0 페이드
-            float t = 0f;
+            
+            float t = 0f; // 알파 1 -> 0 페이드
             while (t < duration)
             {
+                if (cancel.IsCancellationRequested) return;
                 t += Time.deltaTime;
                 float a = 1f - Mathf.Clamp01(t / duration);
                 SetAlpha(tmp, a);
@@ -197,7 +211,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     {
         if (_alphaCts != null && index >= 0 && index < _alphaCts.Length)
         {
-            StopCtsSafe(ref _alphaCts[index]);
+            CancelAndDispose(ref _alphaCts[index]);
         }
 
         Graphic g;
@@ -208,7 +222,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     }
 
     /// <summary> 특정 인덱스의 핑퐁 시작(기존 실행 중이면 교체) </summary>
-    private void StartPingPongAt(int index, float minA = 0.28f, float maxA = 1.0f, float periodSec = 2.0f)
+    private void StartPingPongAt(int index, float minA, float maxA, float periodSec)
     {
         if (main1ChildrenImages == null) return;
         if (index < 0 || index >= main1ChildrenImages.Length) return;
@@ -220,23 +234,23 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             int len = main1ChildrenImages.Length;
             _alphaCts = new CancellationTokenSource[len];
         }
-
+        if (_alphaCts[index] != null)
+        {
+            CancelAndDispose(ref _alphaCts[index]);
+        }
+        
         // 시작
         StartAlphaPingPong(main1ChildrenImages[index], minA, maxA, periodSec, ref _alphaCts[index]);
     }
     
-    /// <summary>
-    /// 외부 호출: 3번 알파 1로 고정, 4번 핑퐁 시작
-    /// </summary>
+    /// <summary> 외부 호출: 3번 알파 1로 고정, 4번 핑퐁 시작 </summary>
     public void FocusImage3ThenPingPong4()
     {
         StopPingPongAndSetAlpha(3, 1.0f);
         StartPingPongAt(4, 0.28f, 1.0f, 2.0f);
     }
 
-    /// <summary>
-    /// 외부 호출: 4번 알파 1로 고정, 5번 핑퐁 시작
-    /// </summary>
+    /// <summary> 외부 호출: 4번 알파 1로 고정, 5번 핑퐁 시작 </summary>
     public void FocusImage4ThenPingPong5()
     {
         StopPingPongAndSetAlpha(4, 1.0f);
@@ -248,14 +262,20 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         if (!TryGetStageGraphic(index, out Graphic g)) return;
 
         // 기존 진행 중이면 취소
+        if (_stageCts == null || (stages != null && _stageCts.Length != stages.Length))
+        {
+            int len = stages?.Length ?? 0;
+            _stageCts = (len > 0) ? new CancellationTokenSource[len] : null;
+        }
+
         if (_stageCts != null && index >= 0 && index < _stageCts.Length)
         {
-            StopCtsSafe(ref _stageCts[index]);
+            CancelAndDispose(ref _stageCts[index]);
             _stageCts[index] = new CancellationTokenSource();
         }
         CancellationToken token = (_stageCts != null && index >= 0 && index < _stageCts.Length)
             ? _stageCts[index].Token
-            : CancellationToken.None;
+            : this.GetCancellationTokenOnDestroy();
 
         float d = Mathf.Max(0.01f, duration);
         float t = 0f;
@@ -283,7 +303,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         g = null;
         if (stages == null) return false;
         if (index < 0 || index >= stages.Length) return false;
-        if (stages[index] == null) return false;
+        if (!stages[index]) return false;
         g = stages[index];
         return true;
     }

@@ -55,10 +55,10 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     private float _camera3TurnSpeed; // 회전 속도
 
     protected int buttonDelayTime;
-
+    private float _lastDebugSkipTime;
+    private const float DebugSkipCooldown = 0.25f; // 너무 빠른 중복 입력 방지
+    
     protected abstract string JsonPath { get; }
-
-    private CancellationTokenSource _cts; // 씬 생명주기용 CTS
 
     #endregion
 
@@ -74,16 +74,12 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         if (!fadeImage1 || !fadeImage2 || !fadeImage3)
             Debug.LogError("[SceneManager] fadeImage is not assigned");
-
-        _cts = new CancellationTokenSource();
     }
-
-    // UniTask 권장: Start를 UniTaskVoid로
-    protected virtual async UniTaskVoid Start()
+    
+    protected async UniTaskVoid Start()
     {
         try
         {
-            CancellationToken token = this.GetCancellationTokenOnDestroy();
             _globalSettings ??= JsonLoader.Instance.settings;
             setting = JsonLoader.Instance.LoadJsonData<T>(JsonPath);
 
@@ -102,7 +98,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             camera3.targetDisplay = _globalSettings.canvas3TargetMonitorIndex;
             verticalCanvas.targetDisplay = _globalSettings.canvas3TargetMonitorIndex;
 
-            await InitSafe(token);
+            await InitSafe();
         }
         catch (OperationCanceledException)
         {
@@ -124,28 +120,27 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             if (_inactivityTimer >= _inactivityThreshold)
             {
                 _inactivityTimer = 0f;
-                // 페이드 후 타이틀 복귀
-                _ = LoadSceneAsync(0, new[] { fadeImage1, fadeImage2, fadeImage3 });
+                if (!sIsLoading)
+                    _ = LoadSceneAsync(0, new[] { fadeImage1, fadeImage2, fadeImage3 });
             }
         }
 
         if (IsAnyUserInputDown())
             _inactivityTimer = 0f;
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            float now = Time.time;
+            if (now - _lastDebugSkipTime >= DebugSkipCooldown)
+            {
+                _lastDebugSkipTime = now;
+                HandleDebugSkipKey();
+            }
+        }
     }
 
     protected virtual void OnDisable()
     {
-        try
-        {
-            _cts?.Cancel();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[SceneManager_Base] OnDisable exception Error: {e}");
-        }
-
-        _cts?.Dispose();
-        _cts = null;
         StopLedEffects();
     }
 
@@ -182,7 +177,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #region Init Wrapper
 
-    private async UniTask InitSafe(CancellationToken token)
+    private async UniTask InitSafe()
     {
         canInput = false;
         inputReceived = false;
@@ -240,12 +235,24 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         while (elapsed < duration)
         {
             float a = Mathf.Lerp(start, end, elapsed / duration);
-            foreach (Image img in targets) SetAlpha(img, a);
+            if (targets != null)
+            {
+                foreach (Image img in targets)
+                {
+                    if (img) SetAlpha(img, a);
+                }
+            }
             elapsed += Time.deltaTime;
             await UniTask.Yield();
         }
 
-        foreach (Image img in targets) SetAlpha(img, end);
+        if (targets != null)
+        {
+            foreach (Image img in targets)
+            {
+                if (img) SetAlpha(img, end);
+            }
+        }
         canInput = true;
     }
 
@@ -274,29 +281,67 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     }
 
     /// <summary> 페이드 후 씬 로드 (async) </summary>
-    protected async UniTask LoadSceneAsync(int buildIndex, Image[] fades)
+    protected async UniTask LoadSceneAsync(int buildIndex, Image[] fadeImages)
     {
-        if (sIsLoading) return; // 중복 전환 방지
+        if (sIsLoading) return;                 // 중복 로드 가드
         sIsLoading = true;
-        canInput = false; // 씬 전환 중 입력 차단
 
-        // 파생 클래스에서 생성한 비동기/이벤트 정리
+        OnBeforeSceneUnload();                  // 공통 정리 (LED/입력/코루틴 등)
+        SceneManager.sceneLoaded += OnSceneLoaded;
+
+        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
+
+        // 페이드아웃
+        if (fadeImages != null && fadeImages.Length > 0)
+        {
+            try
+            {
+                await FadeImageAsync(0f, 1f, Mathf.Max(0f, fadeTime), fadeImages);
+            }
+            catch (OperationCanceledException)
+            {
+                return;
+            }
+        }
+
+        // 로딩 시작
+        AsyncOperation op = null;
         try
         {
-            OnBeforeSceneUnload();
+            op = SceneManager.LoadSceneAsync(buildIndex);
+            if (op == null)
+            {
+                Debug.LogError($"[SceneManager_Base] LoadSceneAsync returned null (buildIndex: {buildIndex})");
+                return;
+            }
+            op.allowSceneActivation = false;
         }
         catch (Exception e)
         {
-            Debug.LogError($"[SceneManager_Base] OnBeforeSceneUnload exception Error: {e}]");
+            Debug.LogError($"[SceneManager_Base] Exception starting LoadSceneAsync: {e}");
+            return;
         }
 
-        await FadeImageAsync(0f, 1f, fadeTime, fades);
+        // 로딩 완료 대기 (0.9 == 준비 완료)
+        try
+        {
+            while (!cancel.IsCancellationRequested && !op.isDone)
+            {
+                if (op.progress < 0.9f)
+                {
+                    await UniTask.Yield(PlayerLoopTiming.Update, cancel);
+                    continue;
+                }
 
-        SceneManager.sceneLoaded += OnSceneLoaded;
-        AsyncOperation op = SceneManager.LoadSceneAsync(buildIndex, LoadSceneMode.Single);
-
-        // Unity AsyncOperation은 await 불가 → 다음 프레임까지 양보
-        await UniTask.Yield();
+                op.allowSceneActivation = true;
+                await UniTask.Yield(PlayerLoopTiming.Update, cancel);
+                break;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            // 파괴/취소 시 조용히 종료
+        }
     }
 
     /// <summary> 씬 전환 직전 클래스의 비동기/이벤트 정리 </summary>
@@ -309,8 +354,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         {
             StopAllCoroutines();
         }
-        catch
+        catch (Exception e)
         {
+            Debug.LogWarning($"[SceneManager_Base] StopAllCoroutines failed: {e.Message}");
         }
 
         // LED 효과 안전 중지
@@ -405,7 +451,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         // 외부 Task를 UniTask로 변환해 await
         await VideoManager.Instance.PrepareAndPlayAsync(
-            vp, url, audioSource, vs.volume, CancellationToken.None
+            vp, url, audioSource, vs.volume, this.GetCancellationTokenOnDestroy()
         ).AsUniTask();
     }
 
@@ -444,7 +490,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #region LED Effects (public helpers for children)
 
-    protected void StartBlinkGreenAsync(int periodMsHalf = 300, int onBrightness = 160)
+    protected void StartBlinkGreenAsync(int periodMsHalf, int onBrightness)
     {
         _blinkHalfPeriodMs = Mathf.Max(50, periodMsHalf);
         StopLedEffects();
@@ -455,19 +501,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     protected void StopLedEffects()
     {
-        if (_ledCts != null)
-        {
-            try
-            {
-                _ledCts.Cancel();
-            }
-            catch
-            {
-            }
-
-            _ledCts.Dispose();
-            _ledCts = null;
-        }
+        CancelAndDispose(ref _ledCts);
     }
 
     private async UniTaskVoid BlinkGreenLoopAsync(CancellationToken token, int onBrightness)
@@ -498,11 +532,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #endregion
     
-    /// <summary>
-    /// Graphic 알파를 minA~maxA로 왕복(ping-pong) 애니메이션.
-    /// periodSec: 내려갔다 올라오는 왕복 한 번의 시간(초)
-    /// </summary>
-    protected async UniTask AnimateAlphaPingPongAsync(Graphic g, float minA, float maxA, float periodSec, CancellationToken token)
+    /// <summary> Graphic 알파를 minA~maxA로 왕복(ping-pong) 애니메이션. </summary>
+    private async UniTask AnimateAlphaPingPongAsync(Graphic g, float minA, float maxA, float periodSec, CancellationToken token)
     {
         if (!g) return;
         if (periodSec <= 0f) periodSec = 1f;
@@ -525,24 +556,57 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 알파 핑퐁 애니메이션 시작. 기존 토큰이 있으면 취소/해제 후 새로 시작.
-    /// </summary>
+    /// <summary> 알파 핑퐁 애니메이션 시작. 기존 토큰이 있으면 취소/해제 후 새로 시작. </summary>
     protected void StartAlphaPingPong(Graphic g, float minA, float maxA, float periodSec, ref CancellationTokenSource cts)
     {
-        StopCtsSafe(ref cts);
+        CancelAndDispose(ref cts);
         cts = new CancellationTokenSource();
         _ = AnimateAlphaPingPongAsync(g, minA, maxA, periodSec, cts.Token);
     }
 
-    /// <summary>
-    /// CTS 안전 정리 헬퍼
-    /// </summary>
-    protected void StopCtsSafe(ref CancellationTokenSource cts)
+    /// <summary> CTS 안전 정리 헬퍼 </summary>
+    protected static void CancelAndDispose(ref CancellationTokenSource cts)
     {
         if (cts == null) return;
-        try { cts.Cancel(); } catch { }
-        cts.Dispose();
-        cts = null;
+        try
+        {
+            cts.Cancel();
+        }
+        catch (ObjectDisposedException)
+        {
+            // 이미 해제된 경우 무시
+        }
+        finally
+        {
+            cts.Dispose();
+            cts = null;
+        }
+    }
+    
+    /// <summary> 디버그 스킵 키 입력 시 공통 처리 -> 파생 클래스 훅 호출 </summary>
+    private void HandleDebugSkipKey()
+    {
+        try
+        {
+            _inactivityTimer = 0f; // 타임아웃 리셋
+            OnDebugSkip();
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SceneManager_Base] OnDebugSkip exception: {e}");
+        }
+    }
+    
+    /// <summary>
+    /// 디버그 스킵 동작 훅 -> 파생 클래스에서 "영상 정지, 다음 단계로 진행" 로직을 구현
+    /// 기본 구현: 입력 래치만 세팅하여 '다음 단계 대기 루프'를 빠져나오게 함
+    /// </summary>
+    protected virtual void OnDebugSkip()
+    {
+        if (!inputReceived && canInput)
+        {
+            inputReceived = true;
+            Debug.Log("[SceneManager_Base] Debug skip -> inputReceived = true");
+        }
     }
 }

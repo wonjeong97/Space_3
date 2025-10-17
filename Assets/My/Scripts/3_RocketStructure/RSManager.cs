@@ -112,7 +112,7 @@ public class RSManager : SceneManager_Base<RSSetting>
     {
         try
         {
-            if (_vp != null) _vp.loopPointReached -= OnVideoEnded;
+            if (_vp) _vp.loopPointReached -= OnVideoEnded;
             
             int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 4;
             await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
@@ -129,6 +129,25 @@ public class RSManager : SceneManager_Base<RSSetting>
         {
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
+        }
+    }
+
+    /// <summary> 디버그 스킵 처리 -> 영상 정지 -> 다음 씬 전환 </summary>
+    protected override void OnDebugSkip()
+    {
+        try
+        {
+            // 이벤트 분리
+            if (_vp) _vp.loopPointReached -= OnVideoEnded;
+
+            // 영상 재생 중이면 정지
+            if (_vp && _vp.isPlaying) _vp.Stop();
+            
+            OnVideoEnded(_vp);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[RSManager] OnDebugSkip Exception: {e}");
         }
     }
 }

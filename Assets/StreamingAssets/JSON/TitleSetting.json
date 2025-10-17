@@ -1,4 +1,9 @@
 {
+  "background": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"sourceImage": "Image/Title/1_BG.png"
+  },
   "titleImage": {
 	"position": { "x": 960, "y": 540 },
 	"size": { "x": 1920, "y": 1080 },
@@ -6,7 +11,7 @@
   },
   "infoImage": {
 	"position": { "x": 960, "y": 925 },
-	"size": { "x": 1920, "y": 225 },
+	"size": { "x": 1600, "y": 278 },
 	"sourceImage": "Image/Title/1_Start.png"
   }
 }
