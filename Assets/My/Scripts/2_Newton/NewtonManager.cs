@@ -21,9 +21,6 @@ public class NewtonSetting
 public class NewtonManager : SceneManager_Base<NewtonSetting>
 {
     [Header("UI")] 
-    [SerializeField] private GameObject titleImage;
-    [SerializeField] private GameObject infoImage1;
-    [SerializeField] private GameObject infoImage2;
     [SerializeField] private GameObject videoPlayerObject;
 
     protected override string JsonPath => "JSON/NewtonSetting.json";
@@ -48,10 +45,9 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     private VideoSetting[] _ruleSeq; // 뉴턴의 법칙 비디오를 저장하는 배열
     private int _ruleIndex;
 
-    
-
-    // 루프 영상에서 사용자 입력을 감시하는 태스크를 제어하기 위한 토큰
+    // 취소 토큰
     private CancellationTokenSource _skipCts;
+    private CancellationToken _destroyToken;
 
     protected override void OnDisable()
     {
@@ -79,28 +75,23 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
         _audio = videoPlayerObject.GetComponent<AudioSource>();
-
-        // 타이틀/안내 이미지 설정
-        SettingImageObject(titleImage, setting.background);
-        SettingImageObject(infoImage1, setting.infoImage1);
-        SettingImageObject(infoImage2, setting.infoImage2);
-        if (infoImage2) infoImage2.SetActive(false);
+        _destroyToken = this.GetCancellationTokenOnDestroy();
 
         // 뉴턴의 법칙 비디오 저장
         _ruleSeq = setting.newtonsRuleVideos;
         _ruleIndex = 0;
         _phase = Phase.Intro;
-        
+
         StopLedEffects();
         ArduinoInputManager.Instance?.SetLedAll(false);
         LedStrip.Range(0, 9, 255, 0, 0);
 
         // 인트로 세팅 및 재생  
-        await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
+        SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio).Forget();
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
 
-        TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
+        TurnCamera3Async(_destroyToken).Forget();
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
     }
 
@@ -108,28 +99,29 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     {
         try
         {
-            if (_vp != null) _vp.loopPointReached -= OnVideoEnded;
+            if (_vp) _vp.loopPointReached -= OnVideoEnded;
 
             if (_phase == Phase.Intro)
             {
                 _phase = Phase.RuleSeq;
                 _ruleIndex = 0;
 
+                // 인트로 이후 뉴턴의 법칙 영상이 없으면 빠르게 다음 씬으로 넘어감
                 if (_ruleSeq == null || _ruleSeq.Length == 0)
                 {
                     _phase = Phase.Done;
-                    await GoNextSceneAsync();
+                    GoNextSceneAsync().Forget();
                     return;
                 }
 
-                await SwitchAndPlayNextAsync(_ruleSeq[_ruleIndex], true); // 인트로 → 첫 법칙: 페이드 O
+                await SwitchAndPlayNextAsync(_ruleSeq[_ruleIndex], true); // 인트로 -> 첫 법칙: 페이드 O
             }
             else if (_phase == Phase.RuleSeq)
             {
                 if (_ruleSeq == null || _ruleSeq.Length == 0 || _ruleIndex < 0 || _ruleIndex >= _ruleSeq.Length)
                 {
                     _phase = Phase.Done;
-                    await GoNextSceneAsync();
+                    GoNextSceneAsync().Forget();
                     return;
                 }
 
@@ -150,7 +142,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                 else
                 {
                     _phase = Phase.Done;
-                    await GoNextSceneAsync();
+                    GoNextSceneAsync().Forget();
                 }
             }
         }
@@ -166,105 +158,106 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
     /// - 이름 또는 파일명이 '...Loop'로 끝나는 영상: 계속 반복 재생하며, 사용자 입력 시 다음으로 이동.
     /// </summary>
     private async UniTask SwitchAndPlayNextAsync(VideoSetting next, bool withFade)
-{
-    if (_isSwitching) return;
-    _isSwitching = true;
-
-    CancelAndDispose(ref _skipCts);
-
-    if (infoImage2) infoImage2.SetActive(false);
-    inputReceived = false;
-
-    StopLedEffects();
-    ArduinoInputManager.Instance?.SetLedAll(false);
-    LedStrip.Range(0, 9, 255, 0, 0);
-
-    bool holdLastFrame = !withFade;
-
-    if (withFade)
-        await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
-
-    // 현재 프레임 고정
-    if (_vp != null)
     {
-        _vp.loopPointReached -= OnVideoEnded;
-        try
+        if (_isSwitching) return;
+        _isSwitching = true;
+
+        CancelAndDispose(ref _skipCts);
+        inputReceived = false;
+
+        StopLedEffects();
+        ArduinoInputManager.Instance?.SetLedAll(false);
+        LedStrip.Range(0, 9, 255, 0, 0);
+
+        bool holdLastFrame = !withFade;
+
+        if (withFade) await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
+
+        // 현재 프레임 고정
+        if (_vp)
         {
-            _vp.Pause();
-            _vp.playbackSpeed = 0f;
+            _vp.loopPointReached -= OnVideoEnded;
+            try
+            {
+                _vp.Pause();
+                _vp.playbackSpeed = 0f;
+            }
+            catch (ObjectDisposedException)
+            {
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[NewtonManager] Pause/playbackSpeed guard failed: {e.Message}");
+            }
         }
-        catch (ObjectDisposedException)
+
+        Vector2Int desired = new Vector2Int(Mathf.RoundToInt(next.size.x), Mathf.RoundToInt(next.size.y));
+        RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
+        RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
+
+        string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
+        bool isLoop = IsLoopClip(next);
+        double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
+
+        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, _destroyToken, timeout);
+
+        if (!ok)
         {
-            // 이미 파괴/해제된 경우 무시
+            Debug.LogError($"[NewtonManager] Prepare failed: {url}");
+            _isSwitching = false;
+            if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+            return;
         }
-        catch (Exception e)
+        
+        // 검은 화면이 덮여있는 동안 첫 프레임이 실제로 그려질 때까지 잠깐 재생
+        if (withFade)
         {
-            Debug.LogWarning($"[NewtonManager] Pause/playbackSpeed guard failed: {e.Message}");
+            await WaitFirstFrameAsync(_vp, _raw, _destroyToken, 2.0);
+            await UniTask.Delay(TimeSpan.FromMilliseconds(50), cancellationToken: _destroyToken);
         }
-    }
+        else
+        {
+            // withFade=false인 경우도 혹시 모를 깜빡임을 줄이기 위해 아주 짧게 대기
+            int guard = 0;
+            while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
+                await UniTask.Yield();
+        }
 
-    Vector2Int desired = new Vector2Int(Mathf.RoundToInt(next.size.x), Mathf.RoundToInt(next.size.y));
-    RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
-    RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
+        // 화면 스왑 + 이전 RT 해제
+        if (_raw != null && rtForNext != null && keepShowing != rtForNext)
+        {
+            // 이전에 트래킹하던 RT가 있고, 이번에 보여줄 텍스처와도 다르면 해제
+            if (_lastRT != null && _lastRT != rtForNext && _lastRT != keepShowing)
+            {
+                if (_lastRT.IsCreated()) _lastRT.Release();
+                Destroy(_lastRT);
+            }
 
-    string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
-    bool isLoop = IsLoopClip(next);
-    double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
+            _raw.texture = rtForNext; // 스왑
+            _lastRT = rtForNext; // 새 RT 기억
+        }
 
-    bool ok = await VideoManager.Instance.PrepareAndPlayAsync(
-        _vp, url, _audio, next.volume, this.GetCancellationTokenOnDestroy(), timeout);
+        if (_vp != null)
+        {
+            _vp.isLooping = isLoop;
+            _vp.playbackSpeed = 1f;
+            _vp.loopPointReached += OnVideoEnded;
+        }
 
-    if (!ok)
-    {
-        Debug.LogError($"[NewtonManager] Prepare failed: {url}");
-        _isSwitching = false;
+        if (isLoop)
+        {
+            ArduinoInputManager.Instance?.SetLedAll(true);
+            StartBlinkGreenAsync(500, 160);
+
+            _skipCts = new CancellationTokenSource();
+            int capturedIndex = _ruleIndex;
+            WaitSkipThenProceedAsync(_skipCts.Token, capturedIndex).Forget();
+        }
+
         if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-        return;
+        _isSwitching = false;
     }
-
-    int guard = 0;
-    while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
-        await UniTask.Yield();
-
-    // 화면 스왑 + 이전 RT 해제
-    if (_raw != null && rtForNext != null && keepShowing != rtForNext)
-    {
-        // 이전에 트래킹하던 RT가 있고, 이번에 보여줄 텍스처와도 다르면 해제
-        if (_lastRT != null && _lastRT != rtForNext && _lastRT != keepShowing)
-        {
-            if (_lastRT.IsCreated()) _lastRT.Release();
-            Destroy(_lastRT);
-        }
-
-        _raw.texture = rtForNext;  // 스왑
-        _lastRT = rtForNext;       // 새 RT 기억
-    }
-
-    if (_vp != null)
-    {
-        _vp.isLooping = isLoop;
-        _vp.playbackSpeed = 1f;
-        _vp.loopPointReached += OnVideoEnded;
-    }
-
-    if (isLoop)
-    {
-        if (infoImage2) infoImage2.SetActive(true);
-        ArduinoInputManager.Instance?.SetLedAll(true);
-        StartBlinkGreenAsync(500, 160);
-
-        _skipCts = new CancellationTokenSource();
-        int capturedIndex = _ruleIndex;
-        _ = WaitSkipThenProceedAsync(_skipCts.Token, capturedIndex);
-    }
-
-    if (withFade)
-        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-
-    _isSwitching = false;
-}
-
-
+    
     /// <summary>
     /// 루프 영상에서 사용자 입력을 받으면 다음 영상으로 진행.
     /// 루프가 아닌 경우 이 함수는 보통 호출되지 않음.
@@ -296,12 +289,11 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
         }
-    
+
         StopLedEffects();
         ArduinoInputManager.Instance?.SetLedAll(false);
         LedStrip.Range(0, 9, 255, 0, 0);
-        
-        if (infoImage2) infoImage2.SetActive(false);
+
         CancelAndDispose(ref _skipCts);
 
         _ruleIndex++;
@@ -312,7 +304,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         else
         {
             _phase = Phase.Done;
-            await GoNextSceneAsync();
+            GoNextSceneAsync().Forget();
         }
     }
 
@@ -336,7 +328,6 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _vp.Stop();
         }
 
-        if (infoImage2) infoImage2.SetActive(false);
         ArduinoInputManager.Instance?.SetLedAll(false);
     }
 
@@ -356,7 +347,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         string stem = string.IsNullOrEmpty(fn) ? string.Empty : Path.GetFileNameWithoutExtension(fn);
         return stem.EndsWith("Loop", StringComparison.OrdinalIgnoreCase);
     }
-    
+
     /// <summary>
     /// 디버그 스킵 입력 처리
     /// - 모든 영상 재생/대기 상태를 종료하고 바로 다음 씬으로 이동
@@ -375,9 +366,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                 if (_vp.isPlaying) _vp.Stop();
             }
 
-            // 안내 UI 및 LED 효과 정리
-            if (infoImage2) infoImage2.SetActive(false);
-            
+            // LED 효과 정리
             StopLedEffects();
             ArduinoInputManager.Instance?.SetLedAll(false);
             LedStrip.Range(0, 9, 255, 0, 0);
@@ -386,7 +375,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
             _isSwitching = false;
             _phase = Phase.Done;
 
-            _ = GoNextSceneAsync();
+            GoNextSceneAsync().Forget();
         }
         catch (Exception e)
         {

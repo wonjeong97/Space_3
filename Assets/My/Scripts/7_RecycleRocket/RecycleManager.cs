@@ -85,13 +85,13 @@ public class RecycleManager :  SceneManager_Base<RecycleSetting>
                 
             await UniTask.Yield();
         }
-        if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
+        ArduinoInputManager.Instance?.FlushAll();
         
         // 팝업과 미션 종료 이미지 크로스페이드
-        await CrossFadeAsync(popupImage1, endBackgroundImage, _popupFadeTime);
+        CrossFadeAsync(popupImage1, endBackgroundImage, _popupFadeTime).Forget();
         
         // 설정한 시간이 지난 후 타이틀로 전환
         await UniTask.Delay(TimeSpan.FromSeconds(_gameCloseTime));
-        await LoadSceneAsync(0, new[] { fadeImage1, fadeImage3 });
+        LoadSceneAsync(0, new[] { fadeImage1, fadeImage3 }).Forget();
     }
 }

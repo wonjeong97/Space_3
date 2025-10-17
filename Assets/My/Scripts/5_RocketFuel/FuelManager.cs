@@ -140,7 +140,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 {
                     _popupFadeCts = new CancellationTokenSource();
                     ArduinoInputManager.Instance.SetLedAll(false);
-                    _ = PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token);
+                    PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token).Forget();
                 }
             }
 
@@ -154,7 +154,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
                     // LED2 블링크 시작
                     _blinkCts = new CancellationTokenSource();
-                    _ = BlinkLedAsync(2, 300, 300, _blinkCts.Token);
+                    BlinkLedAsync(2, 300, 300, _blinkCts.Token).Forget();
 
                     _phase = Phase.FuelInjection2;
                     break;
@@ -179,7 +179,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
 
                     // LED3 블링크 시작
                     _blinkCts = new CancellationTokenSource();
-                    _ = BlinkLedAsync(3, 300, 300, _blinkCts.Token);
+                    BlinkLedAsync(3, 300, 300, _blinkCts.Token).Forget();
 
                     _phase = Phase.FuelInjection3;
                 }
@@ -291,7 +291,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         SetAlpha(img, 0f);
 
         // 팝업이 모두 사라지고 버튼 1 블링크
-        _ = BlinkLedAsync(ledIndex: 1, onMs: 300, offMs: 300, token: _blinkCts.Token);
+        BlinkLedAsync(ledIndex: 1, onMs: 300, offMs: 300, token: _blinkCts.Token).Forget();
     }
 
     /// <summary> 게이지 증가 (delta만큼), 처음 1.0 도달 시 true 반환 </summary>
@@ -349,7 +349,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             // 다음 씬 전환
             if (nextSceneBuildIndex >= 0)
             {
-                _ = LoadSceneAsync(nextSceneBuildIndex, new[] { fadeImage1, fadeImage2, fadeImage3 });
+                LoadSceneAsync(nextSceneBuildIndex, new[] { fadeImage1, fadeImage2, fadeImage3 }).Forget();
             }
             else
             {

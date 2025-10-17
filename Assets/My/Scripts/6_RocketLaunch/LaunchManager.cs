@@ -161,8 +161,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     /// <summary> 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 부드럽게 페이드 </summary>
     private async UniTask RunCountdownAsync()
     {
-        if (!countdownText || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) 
-            return;
+        if (!countdownText || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) return;
 
         CancellationToken cancel = this.GetCancellationTokenOnDestroy();
         float duration = Mathf.Max(0.01f, 1.0f);

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
@@ -104,6 +105,10 @@ public class RSManager : SceneManager_Base<RSSetting>
             _vp.loopPointReached -= OnVideoEnded;
             _vp.loopPointReached += OnVideoEnded;
         }
+        
+        CancellationToken destroyToken = this.GetCancellationTokenOnDestroy();
+        await WaitFirstFrameAsync(_vp, _raw, destroyToken, 2.0);
+        await UniTask.Delay(TimeSpan.FromMilliseconds(50), cancellationToken: destroyToken);
         
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
     }

@@ -98,7 +98,6 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     // 전환/루프 대기
     private bool _isSwitching;
-    private bool _awaitingSkip;
 
     // 배열 인덱스
     private int _locIndex;
@@ -383,8 +382,6 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         // 이전 Loop 대기 정리
         CancelAndDispose(ref _skipCts);
-
-        _awaitingSkip = false;
         inputReceived = false;
 
         // 다음 클립 RT 준비 시, 페이드가 없을 때는 마지막 프레임을 유지
@@ -490,14 +487,13 @@ public class RMManager : SceneManager_Base<RMSetting>
         // Loop라면 사용자 입력 대기 태스크 기동
         if (isLoop)
         {
-            _awaitingSkip = true;
             ArduinoInputManager.Instance?.SetLedAll(true);
             StartBlinkGreenAsync(500, 160);
 
             _skipCts = new CancellationTokenSource();
             int loc = _locIndex;
             int make = _makeIndex;
-            _ = WaitSkipThenProceedAsync(_skipCts.Token, loc, make);
+            WaitSkipThenProceedAsync(_skipCts.Token, loc, make).Forget();
         }
 
         if (withFade)
@@ -546,7 +542,6 @@ public class RMManager : SceneManager_Base<RMSetting>
         ArduinoInputManager.Instance?.SetLedAll(false);
         LedStrip.Range(0, 9, 255, 0, 0);
 
-        _awaitingSkip = false;
         CancelAndDispose(ref _skipCts);
 
         // 다음으로 진행
@@ -626,7 +621,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     private void OnMakeSequenceCompleted()
     {
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 5;
-        _ = LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
+        LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 }).Forget();
         _phase = Phase.Done;
     }
 
@@ -713,7 +708,7 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         if (cts != null) CancelAndDispose(ref cts);
         cts = new CancellationTokenSource();
-        _ = AnimateNumberChangeAsync(label, current, next, decimals, unit, cts.Token);
+        AnimateNumberChangeAsync(label, current, next, decimals, unit, cts.Token).Forget();
         current = next;
     }
 
@@ -826,7 +821,7 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         if (!IsFiniteFloat(cur)) cur = currentValue;
 
-        _ = AnimateBarAsync(img, cur, nextValue, duration, cts.Token);
+        AnimateBarAsync(img, cur, nextValue, duration, cts.Token).Forget();
     }
 
     /// <summary> 선택된 데이터로 모든 진행 바를 한 번에 갱신 </summary>
@@ -870,12 +865,11 @@ public class RMManager : SceneManager_Base<RMSetting>
             LedStrip.Range(0, 9, 255, 0, 0);
 
             // 4) 상태 정리 후 다음 씬 전환
-            _awaitingSkip = false;
             _isSwitching = false;
             _phase = Phase.Done;
 
             int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 5;
-            _ = LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
+            LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 }).Forget();
         }
         catch (Exception e)
         {
