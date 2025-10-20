@@ -22,19 +22,16 @@ public class AudioManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            //DontDestroyOnLoad(gameObject);
 
             _sfxSource = gameObject.GetComponent<AudioSource>();
             if (_sfxSource == null) _sfxSource = gameObject.AddComponent<AudioSource>();
             _sfxSource.playOnAwake = false;
-
-            // UniTask fire-and-forget
+            
             LoadSoundsFromSettingsAsync(this.GetCancellationTokenOnDestroy()).Forget();
         }
         else if (Instance != this)
         {
             Destroy(gameObject);
-            return;
         }
     }
 
@@ -77,26 +74,5 @@ public class AudioManager : MonoBehaviour
                 }
             }
         }
-    }
-
-    /// <summary> 키 기반 사운드 재생 API </summary>
-    public bool Play(string key, float? volumeOverride = null)
-    {
-        if (!_sfxSource) return false;
-        if (!_soundMap.TryGetValue(key, out AudioClip clip) || clip == null)
-        {
-            Debug.LogWarning($"[AudioManager] Key not found: {key}");
-            return false;
-        }
-
-        float vol = volumeOverride ?? (_soundVolumeMap.GetValueOrDefault(key, 1f));
-        _sfxSource.PlayOneShot(clip, Mathf.Clamp01(vol));
-        return true;
-    }
-
-    /// <summary> 현재 재생 중인 모든 사운드 정지 </summary>
-    public void StopAll()
-    {
-        if (_sfxSource && _sfxSource.isPlaying) _sfxSource.Stop();
     }
 }

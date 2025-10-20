@@ -91,6 +91,7 @@ public class ImageSetting
     public Vector2 position;
     public Vector2 size;
     public Vector3 rotation;
+    public Vector3 scale =  Vector3.one;
     public string sourceImage;
     public Color color = Color.white;
     public UIImageType type = UIImageType.Simple;

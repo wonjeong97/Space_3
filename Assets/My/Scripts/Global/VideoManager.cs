@@ -156,7 +156,7 @@ public class VideoManager : MonoBehaviour
             }
 
 #if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN
-            // 경로 존재 확인 (진짜 파일 오타/대소문자 이슈 방지)
+            // 경로 존재 확인
             try
             {
                 Uri u = new (url);
@@ -307,10 +307,8 @@ public class VideoManager : MonoBehaviour
 
         if (canReuse)
         {
-            // 그대로 사용: 화면에 마지막 프레임 유지
+            // 화면에 마지막 프레임 유지
             vp.renderMode = VideoRenderMode.RenderTexture;
-            // vp.targetTexture = existing; // 이미 연결되어 있음
-            // raw.texture 그대로 유지 (스왑 안 함)
             return existing;
         }
 

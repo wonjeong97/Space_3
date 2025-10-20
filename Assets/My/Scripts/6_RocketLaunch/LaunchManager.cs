@@ -154,7 +154,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
         
         // 카운트다운 시작
-        await FadeInStageAsync(1);
         await RunCountdownAsync();
     }
 
@@ -256,6 +255,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         StartPingPongAt(5, 0.28f, 1.0f, 2.0f);
     }
     
+    /// <summary> 로켓 발사 중 스테이지 이미지를 페이드인 함 </summary>
     private async UniTask FadeInStageAsync(int index, float duration = 0.6f)
     {
         if (!TryGetStageGraphic(index, out Graphic g)) return;

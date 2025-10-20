@@ -354,7 +354,6 @@ MonoBehaviour:
   fadeImage3: {fileID: 1352670520}
   nextSceneBuildIndex: 1
   useInactivityTimeout: 0
-  sIsLoading: 0
   backgroundImage: {fileID: 1265246154}
   titleImage: {fileID: 193978919}
   infoImage: {fileID: 1884999327}
@@ -1893,7 +1892,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1979848747}
-  - component: {fileID: 1979848746}
   - component: {fileID: 1979848748}
   m_Layer: 0
   m_Name: UIManager
@@ -1902,18 +1900,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1979848746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1979848744}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: caf5086dcfd4c6d4b867c46817567b4e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1979848747
 Transform:
   m_ObjectHideFlags: 0

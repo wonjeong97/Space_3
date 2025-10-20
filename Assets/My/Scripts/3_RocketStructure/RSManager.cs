@@ -130,7 +130,7 @@ public class RSManager : SceneManager_Base<RSSetting>
     
     protected override void OnDisable()
     {
-        if (_vp != null)
+        if (_vp)
         {
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();

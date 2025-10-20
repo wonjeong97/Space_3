@@ -46,17 +46,17 @@ public class RMManager : SceneManager_Base<RMSetting>
 {
     #region Serialized
 
-    [Header("UI")] [SerializeField] private GameObject backgroundImage;
+    [Header("UI")] 
+    [SerializeField] private GameObject backgroundImage;
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
 
-    [Header("mainImage1")] [SerializeField]
-    private Image[] main1ChildrenImages;
+    [Header("mainImage1")] 
+    [SerializeField] private Image[] main1ChildrenImages;
 
-    [Header("mainImage3")] [SerializeField]
-    private GameObject rocketImage; // 발사체, 위성 선택 이미지
-
+    [Header("mainImage3")]
+    [SerializeField] private GameObject rocketImage; // 발사체, 위성 선택 이미지
     [SerializeField] private TextMeshProUGUI textVelocity;
     [SerializeField] private TextMeshProUGUI textMaxVelocity;
     [SerializeField] private TextMeshProUGUI textAltitude;
@@ -75,7 +75,11 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     protected override string JsonPath => "JSON/RMSetting.json";
 
-    private const float BarMax = 999f;
+    private const float AnimationTime = 0.5f; // 프로그레스 바, 텍스트 등의 애니메이션 시간
+    private const float BarMaxVelocity = 10f;
+    private const float BarMaxAltitude = 40000f;
+    private const float BarMaxSlope = 180f;
+    private const float BarMaxRemainDistance = 1440f;
 
     private enum Phase
     {
@@ -111,6 +115,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     private CancellationTokenSource _main1AlphaCts;
     private CancellationTokenSource _skipCts;
     private CancellationTokenSource _velCts, _maxVelCts, _altCts, _slopeCts, _remainCts;
+    private CancellationTokenSource _velBarCts, _maxBarCts, _altBarCts, _slopeBarCts, _remainBarCts;
 
     // 현재 표시값을 기억해 중복 파싱 없이 애니메이션 시작점으로 사용
     private float _curVelocity, _curMaxVelocity, _curAltitude, _curSlope, _curRemainDistance;
@@ -139,7 +144,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         CancelAndDispose(ref _slopeBarCts);
         CancelAndDispose(ref _remainBarCts);
 
-        if (_lastRT != null)
+        if (_lastRT)
         {
             if (_lastRT.IsCreated()) _lastRT.Release();
             Destroy(_lastRT);
@@ -208,9 +213,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         {
             if (!ArduinoInputManager.Instance) return;
 
-            ArduinoInputManager.ButtonId btn;
-            bool pressed = ArduinoInputManager.Instance.TryConsumeAnyPress(out btn);
-
+            bool pressed = ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn);
             if ((pressed && btn == ArduinoInputManager.ButtonId.Button1) || Input.GetKeyDown(KeyCode.LeftArrow))
             {
                 MoveSelection(-1);
@@ -224,7 +227,7 @@ public class RMManager : SceneManager_Base<RMSetting>
                 if (await ConfirmAsync()) break; // Location 진입 시 true로 탈출
             }
 
-            ArduinoInputManager.Instance.FlushAll();
+            ArduinoInputManager.Instance?.FlushAll();
             await UniTask.Yield();
         }
     }
@@ -287,8 +290,8 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(rocketImage, src.rocketImage);
 
         // 숫자 라벨 애니메이션 시작
-        StartLabelAnimation(textVelocity, ref _curVelocity, src.velocity, ref _velCts, 0, " km/s");
-        StartLabelAnimation(textMaxVelocity, ref _curMaxVelocity, src.maxVelocity, ref _maxVelCts, 0, " km/s");
+        StartLabelAnimation(textVelocity, ref _curVelocity, src.velocity, ref _velCts, 1, " km/s");
+        StartLabelAnimation(textMaxVelocity, ref _curMaxVelocity, src.maxVelocity, ref _maxVelCts, 1, " km/s");
         StartLabelAnimation(textAltitude, ref _curAltitude, src.altitude, ref _altCts, 0, " km");
         StartLabelAnimation(textSlope, ref _curSlope, src.slope, ref _slopeCts, 0, " °");
         StartLabelAnimation(textRemainDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
@@ -646,61 +649,31 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Value Animation
 
-    /// <summary>
-    /// 라벨 값 변경을 애니메이션으로 표시
-    /// - 작은 정수 변화: 1 → 2 → 3 순차 증가/감소
-    /// - 그 외: Lerp 보간
-    /// </summary>
-    private async UniTask AnimateNumberChangeAsync(
-        TextMeshProUGUI label, float from, float to, int decimals, string unit, CancellationToken token)
+    /// <summary> 라벨 값 변경을 애니메이션으로 표시 </summary>
+    private async UniTask AnimateNumberChangeAsync(TextMeshProUGUI label, float from, float to, int decimals, string unit, CancellationToken token)
     {
         if (!label) return;
 
-        bool bothInt = Mathf.Approximately(from, Mathf.Round(from)) && Mathf.Approximately(to, Mathf.Round(to));
-        int deltaInt = Mathf.Abs(Mathf.RoundToInt(to) - Mathf.RoundToInt(from));
-        bool stepMode = bothInt && deltaInt <= 10;
-
-        if (stepMode)
-        {
-            int start = Mathf.RoundToInt(from);
-            int end = Mathf.RoundToInt(to);
-            int dir = (end >= start) ? 1 : -1;
-
-            for (int v = start; v != end + dir; v += dir)
-            {
-                if (token.IsCancellationRequested) return;
-                label.SetText($"{v}{unit}");
-                float t = 0f;
-                while (t < 0.1f)
-                {
-                    if (token.IsCancellationRequested) return;
-                    t += Time.deltaTime;
-                    await UniTask.Yield();
-                }
-            }
-
-            return;
-        }
-
-        // Lerp 모드
-        const float dur = 0.6f;
-        float time = 0f;
-        while (time < dur)
+        float elapsed = 0f;
+        while (elapsed < AnimationTime)
         {
             if (token.IsCancellationRequested) return;
-            time += Time.deltaTime;
-            float u = Mathf.Clamp01(time / dur);
-            float v = Mathf.Lerp(from, to, u);
-            label.SetText($"{v.ToString($"F{decimals}")}{unit}");
+
+            elapsed += Time.deltaTime;
+            float t = Mathf.Clamp01(elapsed / AnimationTime);
+
+            float eased = t * t * (3f - 2f * t);
+            float value = Mathf.Lerp(from, to, eased);
+
+            label.SetText($"{value.ToString($"N{decimals}")}{unit}");
             await UniTask.Yield();
         }
 
-        label.SetText($"{to.ToString($"F{decimals}")}{unit}");
+        // 최종값 보정
+        label.SetText($"{to.ToString($"N{decimals}")}{unit}");
     }
 
-    /// <summary>
-    /// 항목별 애니메이션 시작 헬퍼: 이전 애니메이션 취소→신규 토큰으로 시작
-    /// </summary>
+    /// <summary> 항목별 애니메이션 시작 헬퍼: 이전 애니메이션 취소->신규 토큰으로 시작 </summary>
     private void StartLabelAnimation(TextMeshProUGUI label, ref float current, float next,
         ref CancellationTokenSource cts, int decimals, string unit)
     {
@@ -716,24 +689,16 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Progress Bar
 
-    private CancellationTokenSource _velBarCts, _maxBarCts, _altBarCts, _slopeBarCts, _remainBarCts;
-    private const float BarAnimDur = 0.4f;
-
     private void InitializeProgressBar()
     {
         // 진행 바 베이스 이미지 세팅
         if (setting.progressBars != null)
         {
-            if (setting.progressBars.Length > 0 && imageVelocityBar)
-                SettingImageObject(imageVelocityBar.gameObject, setting.progressBars[0]);
-            if (setting.progressBars.Length > 1 && imageMaxVelocityBar)
-                SettingImageObject(imageMaxVelocityBar.gameObject, setting.progressBars[1]);
-            if (setting.progressBars.Length > 2 && imageAltitudeBar)
-                SettingImageObject(imageAltitudeBar.gameObject, setting.progressBars[2]);
-            if (setting.progressBars.Length > 3 && imageSlopeBar)
-                SettingImageObject(imageSlopeBar.gameObject, setting.progressBars[3]);
-            if (setting.progressBars.Length > 4 && imageRemainDistanceBar)
-                SettingImageObject(imageRemainDistanceBar.gameObject, setting.progressBars[4]);
+            if (setting.progressBars.Length > 0 && imageVelocityBar) SettingImageObject(imageVelocityBar.gameObject, setting.progressBars[0]);
+            if (setting.progressBars.Length > 1 && imageMaxVelocityBar) SettingImageObject(imageMaxVelocityBar.gameObject, setting.progressBars[1]);
+            if (setting.progressBars.Length > 2 && imageAltitudeBar) SettingImageObject(imageAltitudeBar.gameObject, setting.progressBars[2]);
+            if (setting.progressBars.Length > 3 && imageSlopeBar) SettingImageObject(imageSlopeBar.gameObject, setting.progressBars[3]);
+            if (setting.progressBars.Length > 4 && imageRemainDistanceBar) SettingImageObject(imageRemainDistanceBar.gameObject, setting.progressBars[4]);
         }
 
         // 모든 진행 바를 0으로 초기화
@@ -779,13 +744,13 @@ public class RMManager : SceneManager_Base<RMSetting>
     }
 
     /// <summary> 0..BAR_MAX 스칼라 값을 Image.fillAmount로 애니메이션 </summary>
-    private async UniTask AnimateBarAsync(Image img, float fromValue, float toValue, float duration, CancellationToken token)
+    private async UniTask AnimateBarAsync(Image img, float fromValue, float toValue, float duration, float barMax, CancellationToken token)
     {
         if (!img) return;
         EnsureFilled(img);
 
-        float from = Mathf.Clamp01(fromValue / BarMax);
-        float to = Mathf.Clamp01(toValue / BarMax);
+        float from = Mathf.Clamp01(fromValue / barMax);
+        float to = Mathf.Clamp01(toValue / barMax);
 
         float t = 0f;
         while (t < duration)
@@ -794,7 +759,6 @@ public class RMManager : SceneManager_Base<RMSetting>
             t += Time.deltaTime;
             float u = Mathf.Clamp01(t / duration);
 
-            // 스무스스텝 이징
             float s = u * u * (3f - 2f * u);
 
             img.fillAmount = Mathf.Lerp(from, to, s);
@@ -805,14 +769,13 @@ public class RMManager : SceneManager_Base<RMSetting>
     }
 
     /// <summary> 이전 애니메이션 취소 후 새 애니메이션 시작 </summary>
-    private void StartBarAnimation(Image img, float currentValue, float nextValue,
-        ref CancellationTokenSource cts, float duration = BarAnimDur)
+    private void StartBarAnimation(Image img, float currentValue, float nextValue, float barMax, ref CancellationTokenSource cts, float duration = AnimationTime)
     {
         if (!img) return;
         if (cts != null) CancelAndDispose(ref cts);
         cts = new CancellationTokenSource();
 
-        float cur = Mathf.Clamp01(img.fillAmount) * BarMax;
+        float cur = Mathf.Clamp01(img.fillAmount) * barMax;
 
         bool IsFiniteFloat(float x)
         {
@@ -821,7 +784,7 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         if (!IsFiniteFloat(cur)) cur = currentValue;
 
-        AnimateBarAsync(img, cur, nextValue, duration, cts.Token).Forget();
+        AnimateBarAsync(img, cur, nextValue, duration, barMax, cts.Token).Forget();
     }
 
     /// <summary> 선택된 데이터로 모든 진행 바를 한 번에 갱신 </summary>
@@ -829,11 +792,11 @@ public class RMManager : SceneManager_Base<RMSetting>
     {
         if (src == null) return;
 
-        StartBarAnimation(imageVelocityBar, 0f, src.velocity, ref _velBarCts);
-        StartBarAnimation(imageMaxVelocityBar, 0f, src.maxVelocity, ref _maxBarCts);
-        StartBarAnimation(imageAltitudeBar, 0f, src.altitude, ref _altBarCts);
-        StartBarAnimation(imageSlopeBar, 0f, src.slope, ref _slopeBarCts);
-        StartBarAnimation(imageRemainDistanceBar, 0f, src.remainDistance, ref _remainBarCts);
+        StartBarAnimation(imageVelocityBar, 0f, src.velocity, BarMaxVelocity, ref _velBarCts);
+        StartBarAnimation(imageMaxVelocityBar, 0f, src.maxVelocity, BarMaxVelocity, ref _maxBarCts);
+        StartBarAnimation(imageAltitudeBar, 0f, src.altitude, BarMaxAltitude, ref _altBarCts);
+        StartBarAnimation(imageSlopeBar, 0f, src.slope, BarMaxSlope, ref _slopeBarCts);
+        StartBarAnimation(imageRemainDistanceBar, 0f, src.remainDistance, BarMaxRemainDistance, ref _remainBarCts);
     }
 
     #endregion
@@ -847,9 +810,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         try
         {
             // 루프 대기 태스크 취소
-            _skipCts?.Cancel();
-            _skipCts?.Dispose();
-            _skipCts = null;
+            CancelAndDispose(ref _skipCts);
 
             // 비디오 이벤트 해제 및 정지
             if (_vp)

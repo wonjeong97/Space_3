@@ -5,33 +5,33 @@ using UnityEngine.UI;
 public class GameCloser : MonoBehaviour
 {
     [SerializeField] private RectTransform rectTransform;
-    private CloseSetting closeSetting;
+    private CloseSetting _closeSetting;
 
-    private int clickCount = 0;
-    private float timer = 0f;
-    private bool counting = false;
+    private int _clickCount = 0;
+    private float _timer = 0f;
+    private bool _counting = false;
 
     private void Start()
     {
-        closeSetting = JsonLoader.Instance.settings.closeSetting;
+        _closeSetting = JsonLoader.Instance.settings.closeSetting;
 
         if (rectTransform != null)
         {
-            Vector2 anchor = closeSetting.position;
+            Vector2 anchor = _closeSetting.position;
             rectTransform.anchorMin = anchor;
             rectTransform.anchorMax = anchor;
             rectTransform.pivot = anchor;
-            rectTransform.GetComponent<Image>().color = new Color(1, 1, 1, closeSetting.imageAlpha);
+            rectTransform.GetComponent<Image>().color = new Color(1, 1, 1, _closeSetting.imageAlpha);
         }
     }
 
     private void Update()
     {
-        if (!counting) return;
+        if (!_counting) return;
 
-        timer += Time.deltaTime;
+        _timer += Time.deltaTime;
 
-        if (timer >= closeSetting.resetClickTime)
+        if (_timer >= _closeSetting.resetClickTime)
         {
             ResetClickCount();
         }
@@ -42,10 +42,10 @@ public class GameCloser : MonoBehaviour
     /// </summary>
     public void Click()
     {
-        counting = true;
-        clickCount++;
+        _counting = true;
+        _clickCount++;
 
-        if (clickCount >= closeSetting.numToClose)
+        if (_clickCount >= _closeSetting.numToClose)
         {
             ExitGame();
         }
@@ -53,9 +53,9 @@ public class GameCloser : MonoBehaviour
 
     private void ResetClickCount()
     {
-        clickCount = 0;
-        timer = 0f;
-        counting = false;
+        _clickCount = 0;
+        _timer = 0f;
+        _counting = false;
     }
 
     private void ExitGame()

@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class RocketLaunch : MonoBehaviour
@@ -40,7 +41,8 @@ public class RocketLaunch : MonoBehaviour
     {
         launch_Smoke_Particles.Play();
         yield return new WaitForSeconds(startDelay);
-
+        LaunchManager.Instance?.FadeInStagePublicAsync(1).Forget();
+        
         flamesLight.SetActive(true);
         turbulence_Smoke_Particles.Play();
         flames_A_Particles.Play();
@@ -50,7 +52,6 @@ public class RocketLaunch : MonoBehaviour
 
         takeOff_Smoke_Particles.Play();
         rocketLaunchAnim.GetComponent<Animation>().Play();
-
 
         foreach (GameObject vfx in jetEngineVFX)
         {
@@ -64,8 +65,6 @@ public class RocketLaunch : MonoBehaviour
         flames_A_Particles.Stop();
         flames_B_Particles.Stop();
         sparks_Particles.Stop();
-
-        LaunchManager.Instance?.FadeInStagePublicAsync(2);
 
         Destroy(launch_Smoke_Particles);
         Destroy(flamesLight);

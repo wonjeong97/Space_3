@@ -71,11 +71,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket1.png"
 	  },
-	  "velocity": 20,
-	  "maxVelocity": 100,
-	  "altitude": 90,
-	  "slope": 45,
-	  "remainDistance": 150
+	  "velocity": 7.5,
+	  "maxVelocity": 7.5,
+	  "altitude": 1336,
+	  "slope": 98,
+	  "remainDistance": 100
 	},
 	{
 	  "rocketImage": {
@@ -83,11 +83,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket2.png"
 	  },
-	  "velocity": 30,
-	  "maxVelocity": 900,
-	  "altitude": 80,
-	  "slope": 75,
-	  "remainDistance": 130
+	  "velocity": 7.6,
+	  "maxVelocity": 7.6,
+	  "altitude": 500,
+	  "slope": 97,
+	  "remainDistance": 95
 	},
 	{
 	  "rocketImage": {
@@ -95,11 +95,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket3.png"
 	  },
-	  "velocity": 25,
-	  "maxVelocity": 105,
-	  "altitude": 95,
-	  "slope": 35,
-	  "remainDistance": 180
+	  "velocity": 3.07,
+	  "maxVelocity": 3.07,
+	  "altitude": 36000,
+	  "slope": 55,
+	  "remainDistance": 1440
 	},
 	{
 	  "rocketImage": {
@@ -107,11 +107,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket4.png"
 	  },
-	  "velocity": 10,
-	  "maxVelocity": 180,
-	  "altitude": 30,
-	  "slope": 105,
-	  "remainDistance": 350
+	  "velocity": 7.4,
+	  "maxVelocity": 7.4,
+	  "altitude": 1320,
+	  "slope": 66,
+	  "remainDistance": 110
 	},
 	{
 	  "rocketImage": {
@@ -119,11 +119,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket5.png"
 	  },
-	  "velocity": 90,
-	  "maxVelocity": 900,
-	  "altitude": 99,
-	  "slope": 95,
-	  "remainDistance": 950
+	  "velocity": 7.6,
+	  "maxVelocity": 7.6,
+	  "altitude": 500,
+	  "slope": 97,
+	  "remainDistance": 95
 	},
 	{
 	  "rocketImage": {
@@ -131,11 +131,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket6.png"
 	  },
-	  "velocity": 80,
-	  "maxVelocity": 180,
-	  "altitude": 80,
-	  "slope": 48,
-	  "remainDistance": 158
+	  "velocity": 7.5,
+	  "maxVelocity": 7.5,
+	  "altitude": 700,
+	  "slope": 98,
+	  "remainDistance": 99
 	}
   ],
   "satellites": [
@@ -145,11 +145,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite1.png"
 	  },
-	  "velocity": 27,
-	  "maxVelocity": 170,
-	  "altitude": 70,
-	  "slope": 75,
-	  "remainDistance": 750
+	  "velocity": 7.1,
+	  "maxVelocity": 7.1,
+	  "altitude": 1336,
+	  "slope": 66.04,
+	  "remainDistance": 112.5
 	},
 	{
 	  "rocketImage": {
@@ -157,11 +157,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite2.png"
 	  },
-	  "velocity": 60,
-	  "maxVelocity": 160,
-	  "altitude": 60,
-	  "slope": 65,
-	  "remainDistance": 650
+	  "velocity": 7.7,
+	  "maxVelocity": 7.7,
+	  "altitude": 600,
+	  "slope": 97.8,
+	  "remainDistance": 96.7
 	},
 	{
 	  "rocketImage": {
@@ -169,11 +169,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite3.png"
 	  },
-	  "velocity": 50,
-	  "maxVelocity": 500,
-	  "altitude": 50,
-	  "slope": 55,
-	  "remainDistance": 550
+	  "velocity": 7.6,
+	  "maxVelocity": 7.6,
+	  "altitude": 700,
+	  "slope": 97.8,
+	  "remainDistance": 98
 	},
 	{
 	  "rocketImage": {
@@ -181,11 +181,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite4.png"
 	  },
-	  "velocity": 40,
-	  "maxVelocity": 140,
-	  "altitude": 94,
-	  "slope": 44,
-	  "remainDistance": 140
+	  "velocity": 7.7,
+	  "maxVelocity": 7.7,
+	  "altitude": 500,
+	  "slope": 97.5,
+	  "remainDistance": 95
 	},
 	{
 	  "rocketImage": {
@@ -193,11 +193,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite5.png"
 	  },
-	  "velocity": 23,
-	  "maxVelocity": 130,
-	  "altitude": 30,
-	  "slope": 35,
-	  "remainDistance": 350
+	  "velocity": 7.5,
+	  "maxVelocity": 7.5,
+	  "altitude": 1500,
+	  "slope": 53,
+	  "remainDistance": 110
 	},
 	{
 	  "rocketImage": {
@@ -205,11 +205,11 @@
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite6.png"
 	  },
-	  "velocity": 80,
-	  "maxVelocity": 700,
-	  "altitude": 60,
-	  "slope": 55,
-	  "remainDistance": 450
+	  "velocity": 3.1,
+	  "maxVelocity": 3.1,
+	  "altitude": 36000,
+	  "slope": 0,
+	  "remainDistance": 1436
 	}
   ],
   "progressBars": [

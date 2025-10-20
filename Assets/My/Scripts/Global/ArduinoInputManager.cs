@@ -13,7 +13,7 @@ public static class LedStrip
     public static void Pixel(int index, int r, int g, int b)
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
-        if (inst == null)
+        if (!inst)
         {
             Debug.LogError("ArduinoInputManager.Instance is null.");
             return;
@@ -25,7 +25,7 @@ public static class LedStrip
     public static void Range(int start, int end, int r, int g, int b)
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
-        if (inst == null)
+        if (!inst)
         {
             Debug.LogError("ArduinoInputManager.Instance is null.");
             return;
@@ -37,7 +37,7 @@ public static class LedStrip
     public static void Fill(int r, int g, int b)
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
-        if (inst == null)
+        if (!inst)
         {
             Debug.LogError("ArduinoInputManager.Instance is null.");
             return;
@@ -49,7 +49,7 @@ public static class LedStrip
     public static void Clear()
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
-        if (inst == null)
+        if (!inst)
         {
             Debug.LogError("ArduinoInputManager.Instance is null.");
             return;
@@ -61,7 +61,7 @@ public static class LedStrip
     public static void Bright(int brightness)
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
-        if (inst == null)
+        if (!inst)
         {
             Debug.LogError("ArduinoInputManager.Instance is null.");
             return;
@@ -207,24 +207,12 @@ public class ArduinoInputManager : MonoBehaviour
     private void OnApplicationQuit()
     {
         _running = false;
-
-        try
-        {
-            if (_readThread != null && _readThread.IsAlive)
-                _readThread.Join(200);
-        }
-        catch
-        {
-        }
-
-        try
-        {
-            if (_serialPort != null && _serialPort.IsOpen)
-                _serialPort.Close();
-        }
-        catch
-        {
-        }
+        
+        if (_readThread != null && _readThread.IsAlive)
+            _readThread.Join(200);
+        
+        if (_serialPort != null && _serialPort.IsOpen)
+            _serialPort.Close();
     }
 
     // 한 번만 소비하는 입력: 누적된 눌림 중 하나를 반환하고, 해당 비트를 클리어
@@ -274,7 +262,7 @@ public class ArduinoInputManager : MonoBehaviour
         return count;
     }
 
-    // 필요 시 아두이노에 딜레이 값 전송(아두이노가 이 값 처리할 때만 의미 있음)
+    // 필요 시 아두이노에 딜레이 값 전송
     public void SendButtonDelay(int ms)
     {
         if (_serialPort != null && _serialPort.IsOpen)

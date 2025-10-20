@@ -86,8 +86,9 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         ArduinoInputManager.Instance?.SetLedAll(false);
         LedStrip.Range(0, 9, 255, 0, 0);
 
-        // 인트로 세팅 및 재생  
-        SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio).Forget();
+        // 인트로 세팅 및 재생
+        // 페이드 인 후 바로 재생하기 때문에 준비완료까지 await
+        await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
 

@@ -440,7 +440,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
                 rt,
                 size: imageSet.size,
                 anchoredPos: new Vector2(imageSet.position.x, -imageSet.position.y),
-                rotation: imageSet.rotation
+                rotation: imageSet.rotation,
+                scale: imageSet.scale
             );
         }
     }
@@ -586,7 +587,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         _ = AnimateAlphaPingPongAsync(g, minA, maxA, periodSec, cts.Token);
     }
 
-    /// <summary> CTS 안전 정리 헬퍼 </summary>
+    /// <summary> CTS 정리 헬퍼 </summary>
     protected static void CancelAndDispose(ref CancellationTokenSource cts)
     {
         cts?.Cancel();
@@ -597,15 +598,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 디버그 스킵 키 입력 시 공통 처리 -> 파생 클래스 훅 호출 </summary>
     private void HandleDebugSkipKey()
     {
-        try
-        {
-            _inactivityTimer = 0f; // 타임아웃 리셋
-            OnDebugSkip();
-        }
-        catch (Exception e)
-        {
-            Debug.LogError($"[SceneManager_Base] OnDebugSkip exception: {e}");
-        }
+        _inactivityTimer = 0f; // 타임아웃 리셋
+        OnDebugSkip();
     }
 
     /// <summary>

@@ -45,7 +45,7 @@ public class NuriAnimEvent : MonoBehaviour
             if (!stage1 || !stage1Smoke) return;
             
             LaunchManager.Instance?.FocusImage3ThenPingPong4();
-            LaunchManager.Instance?.FadeInStagePublicAsync(3);
+            LaunchManager.Instance?.FadeInStagePublicAsync(2).Forget();
             
             foreach (GameObject vfx in stage1VfXs)
             {
@@ -107,7 +107,7 @@ public class NuriAnimEvent : MonoBehaviour
             if (!fairing1 || !fairing2) return;
 
             fairingSmoke?.Play();
-            LaunchManager.Instance?.FadeInStagePublicAsync(4);
+            LaunchManager.Instance?.FadeInStagePublicAsync(3).Forget();
             await UniTask.Delay(4000, cancellationToken: token);
 
             int rocketLayer = LayerMask.NameToLayer("Nuri");
@@ -176,7 +176,7 @@ public class NuriAnimEvent : MonoBehaviour
             if (!stage2) return;
             // 4 고정, 5 핑퐁
             LaunchManager.Instance?.FocusImage4ThenPingPong5();
-            LaunchManager.Instance?.FadeInStagePublicAsync(5);
+            LaunchManager.Instance?.FadeInStagePublicAsync(4).Forget();
             
             foreach (var vfx in stage2VfXs)
             {
@@ -213,8 +213,7 @@ public class NuriAnimEvent : MonoBehaviour
                     anim.Expand();
                 }
             }
-            LaunchManager.Instance?.FadeInStagePublicAsync(6);
-            LaunchManager.Instance?.FadeInStagePublicAsync(7);
+            LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
 
             await UniTask.Delay(5000, cancellationToken: token);
 
