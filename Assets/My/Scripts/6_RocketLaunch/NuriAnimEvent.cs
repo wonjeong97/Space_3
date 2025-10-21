@@ -70,11 +70,11 @@ public class NuriAnimEvent : MonoBehaviour
 
             await UniTask.Delay(300, cancellationToken: token);
 
-            foreach (var vfx in stage2VfXs)
+            foreach (JetEngine vfx in stage2VfXs)
             {
-                var root = vfx.rootObject;
-                var flameA = vfx.flameA;
-                var flameB = vfx.flameB;
+                GameObject root = vfx.rootObject;
+                ParticleSystem flameA = vfx.flameA;
+                ParticleSystem flameB = vfx.flameB;
 
                 if (root && root.TryGetComponent(out JetVFXAnim anim) && flameA && flameB)
                 {
@@ -122,12 +122,12 @@ public class NuriAnimEvent : MonoBehaviour
             if (rb1) rb1.excludeLayers &= ~rocketMask;
             if (rb2) rb2.excludeLayers &= ~rocketMask;
 
-            foreach (var col in fairing1.GetComponentsInChildren<Collider>(true))
+            foreach (Collider col in fairing1.GetComponentsInChildren<Collider>(true))
             {
                 col.excludeLayers &= ~rocketMask;
                 col.includeLayers = ~0;
             }
-            foreach (var col in fairing2.GetComponentsInChildren<Collider>(true))
+            foreach (Collider col in fairing2.GetComponentsInChildren<Collider>(true))
             {
                 col.excludeLayers &= ~rocketMask;
                 col.includeLayers = ~0;
@@ -178,9 +178,9 @@ public class NuriAnimEvent : MonoBehaviour
             LaunchManager.Instance?.FocusImage4ThenPingPong5();
             LaunchManager.Instance?.FadeInStagePublicAsync(4).Forget();
             
-            foreach (var vfx in stage2VfXs)
+            foreach (JetEngine vfx in stage2VfXs)
             {
-                var root = vfx.rootObject;
+                GameObject root = vfx.rootObject;
                 if (root && root.TryGetComponent(out JetVFXAnim anim))
                 {
                     anim.Shrink();
@@ -200,11 +200,11 @@ public class NuriAnimEvent : MonoBehaviour
                 rb.interpolation = interpolation;
             }
 
-            foreach (var vfx in stage3VfXs)
+            foreach (JetEngine vfx in stage3VfXs)
             {
-                var root = vfx.rootObject;
-                var flameA = vfx.flameA;
-                var flameB = vfx.flameB;
+                GameObject root = vfx.rootObject;
+                ParticleSystem flameA = vfx.flameA;
+                ParticleSystem flameB = vfx.flameB;
 
                 if (root && root.TryGetComponent(out JetVFXAnim anim) && flameA && flameB)
                 {
@@ -213,11 +213,48 @@ public class NuriAnimEvent : MonoBehaviour
                     anim.Expand();
                 }
             }
-            LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
+            
 
             await UniTask.Delay(5000, cancellationToken: token);
 
             if (stage2) Destroy(stage2);
+        }
+        catch (OperationCanceledException)
+        {
+        }
+        catch (Exception e)
+        {
+            Debug.LogError(e);
+        }
+    }
+
+    public async UniTask Stage3Off()
+    {
+        var token = this.GetCancellationTokenOnDestroy();
+        try
+        {
+            if (!stage3) return;
+            
+            LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
+            foreach (JetEngine vfx in stage3VfXs)
+            {
+                var root = vfx.rootObject;
+                if (root && root.TryGetComponent(out JetVFXAnim anim))
+                {
+                    anim.Shrink();
+                }
+            }
+            
+            await UniTask.Delay(5000, cancellationToken: token);
+            
+            foreach (JetEngine vfx in stage3VfXs)
+            {
+                GameObject root = vfx.rootObject;
+                if (root)
+                {
+                    Destroy(root);
+                }
+            }
         }
         catch (OperationCanceledException)
         {
@@ -236,7 +273,8 @@ public class NuriAnimEvent : MonoBehaviour
 
         try
         {
-            await LaunchManager.Instance.LoadNextSceneAsync().AttachExternalCancellation(token);
+            //await LaunchManager.Instance.LoadNextSceneAsync().AttachExternalCancellation(token);
+            Debug.Log("Call Next Scene");
         }
         catch (OperationCanceledException)
         {

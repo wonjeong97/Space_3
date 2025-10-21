@@ -18,8 +18,7 @@ public class FuelSetting
     
     public ImageSetting fuelPopup;
     public ImageSetting sub1;
-
-    public ImageSetting[] fuelImage; // 3개 예상
+    public ImageSetting[] fuelImage;
 }
 
 /// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
@@ -64,6 +63,8 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             _popupFadeCts?.Cancel();
             _blinkCts?.Cancel();
             _main1AlphaCts?.Cancel();
+            CancelAndDispose(ref _popupFadeCts);
+            
             ArduinoInputManager.Instance?.SetLedAll(false);
         }
         catch (Exception e)

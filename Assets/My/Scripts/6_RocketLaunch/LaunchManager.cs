@@ -16,6 +16,7 @@ public class LaunchSetting
     
     public ImageSetting[] stages;
     public ImageSetting[] main1Children;
+    public ImageSetting[] fuelImage;
 }
 
 public class LaunchManager : SceneManager_Base<LaunchSetting>
@@ -27,6 +28,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
     [SerializeField] private GameObject subImage;
+    [SerializeField] private GameObject fuelImage1;
+    [SerializeField] private GameObject fuelImage2;
+    [SerializeField] private GameObject fuelImage3;
     [SerializeField] private GameObject countdownText;
     
     [Header("mainImage1")]
@@ -154,7 +158,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
         
         // 카운트다운 시작
-        await RunCountdownAsync();
+        RunCountdownAsync().Forget();
+        CountController.Instance?.RunCountdownAsync().Forget();
     }
 
     /// <summary> 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 부드럽게 페이드 </summary>

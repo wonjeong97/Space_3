@@ -207,10 +207,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
                 await UniTask.Yield(PlayerLoopTiming.Update, token); // 다음 프레임까지 대기
             }
         }
-        catch (OperationCanceledException)
-        {
-            // 정상 취소 시 조용히 종료
-        }
+        catch (OperationCanceledException) { }
     }
 
     /// <summary> 알파값만 변경 </summary>
@@ -467,9 +464,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         string url = VideoManager.Instance.ResolvePlayableUrl(vs.fileName);
 
         // 외부 Task를 UniTask로 변환해 await
-        await VideoManager.Instance.PrepareAndPlayAsync(
-            vp, url, audioSource, vs.volume, this.GetCancellationTokenOnDestroy()
-        ).AsUniTask();
+        await VideoManager.Instance.PrepareAndPlayAsync(vp, url, audioSource, vs.volume, this.GetCancellationTokenOnDestroy()).AsUniTask();
     }
 
     #endregion
