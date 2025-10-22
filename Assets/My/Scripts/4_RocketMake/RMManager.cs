@@ -26,7 +26,8 @@ public class RMSetting
     public ImageSetting main1;
     public ImageSetting main2;
     public ImageSetting main3;
-    public ImageSetting sub1;
+    public ImageSetting subBg;
+    public ImageSetting subRocket;
 
     public ImageSetting[] main1Children;
 
@@ -69,7 +70,8 @@ public class RMManager : SceneManager_Base<RMSetting>
     [SerializeField] private Image imageRemainDistanceBar;
 
     [SerializeField] private GameObject videoPlayerObject;
-    [SerializeField] private GameObject subImage;
+    [SerializeField] private GameObject subBgImage;
+    [SerializeField] private GameObject subRocketImage;
 
     #endregion
 
@@ -171,7 +173,8 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
-        SettingImageObject(subImage, setting.sub1);
+        SettingImageObject(subBgImage, setting.subBg);
+        SettingImageObject(subRocketImage, setting.subRocket);
 
         // mainImage1의 자식 이미지들 세팅
         if (setting.main1Children != null && main1ChildrenImages != null)

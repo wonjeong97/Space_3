@@ -21,64 +21,92 @@
 	"size": { "x": 1250, "y": 900 },
 	"sourceImage": "Image/RocketFuel/Popup.png"
   },
-  "sub1": {
+  "subBg": {
 	"position": { "x": "960", "y": 270 },
 	"size": { "x": 1920, "y": 540 },
-	"sourceImage": "Image/RocketFuel/sub1.png"
+	"sourceImage": "Image/ForSub/Background.png"
   },
-  "main1Children":[
+  "subRocket": {
+	"position": { "x": 940, "y": 270 },
+	"size": { "x": 2150, "y": 700 },
+	"sourceImage": "Image/ForSub/Rocket_All.png"
+  },
+  "main1Children": [
 	{
 	  "position": { "x": 61.5, "y": 532 },
 	  "size": { "x": 77, "y": 53 },
 	  "sourceImage": "Image/RocketMake/1_거치.png",
-	  "color": {"r": 1, "g": 1, "b": 1, "a": 1}
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
 	},
 	{
 	  "position": { "x": 143, "y": 532 },
 	  "size": { "x": 107, "y": 53 },
 	  "sourceImage": "Image/RocketMake/2_연료주입.png",
-	  "color": {"r": 1, "g": 1, "b": 1, "a": 1}
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
 	},
 	{
 	  "position": { "x": 225, "y": 532 },
 	  "size": { "x": 77, "y": 53 },
 	  "sourceImage": "Image/RocketMake/3_대기.png",
-	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
 	},
 	{
 	  "position": { "x": 291.5, "y": 532 },
 	  "size": { "x": 77, "y": 53 },
 	  "sourceImage": "Image/RocketMake/4_발사.png",
-	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
 	},
 	{
 	  "position": { "x": 373, "y": 532 },
 	  "size": { "x": 107, "y": 53 },
 	  "sourceImage": "Image/RocketMake/5_엔진분리.png",
-	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
 	},
 	{
 	  "position": { "x": 471, "y": 532 },
 	  "size": { "x": 107, "y": 53 },
 	  "sourceImage": "Image/RocketMake/6_위성안착.png",
-	  "color": {"r": 1, "g": 1, "b": 1, "a": 0.28}
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
 	}
   ],
-  "fuelImage": [
+  "oxidizers": [
+  {
+	"position": { "x": "-285", "y": 8 },
+	"size": { "x": 415, "y": 145 },
+	"sourceImage": "Image/ForSub/1_ox.png",
+	"type": 3
+  },
+  {
+	"position": { "x": "370", "y": 8 },
+	"size": { "x": 280, "y": 110 },
+	"sourceImage": "Image/ForSub/2_ox.png",
+	"type": 3
+  },
+  {
+	"position": { "x": "690", "y": 8 },
+	"size": { "x": 50, "y": 105 },
+	"sourceImage": "Image/ForSub/3_ox.png",
+	"type": 3
+  }
+],
+  "fuels": [
 	{
-	  "position": { "x": "-365", "y": -5 },
-	  "size": { "x": 440, "y": 210 },
-	  "sourceImage": "Image/RocketFuel/fuel.png"
+	  "position": { "x": "-630", "y": 8 },
+	  "size": { "x": 245, "y": 145 },
+	  "sourceImage": "Image/ForSub/1_fuel.png",
+	  "type": 3
 	},
 	{
-	  "position": { "x": "200", "y": -7.5 },
-	  "size": { "x": 250, "y": 140 },
-	  "sourceImage": "Image/RocketFuel/fuel.png"
+	  "position": { "x": "160", "y": 8 },
+	  "size": { "x": 130, "y": 110 },
+	  "sourceImage": "Image/ForSub/2_fuel.png",
+	  "type": 3
 	},
 	{
-	  "position": { "x": "655", "y": -7.5 },
-	  "size": { "x": 120, "y": 140 },
-	  "sourceImage": "Image/RocketFuel/fuel.png"
+	  "position": { "x": "620", "y": 8 },
+	  "size": { "x": 55, "y": 50 },
+	  "sourceImage": "Image/ForSub/3_fuel.png",
+	  "type": 3
 	}
   ]
 }

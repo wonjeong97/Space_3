@@ -230,6 +230,7 @@ public class Settings
     public int canvas3TargetMonitorIndex;
 
     public float camera3TurnSpeed;
+    public SoundSetting buttonSound;
 }
 
 #endregion

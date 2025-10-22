@@ -15,10 +15,30 @@
 	"size": { "x": 550, "y": 800 },
 	"sourceImage": "Image/RocketLaunch/3_Guide.png"
   },
-  "sub1": {
+  "subBg": {
 	"position": { "x": 960, "y": 270 },
 	"size": { "x": 1920, "y": 540 },
-	"sourceImage": "Image/RocketLaunch/sub1.png"
+	"sourceImage": "Image/ForSub/Background.png"
+  },
+  "rocketStage1": {
+	"position": { "x": -422.6, "y": 6 },
+	"size": { "x": 1010, "y": 180 },
+	"sourceImage": "Image/ForSub/Stage1.png"
+  },
+  "rocketStage2": {
+	"position": { "x": 275.1, "y": 9.7 },
+	"size": { "x": 778.2, "y": 153.3 },
+	"sourceImage": "Image/ForSub/Stage2.png"
+  },
+  "rocketStage3": {
+	"position": { "x": 620, "y": 9 },
+	"size": { "x": 264.6, "y": 117.2 },
+	"sourceImage": "Image/ForSub/Stage3.png"
+  },
+  "rocketPairing": {
+	"position": { "x": 792, "y": 8 },
+	"size": { "x": 294.1, "y": 143 },
+	"sourceImage": "Image/ForSub/Pairing.png"
   },
   "stages": [
 	{
@@ -94,6 +114,46 @@
 	  "size": { "x": 107, "y": 53 },
 	  "sourceImage": "Image/RocketMake/6_위성안착.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+	}
+  ],
+  "oxidizers": [
+	{
+	  "position": { "x": "102.6", "y": 1.6 },
+	  "size": { "x": 415, "y": 142.7 },
+	  "sourceImage": "Image/ForSub/1_ox.png",
+	  "type": 3
+	},
+	{
+	  "position": { "x": "34", "y": -1.7 },
+	  "size": { "x": 280, "y": 110 },
+	  "sourceImage": "Image/ForSub/2_ox.png",
+	  "type": 3
+	},
+	{
+	  "position": { "x": "45.2", "y": -1 },
+	  "size": { "x": 47.2, "y": 105 },
+	  "sourceImage": "Image/ForSub/3_ox.png",
+	  "type": 3
+	}
+  ],
+  "fuels": [
+	{
+	  "position": { "x": "-232.4", "y": 4.4 },
+	  "size": { "x": 245, "y": 145.5 },
+	  "sourceImage": "Image/ForSub/1_fuel.png",
+	  "type": 3
+	},
+	{
+	  "position": { "x": "-179", "y": -1.7 },
+	  "size": { "x": 130, "y": 110 },
+	  "sourceImage": "Image/ForSub/2_fuel.png",
+	  "type": 3
+	},
+	{
+	  "position": { "x": "-27", "y": -0.2 },
+	  "size": { "x": 34, "y": 66 },
+	  "sourceImage": "Image/ForSub/3_fuel.png",
+	  "type": 3
 	}
   ]
 }

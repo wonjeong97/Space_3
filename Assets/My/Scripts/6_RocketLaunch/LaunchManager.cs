@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
@@ -12,33 +13,47 @@ public class LaunchSetting
     public ImageSetting main1;
     public ImageSetting main2;
     public ImageSetting main3;
-    public ImageSetting sub1;
-    
+    public ImageSetting subBg;
+    public ImageSetting rocketStage1;
+    public ImageSetting rocketStage2;
+    public ImageSetting rocketStage3;
+    public ImageSetting rocketPairing;
+
     public ImageSetting[] stages;
     public ImageSetting[] main1Children;
-    public ImageSetting[] fuelImage;
+    public ImageSetting[] oxidizers;
+    public ImageSetting[] fuels;
 }
 
 public class LaunchManager : SceneManager_Base<LaunchSetting>
-{   
+{
     public static LaunchManager Instance;
-    
-    [Header("UI")]
-    [SerializeField] private GameObject mainImage1;
+
+    [Header("UI")] [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
-    [SerializeField] private GameObject subImage;
-    [SerializeField] private GameObject fuelImage1;
-    [SerializeField] private GameObject fuelImage2;
-    [SerializeField] private GameObject fuelImage3;
     [SerializeField] private GameObject countdownText;
-    
-    [Header("mainImage1")]
-    [SerializeField] private Image[] stages;
+    [SerializeField] private GameObject subBgImage;
+    [SerializeField] private GameObject subRocketStage1Image;
+    [SerializeField] private GameObject subRocketStage2Image;
+    [SerializeField] private GameObject subRocketStage3Image;
+    [SerializeField] private GameObject subRocketPairingImage;
+
+    [Header("Oxidizers")] [SerializeField] private GameObject stage1Oxidizer;
+    [SerializeField] private GameObject stage2Oxidizer;
+    [SerializeField] private GameObject stage3Oxidizer;
+
+    [Header("Fuels")] [SerializeField] private GameObject stage1Fuel;
+    [SerializeField] private GameObject stage2Fuel;
+    [SerializeField] private GameObject stage3Fuel;
+
+
+    [Header("mainImage1")] [SerializeField]
+    private Image[] stages;
+
     [SerializeField] private Image[] main1ChildrenImages;
 
-    [Header("Rocket")]
-    [SerializeField] private GameObject rocketVFX;
+    [Header("Rocket")] [SerializeField] private GameObject rocketVFX;
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
 
@@ -46,6 +61,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     private RocketLaunch _rocketLaunch;
     private CancellationTokenSource[] _alphaCts;
     private CancellationTokenSource[] _stageCts;
+    private readonly Dictionary<GameObject, CancellationTokenSource> _rocketFadeCts = new Dictionary<GameObject, CancellationTokenSource>();
+
 
     protected override void Awake()
     {
@@ -54,7 +71,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         if (Instance == null) Instance = this;
         else if (Instance != this) Destroy(gameObject);
     }
-    
+
     protected override void OnDisable()
     {
         base.OnDisable();
@@ -66,6 +83,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 CancelAndDispose(ref _alphaCts[i]);
             }
         }
+
         if (_stageCts != null)
         {
             for (int i = 0; i < _stageCts.Length; i++)
@@ -73,15 +91,40 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 CancelAndDispose(ref _stageCts[i]);
             }
         }
+
+        if (_rocketFadeCts != null)
+        {
+            foreach (KeyValuePair<GameObject, CancellationTokenSource> kv in _rocketFadeCts)
+            {
+                CancellationTokenSource cts = kv.Value;
+                CancelAndDispose(ref cts);
+            }
+
+            _rocketFadeCts.Clear();
+        }
     }
-    
+
     protected override async UniTask Init()
     {
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
-        SettingImageObject(subImage,  setting.sub1);
-        
+        SettingImageObject(subBgImage, setting.subBg);
+        SettingImageObject(subRocketStage1Image, setting.rocketStage1);
+        SettingImageObject(subRocketStage2Image, setting.rocketStage2);
+        SettingImageObject(subRocketStage3Image, setting.rocketStage3);
+        SettingImageObject(subRocketPairingImage, setting.rocketPairing);
+
+        // 산화제 이미지 세팅
+        SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
+        SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
+        SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
+
+        // 연료 이미지 세팅
+        SettingImageObject(stage1Fuel, setting.fuels[0]);
+        SettingImageObject(stage2Fuel, setting.fuels[1]);
+        SettingImageObject(stage3Fuel, setting.fuels[2]);
+
         // stage 이미지 세팅
         if (setting.stages != null && stages != null)
         {
@@ -92,7 +135,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SettingImageObject(stages[i].gameObject, setting.stages[i]);
             }
         }
-        
+
         // mainImage1의 자식 이미지들 세팅
         if (setting.main1Children != null && main1ChildrenImages != null)
         {
@@ -103,12 +146,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
             }
         }
-        
+
         if (main1ChildrenImages != null)
         {
             _alphaCts = new CancellationTokenSource[main1ChildrenImages.Length];
         }
-        
+
         if (stages != null)
         {
             _stageCts = new CancellationTokenSource[stages.Length];
@@ -120,9 +163,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             tmp.text = _rocketCountdown.ToString();
             SetAlpha(tmp, 0f);
         }
-        
+
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
-        
+
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
 
@@ -134,20 +177,20 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
                 || TryConsumeSingleInput())
-            {   
+            {
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
-        
+
                 StopPingPongAndSetAlpha(2, 1.0f); // 2번 고정 1
                 StartPingPongAt(3, 0.28f, 1.0f, 2.0f); // 3번 핑퐁
-        
+
                 break;
             }
-    
+
             await UniTask.Yield();
         }
-        
+
         if (rocketVFX != null && rocketVFX.TryGetComponent(out _rocketLaunch))
         {
             _rocketLaunch.Call();
@@ -156,7 +199,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             Debug.LogError("[LaunchManager] rocketVFX not assigned or missing RocketLaunch component");
         }
-        
+
         // 카운트다운 시작
         RunCountdownAsync().Forget();
         CountController.Instance?.RunCountdownAsync().Forget();
@@ -173,10 +216,10 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         for (int n = _rocketCountdown; n > 0; n--)
         {
             if (cancel.IsCancellationRequested) return;
-            
+
             tmp.text = n.ToString(); // 숫자 갱신 및 완전 표시
             SetAlpha(tmp, 1f);
-            
+
             float t = 0f; // 알파 1 -> 0 페이드
             while (t < duration)
             {
@@ -197,7 +240,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 0;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
     }
-    
+
     /// <summary> 인덱스 범위/널 체크 후 Graphic 반환 </summary>
     private bool TryGetChildGraphic(int index, out Graphic g)
     {
@@ -217,8 +260,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             CancelAndDispose(ref _alphaCts[index]);
         }
 
-        Graphic g;
-        if (TryGetChildGraphic(index, out g))
+        if (TryGetChildGraphic(index, out Graphic g))
         {
             SetAlpha(g, alpha);
         }
@@ -237,15 +279,16 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             int len = main1ChildrenImages.Length;
             _alphaCts = new CancellationTokenSource[len];
         }
+
         if (_alphaCts[index] != null)
         {
             CancelAndDispose(ref _alphaCts[index]);
         }
-        
+
         // 시작
         StartAlphaPingPong(main1ChildrenImages[index], minA, maxA, periodSec, ref _alphaCts[index]);
     }
-    
+
     /// <summary> 외부 호출: 3번 알파 1로 고정, 4번 핑퐁 시작 </summary>
     public void FocusImage3ThenPingPong4()
     {
@@ -259,7 +302,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         StopPingPongAndSetAlpha(4, 1.0f);
         StartPingPongAt(5, 0.28f, 1.0f, 2.0f);
     }
-    
+
     /// <summary> 로켓 발사 중 스테이지 이미지를 페이드인 함 </summary>
     private async UniTask FadeInStageAsync(int index, float duration = 0.6f)
     {
@@ -277,6 +320,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             CancelAndDispose(ref _stageCts[index]);
             _stageCts[index] = new CancellationTokenSource();
         }
+
         CancellationToken token = (_stageCts != null && index >= 0 && index < _stageCts.Length)
             ? _stageCts[index].Token
             : this.GetCancellationTokenOnDestroy();
@@ -294,14 +338,15 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             SetAlpha(g, a);
             await UniTask.Yield();
         }
+
         SetAlpha(g, 1f);
     }
-    
+
     public UniTask FadeInStagePublicAsync(int index, float duration = 0.6f)
     {
         return FadeInStageAsync(index, duration);
     }
-    
+
     private bool TryGetStageGraphic(int index, out Graphic g)
     {
         g = null;
@@ -310,5 +355,146 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         if (!stages[index]) return false;
         g = stages[index];
         return true;
+    }
+
+    /// <summary> 서브 화면: 1단 이미지 페이드아웃 </summary>
+    public UniTask FadeOutSubRocketStage1Async(float duration = 0.6f)
+    {
+        return FadeOutRocketImageAsync(subRocketStage1Image, duration);
+    }
+
+    /// <summary> 서브 화면: 2단 이미지 페이드아웃 </summary>
+    public UniTask FadeOutSubRocketStage2Async(float duration = 0.6f)
+    {
+        return FadeOutRocketImageAsync(subRocketStage2Image, duration);
+    }
+
+    /// <summary> 서브 화면: 3단 이미지 페이드아웃 </summary>
+    public UniTask FadeOutSubRocketStage3Async(float duration = 0.6f)
+    {
+        return FadeOutRocketImageAsync(subRocketStage3Image, duration);
+    }
+
+    /// <summary> 서브 화면: 페어링 이미지 페이드아웃 </summary>
+    public UniTask FadeOutSubRocketPairingAsync(float duration = 0.6f)
+    {
+        return FadeOutRocketImageAsync(subRocketPairingImage, duration);
+    }
+
+
+    private async UniTask FadeOutRocketImageAsync(GameObject go, float duration)
+    {
+        if (!go) return;
+
+        // 중복 실행 취소
+        if (_rocketFadeCts.TryGetValue(go, out CancellationTokenSource running) && running != null)
+        {
+            CancelAndDispose(ref running);
+        }
+
+        CancellationTokenSource cts = new CancellationTokenSource();
+        _rocketFadeCts[go] = cts;
+
+        CancellationToken token = cts.Token;
+        float d = Mathf.Max(0.01f, duration);
+
+        try
+        {
+            // 1) CanvasGroup 우선
+            if (go.TryGetComponent(out CanvasGroup cg))
+            {
+                float start = cg.alpha;
+                float t = 0f;
+                while (t < d)
+                {
+                    if (token.IsCancellationRequested) return;
+                    t += Time.deltaTime;
+                    float u = Mathf.Clamp01(t / d);
+                    cg.alpha = Mathf.Lerp(start, 0f, u);
+                    await UniTask.Yield();
+                }
+
+                cg.alpha = 0f;
+                return;
+            }
+
+            // 2) 단일 Graphic
+            if (go.TryGetComponent(out Graphic g))
+            {
+                await LerpGraphicAlphaAsync(g, 0f, d, token);
+                return;
+            }
+
+            // 3) 자식 Graphics 전체
+            Graphic[] gs = go.GetComponentsInChildren<Graphic>(true);
+            if (gs != null && gs.Length > 0)
+            {
+                // 시작 알파 스냅샷
+                float[] starts = new float[gs.Length];
+                for (int i = 0; i < gs.Length; i++)
+                {
+                    starts[i] = (gs[i] != null) ? gs[i].color.a : 1f;
+                }
+
+                float t = 0f;
+                while (t < d)
+                {
+                    if (token.IsCancellationRequested) return;
+                    t += Time.deltaTime;
+                    float u = Mathf.Clamp01(t / d);
+                    for (int i = 0; i < gs.Length; i++)
+                    {
+                        Graphic gi = gs[i];
+                        if (!gi) continue;
+                        float a = Mathf.Lerp(starts[i], 0f, u);
+                        SetAlpha(gi, a);
+                    }
+
+                    await UniTask.Yield();
+                }
+                foreach (Graphic t1 in gs)
+                {
+                    if (t1) SetAlpha(t1, 0f);
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            // 정리
+            if (_rocketFadeCts.TryGetValue(go, out CancellationTokenSource mine) && mine == cts)
+            {
+                CancelAndDispose(ref cts);
+                _rocketFadeCts.Remove(go);
+            }
+            else
+            {
+                CancelAndDispose(ref cts);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 단일 Graphic 알파를 목표값으로 보간
+    /// </summary>
+    private async UniTask LerpGraphicAlphaAsync(Graphic g, float targetA, float duration, CancellationToken token)
+    {
+        if (!g) return;
+
+        float startA = g.color.a;
+        float t = 0f;
+        float d = Mathf.Max(0.01f, duration);
+
+        while (t < d)
+        {
+            if (token.IsCancellationRequested) return;
+            t += Time.deltaTime;
+            float u = Mathf.Clamp01(t / d);
+            float a = Mathf.Lerp(startA, targetA, u);
+            SetAlpha(g, a);
+            await UniTask.Yield();
+        }
+
+        SetAlpha(g, targetA);
     }
 }

@@ -168,15 +168,18 @@ public class ArduinoInputManager : MonoBehaviour
 
                 // 아두이노 포맷: "Button 1 Pressed" 등
                 if (s.IndexOf("Button 1 Pressed", StringComparison.OrdinalIgnoreCase) >= 0)
-                {
+                {   
+                    SoundManager.Instance?.PlayByPath("Sound/물리 버튼.mp3", 1.0f);
                     SetPressedBit(BIT_B1);
                 }
                 else if (s.IndexOf("Button 2 Pressed", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
+                    SoundManager.Instance?.PlayByPath("Sound/물리 버튼.mp3", 1.0f);
                     SetPressedBit(BIT_B2);
                 }
                 else if (s.IndexOf("Button 3 Pressed", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
+                    SoundManager.Instance?.PlayByPath("Sound/물리 버튼.mp3", 1.0f);
                     SetPressedBit(BIT_B3);
                 }
             }

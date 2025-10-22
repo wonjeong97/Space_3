@@ -17,8 +17,10 @@ public class FuelSetting
     public ImageSetting[] main1Children;
     
     public ImageSetting fuelPopup;
-    public ImageSetting sub1;
-    public ImageSetting[] fuelImage;
+    public ImageSetting subBg;
+    public ImageSetting subRocket;
+    public ImageSetting[] oxidizers;
+    public ImageSetting[] fuels;
 }
 
 /// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
@@ -29,10 +31,18 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
     [SerializeField] private GameObject popupImage;
-    [SerializeField] private GameObject subImage;
-    [SerializeField] private GameObject fuelImage1;
-    [SerializeField] private GameObject fuelImage2;
-    [SerializeField] private GameObject fuelImage3;
+    [SerializeField] private GameObject subBgImage;
+    [SerializeField] private GameObject subRocketImage;
+    
+    [Header("Oxidizers")]
+    [SerializeField] private GameObject stage1Oxidizer;
+    [SerializeField] private GameObject stage2Oxidizer;
+    [SerializeField] private GameObject stage3Oxidizer;
+    
+    [Header("Fuels")]
+    [SerializeField] private GameObject stage1Fuel;
+    [SerializeField] private GameObject stage2Fuel;
+    [SerializeField] private GameObject stage3Fuel;
     
     [Header("mainImage1")]
     [SerializeField] private Image[] main1ChildrenImages;
@@ -91,7 +101,8 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(popupImage, setting.fuelPopup);
-        SettingImageObject(subImage, setting.sub1);
+        SettingImageObject(subBgImage, setting.subBg);
+        SettingImageObject(subRocketImage, setting.subRocket);
         
         // mainImage1의 자식 이미지들 세팅
         if (setting.main1Children != null && main1ChildrenImages != null)
@@ -108,11 +119,16 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         {
             StartAlphaPingPong(main1ChildrenImages[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
-
-        // 게이지 이미지 세팅
-        SettingImageObject(fuelImage1, setting.fuelImage[0]);
-        SettingImageObject(fuelImage2, setting.fuelImage[1]);
-        SettingImageObject(fuelImage3, setting.fuelImage[2]);
+        
+        // 산화제 이미지 세팅
+        SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
+        SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
+        SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
+        
+        // 연료 이미지 세팅
+        SettingImageObject(stage1Fuel, setting.fuels[0]);
+        SettingImageObject(stage2Fuel, setting.fuels[1]);
+        SettingImageObject(stage3Fuel, setting.fuels[2]);
 
         InitFuelImage(); // fillAmount 0으로 초기화
         ArduinoInputManager.Instance?.SetLedAll(true);
@@ -245,7 +261,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     /// <summary> 연료 게이지 이미지 초기화 </summary>
     private void InitFuelImage()
     {
-        if (fuelImage1.TryGetComponent(out _fuel1Image))
+        if (stage1Fuel.TryGetComponent(out _fuel1Image))
         {
             _fuel1Image.type = Image.Type.Filled;
             _fuel1Image.fillMethod = Image.FillMethod.Horizontal;
@@ -253,7 +269,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             _fuel1Image.fillAmount = 0f;
         }
 
-        if (fuelImage2.TryGetComponent(out _fuel2Image))
+        if (stage2Fuel.TryGetComponent(out _fuel2Image))
         {
             _fuel2Image.type = Image.Type.Filled;
             _fuel2Image.fillMethod = Image.FillMethod.Horizontal;
@@ -261,7 +277,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             _fuel2Image.fillAmount = 0f;
         }
 
-        if (fuelImage3.TryGetComponent(out _fuel3Image))
+        if (stage3Fuel.TryGetComponent(out _fuel3Image))
         {
             _fuel3Image.type = Image.Type.Filled;
             _fuel3Image.fillMethod = Image.FillMethod.Horizontal;

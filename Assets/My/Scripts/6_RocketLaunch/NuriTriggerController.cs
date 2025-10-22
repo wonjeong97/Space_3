@@ -15,6 +15,7 @@ public class NuriTriggerController : MonoBehaviour
     [Header("Refs")]
     [SerializeField] private CountController count;
     [SerializeField] private NuriAnimEvent nuri;
+    [SerializeField] private FocusObject focus;
 
     [Header("Trigger Times (T+ in seconds)")]
     [SerializeField] private float tDropStage1     = 2f * 60f + 5f;   // 2:05
@@ -58,6 +59,11 @@ public class NuriTriggerController : MonoBehaviour
             Debug.LogError("[NuriTriggerController] NuriAnimEvent reference missing");
             return;
         }
+        if (focus == null)
+        {
+            Debug.LogError("[NuriTriggerController] FocusObject reference missing");
+            return;
+        }
 
         _firedDrop1 = _firedFairing = _firedDrop2 = _firedStage3Off = false;
 
@@ -71,7 +77,10 @@ public class NuriTriggerController : MonoBehaviour
                 if (!_firedDrop1 && t >= tDropStage1)
                 {
                     _firedDrop1 = true;
+                    FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3100f, 0f), Quaternion.identity);
+                    focus.FocusTo(pose, 2f);
                     nuri.DropStage1().Forget();
+                    LaunchManager.Instance?.FadeOutSubRocketStage1Async().Forget();
                     Debug.Log("[Trigger] DropStage1()");
                 }
 
@@ -80,6 +89,7 @@ public class NuriTriggerController : MonoBehaviour
                 {
                     _firedFairing = true;
                     nuri.SeparateFairing().Forget();
+                    LaunchManager.Instance?.FadeOutSubRocketPairingAsync().Forget();
                     Debug.Log("[Trigger] SeparateFairing()");
                 }
 
@@ -87,7 +97,10 @@ public class NuriTriggerController : MonoBehaviour
                 if (!_firedDrop2 && t >= tDropStage2)
                 {
                     _firedDrop2 = true;
+                    FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3800f, 0f), Quaternion.identity);
+                    focus.FocusTo(pose, 2f);
                     nuri.DropStage2().Forget();
+                    LaunchManager.Instance?.FadeOutSubRocketStage2Async().Forget();
                     Debug.Log("[Trigger] DropStage2()");
                 }
 
@@ -95,6 +108,8 @@ public class NuriTriggerController : MonoBehaviour
                 if (!_firedStage3Off && t >= tStage3Off)
                 {
                     _firedStage3Off = true;
+                    FocusObject.Pose pose = new FocusObject.Pose(new Vector3(-46f, 4474f, 0f), Quaternion.Euler(-75f, -90f, 90f));
+                    focus.FocusTo(pose, 2f);
                     nuri.Stage3Off().Forget();
                     Debug.Log("[Trigger] Stage3Off()");
                 }

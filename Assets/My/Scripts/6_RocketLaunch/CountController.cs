@@ -232,8 +232,8 @@ public class CountController : MonoBehaviour
     {
         if (slopeKeys == null || slopeKeys.Length == 0)
         {
-            _slpT = new float[0];
-            _slpV = new float[0];
+            _slpT = Array.Empty<float>();
+            _slpV = Array.Empty<float>();
             return;
         }
 
