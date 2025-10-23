@@ -18,6 +18,7 @@ public class NuriAnimEvent : MonoBehaviour
     [SerializeField] private GameObject fairing1;
     [SerializeField] private GameObject fairing2;
     [SerializeField] private ParticleSystem fairingSmoke;
+    [SerializeField] private ParticleSystem fairingSmokeVertical;
 
     [Header("Stage1")]
     [SerializeField] private GameObject stage1;
@@ -44,9 +45,6 @@ public class NuriAnimEvent : MonoBehaviour
         {
             if (!stage1 || !stage1Smoke) return;
             
-            LaunchManager.Instance?.FocusImage3ThenPingPong4();
-            LaunchManager.Instance?.FadeInStagePublicAsync(2).Forget();
-            
             foreach (GameObject vfx in stage1VfXs)
             {
                 if (vfx && vfx.TryGetComponent(out JetVFXAnim anim))
@@ -56,8 +54,7 @@ public class NuriAnimEvent : MonoBehaviour
             }
 
             stage1Smoke?.Play();
-
-            await UniTask.Delay(2000, cancellationToken: token);
+            await UniTask.Delay(3000, cancellationToken: token);
 
             stage1.transform.SetParent(null, true);
             if (stage1.TryGetComponent(out Rigidbody rb))
@@ -67,8 +64,7 @@ public class NuriAnimEvent : MonoBehaviour
                 rb.collisionDetectionMode = collisionMode;
                 rb.interpolation = interpolation;
             }
-
-            await UniTask.Delay(300, cancellationToken: token);
+            await UniTask.Delay(3000, cancellationToken: token);
 
             foreach (JetEngine vfx in stage2VfXs)
             {
@@ -84,14 +80,11 @@ public class NuriAnimEvent : MonoBehaviour
                 }
             }
 
-            await UniTask.Delay(5000, cancellationToken: token);
+            await UniTask.Delay(10000, cancellationToken: token);
 
             if (stage1) Destroy(stage1);
         }
-        catch (OperationCanceledException)
-        {
-            // 씬 파괴/전환 시 정상 취소
-        }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -101,14 +94,14 @@ public class NuriAnimEvent : MonoBehaviour
     /// <summary> 페어링 분리: 연기 → 분리/물리활성 → 연기정지 → 파편 제거 </summary>
     public async UniTask SeparateFairing()
     {
-        var token = this.GetCancellationTokenOnDestroy();
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
         try
         {
             if (!fairing1 || !fairing2) return;
 
             fairingSmoke?.Play();
-            LaunchManager.Instance?.FadeInStagePublicAsync(3).Forget();
-            await UniTask.Delay(4000, cancellationToken: token);
+            fairingSmokeVertical?.Play();
+            await UniTask.Delay(3000, cancellationToken: token);
 
             int rocketLayer = LayerMask.NameToLayer("Nuri");
             int rocketMask = 1 << rocketLayer;
@@ -116,8 +109,8 @@ public class NuriAnimEvent : MonoBehaviour
             fairing1.transform.SetParent(null, true);
             fairing2.transform.SetParent(null, true);
 
-            var rb1 = fairing1.GetComponent<Rigidbody>();
-            var rb2 = fairing2.GetComponent<Rigidbody>();
+            Rigidbody rb1 = fairing1.GetComponent<Rigidbody>();
+            Rigidbody rb2 = fairing2.GetComponent<Rigidbody>();
 
             if (rb1) rb1.excludeLayers &= ~rocketMask;
             if (rb2) rb2.excludeLayers &= ~rocketMask;
@@ -149,18 +142,17 @@ public class NuriAnimEvent : MonoBehaviour
                 rb2.interpolation = interpolation;
             }
 
-            await UniTask.Delay(2000, cancellationToken: token);
+            await UniTask.Delay(5000, cancellationToken: token);
             fairingSmoke?.Stop();
+            fairingSmokeVertical?.Stop();
 
-            await UniTask.Delay(4000, cancellationToken: token);
+            await UniTask.Delay(10000, cancellationToken: token);
 
             if (fairingSmoke) Destroy(fairingSmoke.gameObject);
             if (fairing1) Destroy(fairing1);
             if (fairing2) Destroy(fairing2);
         }
-        catch (OperationCanceledException)
-        {
-        }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -174,9 +166,6 @@ public class NuriAnimEvent : MonoBehaviour
         try
         {
             if (!stage2) return;
-            // 4 고정, 5 핑퐁
-            LaunchManager.Instance?.FocusImage4ThenPingPong5();
-            LaunchManager.Instance?.FadeInStagePublicAsync(4).Forget();
             
             foreach (JetEngine vfx in stage2VfXs)
             {
@@ -188,8 +177,7 @@ public class NuriAnimEvent : MonoBehaviour
             }
 
             stage2Smoke?.Play();
-
-            await UniTask.Delay(2000, cancellationToken: token);
+            await UniTask.Delay(3000, cancellationToken: token);
 
             stage2.transform.SetParent(null, true);
             if (stage2.TryGetComponent(out Rigidbody rb))
@@ -199,7 +187,8 @@ public class NuriAnimEvent : MonoBehaviour
                 rb.collisionDetectionMode = collisionMode;
                 rb.interpolation = interpolation;
             }
-
+            await UniTask.Delay(3000, cancellationToken: token);
+            
             foreach (JetEngine vfx in stage3VfXs)
             {
                 GameObject root = vfx.rootObject;
@@ -213,15 +202,10 @@ public class NuriAnimEvent : MonoBehaviour
                     anim.Expand();
                 }
             }
-            
-
-            await UniTask.Delay(5000, cancellationToken: token);
-
+            await UniTask.Delay(10000, cancellationToken: token);
             if (stage2) Destroy(stage2);
         }
-        catch (OperationCanceledException)
-        {
-        }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -230,12 +214,11 @@ public class NuriAnimEvent : MonoBehaviour
 
     public async UniTask Stage3Off()
     {
-        var token = this.GetCancellationTokenOnDestroy();
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
         try
         {
             if (!stage3) return;
             
-            LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
             foreach (JetEngine vfx in stage3VfXs)
             {
                 var root = vfx.rootObject;
@@ -256,9 +239,7 @@ public class NuriAnimEvent : MonoBehaviour
                 }
             }
         }
-        catch (OperationCanceledException)
-        {
-        }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -273,13 +254,9 @@ public class NuriAnimEvent : MonoBehaviour
 
         try
         {
-            //await LaunchManager.Instance.LoadNextSceneAsync().AttachExternalCancellation(token);
-            Debug.Log("Call Next Scene");
+            await LaunchManager.Instance.LoadNextSceneAsync().AttachExternalCancellation(token);
         }
-        catch (OperationCanceledException)
-        {
-            // 씬 전환/오브젝트 파괴 시 정상 취소
-        }
+        catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);

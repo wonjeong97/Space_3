@@ -104,6 +104,7 @@ public class CountController : MonoBehaviour
         _checkpointHolding = false;
         _checkpointCleared = false;
         _autoSlopeEnabled = false;
+        bool _firedGreenLed = false;
 
         UpdateHint(false);
 
@@ -153,6 +154,12 @@ public class CountController : MonoBehaviour
 
                         // 안내 문구 출력
                         UpdateHint(true);
+                        LaunchManager.Instance?.FadeInStagePublicAsync(2).Forget(); // 2. 피치 기동 이미지 페이드 인
+                        if (!_firedGreenLed)
+                        {
+                            _firedGreenLed = true;
+                            LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
+                        }
 
                         // 표기/내부 시간 고정
                         if (lockTimeAtCheckpoint)
@@ -169,7 +176,7 @@ public class CountController : MonoBehaviour
                     if (_checkpointHolding)
                     {
                         deltaPlus = 0f;
-
+                        
                         // Slope 조건 검사(오차 포함)
                         bool ok = false;
                         if (slope != null)
@@ -184,6 +191,8 @@ public class CountController : MonoBehaviour
                             _checkpointCleared = true;
                             _checkpointHolding = false;
                             UpdateHint(false);
+                            LaunchManager.Instance?.PublicStopLedEffects();
+                            LedStrip.Range(0, 9, 255, 0, 0);
 
                             // -> 이후는 자동 SLP 진행 모드로 전환 + 입력 잠금(스냅)
                             _autoSlopeEnabled = true;

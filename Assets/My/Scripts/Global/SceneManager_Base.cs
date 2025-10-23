@@ -502,6 +502,11 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #region LED Effects (public helpers for children)
 
+    public void PublicStartBlinkGreen(int periodMsHalf, int onBrightness)
+    {
+        StartBlinkGreenAsync(periodMsHalf, onBrightness);
+    }
+
     protected void StartBlinkGreenAsync(int periodMsHalf, int onBrightness)
     {
         _blinkHalfPeriodMs = Mathf.Max(50, periodMsHalf);
@@ -509,6 +514,11 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         _ledCts = new CancellationTokenSource();
         _ = BlinkGreenLoopAsync(_ledCts.Token, onBrightness);
+    }
+
+    public void PublicStopLedEffects()
+    {
+        StopLedEffects();
     }
 
     protected void StopLedEffects()

@@ -43,38 +43,50 @@
   "stages": [
 	{
 	  "position": { "x": 275, "y": 320 },
-	  "size": { "x": 1960, "y": 1146 },
+	  "size": { "x": 1860, "y": 1300 },
 	  "scale": { "x": 0.25, "y": 0.25, "z": 0.25 },
 	  "sourceImage": "Image/RocketLaunch/Nuri_BG.png"
 	},
 	{
-	  "position": { "x": 188, "y": 927 },
-	  "size": { "x": 267, "y": 392 },
+	  "position": { "x": 83, "y": 1021 },
+	  "size": { "x": 152, "y": 514 },
 	  "sourceImage": "Image/RocketLaunch/Nuri_1.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
 	},
 	{
-	  "position": { "x": 375, "y": 725 },
-	  "size": { "x": 486, "y": 714 },
+	  "position": { "x": 253, "y": 768 },
+	  "size": { "x": 320, "y": 567 },
 	  "sourceImage": "Image/RocketLaunch/Nuri_2.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
 	},
 	{
-	  "position": { "x": 914, "y": 607 },
-	  "size": { "x": 1248, "y": 883 },
+	  "position": { "x": 441, "y": 815 },
+	  "size": { "x": 390, "y": 929 },
 	  "sourceImage": "Image/RocketLaunch/Nuri_3.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
 	},
 	{
-	  "position": { "x": 1291, "y": 547 },
-	  "size": { "x": 1025, "y": 1001 },
+	  "position": { "x": 1038, "y": 744 },
+	  "size": { "x": 960, "y": 1001 },
 	  "sourceImage": "Image/RocketLaunch/Nuri_4.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
 	},
 	{
-	  "position": { "x": 1448, "y": 95 },
-	  "size": { "x": 710, "y": 121 },
+	  "position": { "x": 1279, "y": 743 },
+	  "size": { "x": 1024, "y": 1001 },
 	  "sourceImage": "Image/RocketLaunch/Nuri_5.png",
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
+	},
+	{
+	  "position": { "x": 1371, "y": 294 },
+	  "size": { "x": 512, "y": 121 },
+	  "sourceImage": "Image/RocketLaunch/Nuri_6.png",
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
+	},
+	{
+	  "position": { "x": 1737, "y": 289 },
+	  "size": { "x": 237, "y": 112 },
+	  "sourceImage": "Image/RocketLaunch/Nuri_7.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 0 }
 	}
   ],

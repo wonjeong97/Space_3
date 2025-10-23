@@ -22,9 +22,5 @@
   "canvas2TargetMonitorIndex": 1,
   "canvas3TargetMonitorIndex": 2,
   "camera3TurnSpeed": 5.0,
-  "buttonSound": {
-	"key": "button",
-	"clipPath": "Sound/물리 버튼.mp3",
-	"volume": 1.0
-  }
+  "buttonSound": {	"key": "button",	"clipPath": "Sound/물리 버튼.mp3",	"volume": 1.0  }
 }

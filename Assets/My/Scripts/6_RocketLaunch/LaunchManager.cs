@@ -29,7 +29,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 {
     public static LaunchManager Instance;
 
-    [Header("UI")] [SerializeField] private GameObject mainImage1;
+    [Header("UI")] 
+    [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
     [SerializeField] private GameObject countdownText;
@@ -39,21 +40,23 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject subRocketStage3Image;
     [SerializeField] private GameObject subRocketPairingImage;
 
-    [Header("Oxidizers")] [SerializeField] private GameObject stage1Oxidizer;
+    [Header("Oxidizers")] 
+    [SerializeField] private GameObject stage1Oxidizer;
     [SerializeField] private GameObject stage2Oxidizer;
     [SerializeField] private GameObject stage3Oxidizer;
 
-    [Header("Fuels")] [SerializeField] private GameObject stage1Fuel;
+    [Header("Fuels")] 
+    [SerializeField] private GameObject stage1Fuel;
     [SerializeField] private GameObject stage2Fuel;
     [SerializeField] private GameObject stage3Fuel;
 
 
-    [Header("mainImage1")] [SerializeField]
-    private Image[] stages;
+    [Header("mainImage1")] 
+    [SerializeField] private Image[] stages;
+    [SerializeField] private Image[] sequences;
 
-    [SerializeField] private Image[] main1ChildrenImages;
-
-    [Header("Rocket")] [SerializeField] private GameObject rocketVFX;
+    [Header("Rocket")] 
+    [SerializeField] private GameObject rocketVFX;
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
 
@@ -137,26 +140,18 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
 
         // mainImage1의 자식 이미지들 세팅
-        if (setting.main1Children != null && main1ChildrenImages != null)
+        if (setting.main1Children != null && sequences != null)
         {
-            int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
+            int count = Mathf.Min(setting.main1Children.Length, sequences.Length);
             for (int i = 0; i < count; i++)
             {
-                if (main1ChildrenImages[i] == null) continue;
-                SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
+                if (sequences[i] == null) continue;
+                SettingImageObject(sequences[i].gameObject, setting.main1Children[i]);
             }
         }
-
-        if (main1ChildrenImages != null)
-        {
-            _alphaCts = new CancellationTokenSource[main1ChildrenImages.Length];
-        }
-
-        if (stages != null)
-        {
-            _stageCts = new CancellationTokenSource[stages.Length];
-        }
-
+        if (sequences != null) _alphaCts = new CancellationTokenSource[sequences.Length];
+        if (stages != null) _stageCts = new CancellationTokenSource[stages.Length];
+        
         _rocketCountdown = Mathf.Max(1, setting.rocketCountdown);
         if (countdownText && countdownText.TryGetComponent(out TextMeshProUGUI tmp))
         {
@@ -165,7 +160,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
 
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
-
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
 
@@ -175,8 +169,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         CancellationToken cancel = this.GetCancellationTokenOnDestroy();
         while (!cancel.IsCancellationRequested && isActiveAndEnabled)
         {
-            if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
-                || TryConsumeSingleInput())
+            if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) || TryConsumeSingleInput())
             {
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
@@ -245,14 +238,14 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     private bool TryGetChildGraphic(int index, out Graphic g)
     {
         g = null;
-        if (main1ChildrenImages == null) return false;
-        if (index < 0 || index >= main1ChildrenImages.Length) return false;
-        if (main1ChildrenImages[index] == null) return false;
-        g = main1ChildrenImages[index];
+        if (sequences == null) return false;
+        if (index < 0 || index >= sequences.Length) return false;
+        if (sequences[index] == null) return false;
+        g = sequences[index];
         return true;
     }
 
-    /// <summary> 특정 인덱스의 핑퐁을 중지하고 알파를 고정값으로 설정 </summary>
+    /// <summary> 특정 시퀀스 인덱스의 핑퐁을 중지하고 알파를 고정값으로 설정 </summary>
     private void StopPingPongAndSetAlpha(int index, float alpha)
     {
         if (_alphaCts != null && index >= 0 && index < _alphaCts.Length)
@@ -266,17 +259,17 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
     }
 
-    /// <summary> 특정 인덱스의 핑퐁 시작(기존 실행 중이면 교체) </summary>
+    /// <summary> 특정 시퀀스 인덱스의 핑퐁 시작(기존 실행 중이면 교체) </summary>
     private void StartPingPongAt(int index, float minA, float maxA, float periodSec)
     {
-        if (main1ChildrenImages == null) return;
-        if (index < 0 || index >= main1ChildrenImages.Length) return;
-        if (main1ChildrenImages[index] == null) return;
+        if (sequences == null) return;
+        if (index < 0 || index >= sequences.Length) return;
+        if (sequences[index] == null) return;
 
         // 배열 초기화
-        if (_alphaCts == null || _alphaCts.Length != main1ChildrenImages.Length)
+        if (_alphaCts == null || _alphaCts.Length != sequences.Length)
         {
-            int len = main1ChildrenImages.Length;
+            int len = sequences.Length;
             _alphaCts = new CancellationTokenSource[len];
         }
 
@@ -286,7 +279,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
 
         // 시작
-        StartAlphaPingPong(main1ChildrenImages[index], minA, maxA, periodSec, ref _alphaCts[index]);
+        StartAlphaPingPong(sequences[index], minA, maxA, periodSec, ref _alphaCts[index]);
     }
 
     /// <summary> 외부 호출: 3번 알파 1로 고정, 4번 핑퐁 시작 </summary>

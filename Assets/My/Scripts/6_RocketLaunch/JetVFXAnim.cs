@@ -19,11 +19,11 @@ public class JetVFXAnim : MonoBehaviour
         startScale.x = 0f;
         transform.localScale = startScale;
 
-        StartCoroutine(ScaleXAnim(0f, _originalScale.x, duration));
+        StartCoroutine(ScaleAnim(Vector3.zero, new Vector3(_originalScale.x, _originalScale.y, _originalScale.z), duration));
     }
 
     /// <summary> X축 스케일을 from → to 로 time 동안 변화 </summary>
-    private IEnumerator ScaleXAnim(float from, float to, float time)
+    private IEnumerator ScaleAnim(Vector3 from, Vector3 to, float time)
     {
         float elapsed = 0f;
 
@@ -32,29 +32,26 @@ public class JetVFXAnim : MonoBehaviour
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / time);
 
-            Vector3 s = transform.localScale;
-            s.x = Mathf.Lerp(from, to, t);
-            transform.localScale = s;
+            transform.localScale = Vector3.Lerp(from, to, t);
 
             yield return null;
         }
 
-        Vector3 final = transform.localScale;
-        final.x = to;
-        transform.localScale = final;
+        transform.localScale = to;
     }
 
     /// <summary> 외부에서 호출: 원래 크기 → 0 으로 줄어들기 </summary>
     public void Shrink()
     {
         StopAllCoroutines();
-        StartCoroutine(ScaleXAnim(_originalScale.x, 0f, duration)); 
+        ;
+        StartCoroutine(ScaleAnim(new Vector3(_originalScale.x, _originalScale.y, _originalScale.z), Vector3.zero, duration)); 
     }
 
     /// <summary> 외부에서 호출: 0 → 원래 크기로 늘어나기 </summary>
     public void Expand()
     {
         StopAllCoroutines();
-        StartCoroutine(ScaleXAnim(0f, _originalScale.x, duration));
+        StartCoroutine(ScaleAnim(Vector3.zero, new Vector3(_originalScale.x, _originalScale.y, _originalScale.z), duration));
     }
 }

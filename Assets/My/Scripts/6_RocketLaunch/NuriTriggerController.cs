@@ -22,6 +22,8 @@ public class NuriTriggerController : MonoBehaviour
     [SerializeField] private float tSeparateFairing = 3f * 60f + 56f; // 3:56
     [SerializeField] private float tDropStage2     = 4f * 60f + 30f;  // 4:30
     [SerializeField] private float tStage3Off      = 12f * 60f + 14f; // 12:14
+    [SerializeField] private float tSeparateSatellite = 13f * 60f + 5f; // 13:05
+    [SerializeField] private float tCallNextScene = 15f * 60f; // 15:00
 
     [Header("Polling Interval (sec)")]
     [SerializeField] private float pollInterval = 0.05f;
@@ -30,6 +32,8 @@ public class NuriTriggerController : MonoBehaviour
     private bool _firedFairing;
     private bool _firedDrop2;
     private bool _firedStage3Off;
+    private bool _firedSatellite;
+    private bool _firedNextScene;
 
     private void Reset()
     {
@@ -80,8 +84,10 @@ public class NuriTriggerController : MonoBehaviour
                     FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3100f, 0f), Quaternion.identity);
                     focus.FocusTo(pose, 2f);
                     nuri.DropStage1().Forget();
-                    LaunchManager.Instance?.FadeOutSubRocketStage1Async().Forget();
-                    Debug.Log("[Trigger] DropStage1()");
+                    
+                    LaunchManager.Instance?.FocusImage3ThenPingPong4(); // 시퀀스 이미지 핑퐁
+                    LaunchManager.Instance?.FadeInStagePublicAsync(3).Forget(); // 스테이지 이미지 페이드 인
+                    LaunchManager.Instance?.FadeOutSubRocketStage1Async().Forget(); // 서브모니터 stage1 이미지 페이드 아웃
                 }
 
                 // T+ 3:56 SeparateFairing
@@ -89,8 +95,9 @@ public class NuriTriggerController : MonoBehaviour
                 {
                     _firedFairing = true;
                     nuri.SeparateFairing().Forget();
+                    
+                    LaunchManager.Instance?.FadeInStagePublicAsync(4).Forget();
                     LaunchManager.Instance?.FadeOutSubRocketPairingAsync().Forget();
-                    Debug.Log("[Trigger] SeparateFairing()");
                 }
 
                 // T+ 4:30 DropStage2
@@ -100,8 +107,9 @@ public class NuriTriggerController : MonoBehaviour
                     FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3800f, 0f), Quaternion.identity);
                     focus.FocusTo(pose, 2f);
                     nuri.DropStage2().Forget();
+                    
+                    LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
                     LaunchManager.Instance?.FadeOutSubRocketStage2Async().Forget();
-                    Debug.Log("[Trigger] DropStage2()");
                 }
 
                 // T+ 12:14 Stage3Off
@@ -111,7 +119,24 @@ public class NuriTriggerController : MonoBehaviour
                     FocusObject.Pose pose = new FocusObject.Pose(new Vector3(-46f, 4474f, 0f), Quaternion.Euler(-75f, -90f, 90f));
                     focus.FocusTo(pose, 2f);
                     nuri.Stage3Off().Forget();
-                    Debug.Log("[Trigger] Stage3Off()");
+                    
+                    LaunchManager.Instance?.FadeInStagePublicAsync(6).Forget();
+                }
+                
+                // T+ 13:04 SeparateSatellite
+                if (!_firedSatellite && t >= tSeparateSatellite)
+                {
+                    _firedSatellite = true;
+                    // TODO: 포커스 오브젝트 이벤트 설정 해야 함
+                    
+                    LaunchManager.Instance?.FocusImage4ThenPingPong5();
+                    LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
+                }
+                
+                // T+ 15:00 Call Next Scene
+                if (!_firedNextScene && t >= tCallNextScene)
+                {
+                    nuri.CallNextScene().Forget();
                 }
             }
 
