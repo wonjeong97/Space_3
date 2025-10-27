@@ -393,21 +393,23 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     #region UI Builders
 
     /// <summary> TextObject 설정: 폰트/문구/색/정렬/RectTransform 반영 </summary>
-    protected async UniTask SettingTextObject(GameObject textObject, TextSetting ts)
+    protected async UniTask SettingTextObject(GameObject textObject, TextSetting ts, string overrideText = null)
     {
         if (!textObject || ts == null) return;
-        if (textObject.TryGetComponent(out TextMeshProUGUI tmp) &&
-            textObject.TryGetComponent(out RectTransform rt))
+
+        if (textObject.TryGetComponent(out TextMeshProUGUI tmp) && textObject.TryGetComponent(out RectTransform rt))
         {
+            string finalText = string.IsNullOrEmpty(overrideText) ? ts.text : overrideText;
+
             await UICreator.Instance.ApplyFontAsync(
                 tmp,
                 ts.fontName,
-                ts.text,
+                finalText,
                 ts.fontSize,
                 ts.fontColor,
                 ts.alignment,
                 CancellationToken.None
-            ); // 외부 Task → UniTask
+            );
 
             UIUtility.ApplyRect(
                 rt,

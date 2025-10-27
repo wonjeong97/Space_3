@@ -37,6 +37,17 @@ public class RMSetting
 
     public VideoSetting[] locationVideo;
     public VideoSetting[] rocketMakeVideo;
+
+    public TextSetting objectiveText;
+
+    public ImageSetting controllerBackground;
+    public ImageSetting buttonLeft;
+    public ImageSetting buttonMiddle;
+    public ImageSetting buttonRight;
+    public ImageSetting throttleBackground;
+    public ImageSetting throttleButton;
+    
+    public TextSetting guideText;
 }
 
 /// <summary>
@@ -55,6 +66,16 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     [Header("mainImage1")] 
     [SerializeField] private Image[] main1ChildrenImages;
+    [SerializeField] private GameObject textObjective;
+    
+    [Header("mainImage2")]
+    [SerializeField] private GameObject controllerBackground;
+    [SerializeField] private GameObject buttonLeft;
+    [SerializeField] private GameObject buttonMiddle;
+    [SerializeField] private GameObject buttonRight;
+    [SerializeField] private GameObject throttleBackground;
+    [SerializeField] private GameObject throttleButton;
+    [SerializeField] private GameObject textGuide;
 
     [Header("mainImage3")]
     [SerializeField] private GameObject rocketImage; // 발사체, 위성 선택 이미지
@@ -176,7 +197,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(subBgImage, setting.subBg);
         SettingImageObject(subRocketImage, setting.subRocket);
 
-        // mainImage1의 자식 이미지들 세팅
+        // ===== mainImage1 =====
         if (setting.main1Children != null && main1ChildrenImages != null)
         {
             int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
@@ -186,11 +207,23 @@ public class RMManager : SceneManager_Base<RMSetting>
                 SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
             }
         }
+        SettingTextObject(textObjective, setting.objectiveText, "위성을 선택하세요.").Forget();
 
         if (main1ChildrenImages != null && main1ChildrenImages.Length > 0 && main1ChildrenImages[0] != null)
         {
             StartAlphaPingPong(main1ChildrenImages[0], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
+        // ======================
+        
+        // ===== mainImage2 =====
+        SettingImageObject(controllerBackground, setting.controllerBackground);
+        SettingImageObject(buttonLeft, setting.buttonLeft);
+        SettingImageObject(buttonMiddle, setting.buttonMiddle);
+        SettingImageObject(buttonRight, setting.buttonRight);
+        SettingImageObject(throttleBackground, setting.throttleBackground);
+        SettingImageObject(throttleButton, setting.throttleButton);
+        SettingTextObject(textGuide, setting.guideText, "버튼을 누르세요").Forget();
+        // ======================
 
         InitializeProgressBar();
         if (rocketImage) rocketImage.SetActive(false);

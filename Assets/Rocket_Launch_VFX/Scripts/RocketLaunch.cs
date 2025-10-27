@@ -31,12 +31,6 @@ public class RocketLaunch : MonoBehaviour
     {
         _launchSmokeParticle = launchSmoke?.GetComponent<ParticleSystem>();
         _launchSmokeAnim = launchSmoke?.GetComponent<Animation>();
-
-        if (_launchSmokeParticle != null && _launchSmokeAnim != null)
-        {
-            Debug.Log($"_launchSmokeParticle:{_launchSmokeParticle.name}");
-            Debug.Log($"_launchSmokeAnim:{_launchSmokeAnim.name}");
-        }
     }
 
     private void Start()
