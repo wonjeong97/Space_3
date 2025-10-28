@@ -83,6 +83,7 @@ public class ArduinoInputManager : MonoBehaviour
 
     public enum ButtonId
     {
+        None = 0,
         Button1 = 1,
         Button2 = 2,
         Button3 = 3

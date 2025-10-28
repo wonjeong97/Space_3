@@ -50,6 +50,12 @@ public class CountController : MonoBehaviour
     [SerializeField] private float slopeToleranceDeg = 0.2f;  // 허용 오차(±)
     [Tooltip("체크포인트 대기 중 T+ 표시를 0:51에 고정할지 여부")]
     [SerializeField] private bool lockTimeAtCheckpoint = true;
+    [Tooltip("외부 클래스에서 T+ 시간을 고정할지 여부")]
+    [SerializeField] private bool lockTimeOnExternalHold = true;
+    
+    private bool _externalHold;          // 외부(다른 컴포넌트)에서 건 홀드
+    private float _externalHoldTimeSnap; // 외부 홀드 시 표시/내부 시간을 고정할 값
+    public  bool  IsExternallyHolding => _externalHold;
 
     // -> SLP 자동 스케줄 키들(체크포인트 통과 후 사용자 입력 없이 자동 진행)
     [Serializable] private struct SlopeKey { public int m; public int s; public float deg; public float T() => m * 60f + s; }
@@ -116,7 +122,7 @@ public class CountController : MonoBehaviour
             float displayAbs = Mathf.Abs(time);
             int displayMin = Mathf.FloorToInt(displayAbs / 60f);
             int displaySec = Mathf.FloorToInt(displayAbs % 60f);
-            string prefix = IsCountingDown ? "T -" : "T +";
+            string prefix = IsCountingDown ? "T - " : "T + ";
             string formatted = (displayMin > 0)
                 ? $"{prefix}00:{displayMin:00}:{displaySec:00}"
                 : $"{prefix}00:00:{displaySec:00}";
@@ -143,6 +149,17 @@ public class CountController : MonoBehaviour
             {
                 // T+ 구간
                 float deltaPlus = Time.deltaTime * Mathf.Max(0f, deltaTimeSpeed);
+                if (_externalHold) // 외부 홀드 여부
+                {
+                    deltaPlus = 0f; // 시간 진행 중단
+
+                    // 표기 고정(옵션)
+                    if (lockTimeOnExternalHold)
+                    {
+                        TPlusSeconds = _externalHoldTimeSnap;
+                        time = _externalHoldTimeSnap; // 카운터 텍스트도 해당 값으로 고정
+                    }
+                }
 
                 // 체크포인트 로직
                 if (_checkpointArmed && !_checkpointCleared)
@@ -160,7 +177,11 @@ public class CountController : MonoBehaviour
                             _firedGreenLed = true;
                             LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
                         }
-
+                        
+                        // 스로틀 버튼 애니메이션 실행
+                        LaunchManager.Instance?.AnimateThrottleY(-110f, 0f, 0.8f, 0.2f);
+                        LaunchManager.Instance?.SetGuideText("스로틀을 올리세요.");
+                        
                         // 표기/내부 시간 고정
                         if (lockTimeAtCheckpoint)
                         {
@@ -187,7 +208,9 @@ public class CountController : MonoBehaviour
 
                         if (ok)
                         {
-                            // -> 체크포인트 해제
+                            LaunchManager.Instance?.StopAnimateThrottleY(); // 스로틀 애니메이션 해제
+                            LaunchManager.Instance?.SetGuideText("");
+                            
                             _checkpointCleared = true;
                             _checkpointHolding = false;
                             UpdateHint(false);
@@ -215,9 +238,7 @@ public class CountController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 체크포인트 안내 문구 표시/숨김
-    /// </summary>
+    /// <summary> 체크포인트 안내 문구 표시/숨김 </summary>
     private void UpdateHint(bool show)
     {
         if (!textHint) return;
@@ -234,9 +255,7 @@ public class CountController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// SLP 키 스케줄 캐시를 구성(시간 오름차순 정렬)
-    /// </summary>
+    /// <summary> SLP 키 스케줄 캐시를 구성(시간 오름차순 정렬) </summary>
     private void BuildSlopeCaches()
     {
         if (slopeKeys == null || slopeKeys.Length == 0)
@@ -258,9 +277,7 @@ public class CountController : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 주어진 T+초에서 스케줄된 SLP 각도를 반환(선형 보간, 양끝 고정)
-    /// </summary>
+    /// <summary> 주어진 T+초에서 스케줄된 SLP 각도를 반환(선형 보간, 양끝 고정) </summary>
     private float EvaluateScheduledSlope(float tPlusSec)
     {
         if (_slpT == null || _slpT.Length == 0) return 0f;
@@ -283,5 +300,23 @@ public class CountController : MonoBehaviour
 
         float u = Mathf.InverseLerp(t0, t1, tPlusSec);
         return Mathf.Lerp(v0, v1, u);
+    }
+    
+    ///<summary> 외부 홀드 시작 </summary>
+    public void BeginExternalHold()
+    {
+        if (_externalHold) return;
+        _externalHold = true;
+
+        if (lockTimeOnExternalHold)
+        {
+            _externalHoldTimeSnap = TPlusSeconds;
+        }
+    }
+
+    ///<summary> 외부 홀드 해제 </summary>
+    public void EndExternalHold()
+    {
+        _externalHold = false;
     }
 }

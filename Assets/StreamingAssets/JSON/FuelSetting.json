@@ -2,19 +2,19 @@
   "popupFadeTime": 1,
   "fuelFillSpeed": 5,
   "main1": {
-	"position": { "x": "375", "y": 540 },
-	"size": { "x": 550, "y": 800 },
-	"sourceImage": "Image/RocketFuel/1_Guide.png"
+	"position": { "x": 340, "y": 540 },
+	"size": { "x": 600, "y": 800 },
+	"sourceImage": "Image/MainDisplay/1_Guide.png"
   },
   "main2": {
-	"position": { "x": "960", "y": 540 },
-	"size": { "x": 550, "y": 800 },
-	"sourceImage": "Image/RocketFuel/2_Guide.png"
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 600, "y": 800 },
+	"sourceImage": "Image/MainDisplay/2_Guide.png"
   },
   "main3": {
-	"position": { "x": "1545", "y": 540 },
-	"size": { "x": 550, "y": 800 },
-	"sourceImage": "Image/RocketFuel/3_Guide.png"
+	"position": { "x": 1580, "y": 540 },
+	"size": { "x": 600, "y": 800 },
+	"sourceImage": "Image/MainDisplay/3_Guide.png"
   },
   "fuelPopup": {
 	"position": { "x": "960", "y": 540 },
@@ -108,5 +108,47 @@
 	  "sourceImage": "Image/ForSub/3_fuel.png",
 	  "type": 3
 	}
-  ]
+  ],
+  "objectiveText": {
+	"position": { "x": 300, "y": 700 },
+	"fontName": "font1",
+	"fontSize": 48,
+	"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 }
+  },
+  "controllerBackground": {
+	"position": { "x": 300, "y": 370 },
+	"size": { "x": 400, "y": 200 },
+	"sourceImage": "Image/MainDisplay/ControllerPanel.png"
+  },
+  "buttonLeft": {
+	"position": { "x": 80, "y": 105 },
+	"size": { "x": 80, "y": 80 },
+	"sourceImage": "Image/MainDisplay/ButtonOff.png"
+  },
+  "buttonMiddle": {
+	"position": { "x": 165, "y": 105 },
+	"size": { "x": 80, "y": 80 },
+	"sourceImage": "Image/MainDisplay/ButtonOff.png"
+  },
+  "buttonRight": {
+	"position": { "x": 250, "y": 105 },
+	"size": { "x": 80, "y": 80 },
+	"sourceImage": "Image/MainDisplay/ButtonOff.png"
+  },
+  "throttleBackground": {
+	"position": { "x": 340, "y": 105 },
+	"size": { "x": 15, "y": 120 },
+	"sourceImage": "Image/MainDisplay/ThrottleBG.png"
+  },
+  "throttleButton": {
+	"position": { "x": 6.5, "y": 70 },
+	"size": { "x": 50, "y": 30 },
+	"sourceImage": "Image/MainDisplay/ThrottleButton.png"
+  },
+  "guideText": {
+	"position": { "x": 300, "y": 700 },
+	"fontName": "font1",
+	"fontSize": 48,
+	"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 }
+  }
 }

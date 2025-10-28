@@ -7,18 +7,18 @@
 	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
   },
   "main1": {
-	"position": { "x": 375, "y": 540 },
-	"size": { "x": 550, "y": 800 },
+	"position": { "x": 340, "y": 540 },
+	"size": { "x": 600, "y": 800 },
 	"sourceImage": "Image/MainDisplay/1_Guide.png"
   },
   "main2": {
 	"position": { "x": 960, "y": 540 },
-	"size": { "x": 550, "y": 800 },
+	"size": { "x": 600, "y": 800 },
 	"sourceImage": "Image/MainDisplay/2_Guide.png"
   },
   "main3": {
-	"position": { "x": 1545, "y": 540 },
-	"size": { "x": 550, "y": 800 },
+	"position": { "x": 1580, "y": 540 },
+	"size": { "x": 600, "y": 800 },
 	"sourceImage": "Image/MainDisplay/3_Guide.png"
   },
   "subBg": {
@@ -72,7 +72,7 @@
   "rockets": [
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/rocket1.png"
 	  },
@@ -81,72 +81,12 @@
 	  "altitude": 1336,
 	  "slope": 98,
 	  "remainDistance": 100
-	},
-	{
-	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
-		"size": { "x": 425, "y": 350 },
-		"sourceImage": "Image/RocketMake/rocket2.png"
-	  },
-	  "velocity": 7.6,
-	  "maxVelocity": 7.6,
-	  "altitude": 500,
-	  "slope": 97,
-	  "remainDistance": 95
-	},
-	{
-	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
-		"size": { "x": 425, "y": 350 },
-		"sourceImage": "Image/RocketMake/rocket3.png"
-	  },
-	  "velocity": 3.07,
-	  "maxVelocity": 3.07,
-	  "altitude": 36000,
-	  "slope": 55,
-	  "remainDistance": 1440
-	},
-	{
-	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
-		"size": { "x": 425, "y": 350 },
-		"sourceImage": "Image/RocketMake/rocket4.png"
-	  },
-	  "velocity": 7.4,
-	  "maxVelocity": 7.4,
-	  "altitude": 1320,
-	  "slope": 66,
-	  "remainDistance": 110
-	},
-	{
-	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
-		"size": { "x": 425, "y": 350 },
-		"sourceImage": "Image/RocketMake/rocket5.png"
-	  },
-	  "velocity": 7.6,
-	  "maxVelocity": 7.6,
-	  "altitude": 500,
-	  "slope": 97,
-	  "remainDistance": 95
-	},
-	{
-	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
-		"size": { "x": 425, "y": 350 },
-		"sourceImage": "Image/RocketMake/rocket6.png"
-	  },
-	  "velocity": 7.5,
-	  "maxVelocity": 7.5,
-	  "altitude": 700,
-	  "slope": 98,
-	  "remainDistance": 99
 	}
   ],
   "satellites": [
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite1.png"
 	  },
@@ -158,7 +98,7 @@
 	},
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite2.png"
 	  },
@@ -170,7 +110,7 @@
 	},
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite3.png"
 	  },
@@ -182,7 +122,7 @@
 	},
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite4.png"
 	  },
@@ -194,7 +134,7 @@
 	},
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite5.png"
 	  },
@@ -206,7 +146,7 @@
 	},
 	{
 	  "rocketImage": {
-		"position": { "x": 290, "y": 250 },
+		"position": { "x": 275, "y": 700 },
 		"size": { "x": 425, "y": 350 },
 		"sourceImage": "Image/RocketMake/satellite6.png"
 	  },
@@ -296,7 +236,7 @@
 	"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 }
   },
   "controllerBackground": {
-	"position": { "x": 270, "y": 370 },
+	"position": { "x": 300, "y": 370 },
 	"size": { "x": 400, "y": 200 },
 	"sourceImage": "Image/MainDisplay/ControllerPanel.png"
   },

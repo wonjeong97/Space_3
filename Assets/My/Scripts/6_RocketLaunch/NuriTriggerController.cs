@@ -79,7 +79,17 @@ public class NuriTriggerController : MonoBehaviour
 
                 // T+ 2:05 DropStage1
                 if (!_firedDrop1 && t >= tDropStage1)
-                {
+                {   
+                    // ===== 왼쪽 버튼 대기 =====
+                    LaunchManager.Instance?.SetButtonOn("Left");
+                    count.BeginExternalHold(); // T+ 시간 멈춤
+                    LaunchManager.Instance?.SetGuideText("1단 분리 버튼을 누르세요.");
+                    await LaunchManager.Instance.WaitForLeftButtonAsync(token);
+                    LaunchManager.Instance?.SetGuideText("");
+                    count.EndExternalHold();
+                    LaunchManager.Instance?.SetButtonOff("Left");
+                    // ========================
+                    
                     _firedDrop1 = true;
                     FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3100f, 0f), Quaternion.identity);
                     focus.FocusTo(pose, 2f);
@@ -92,7 +102,17 @@ public class NuriTriggerController : MonoBehaviour
 
                 // T+ 3:56 SeparateFairing
                 if (!_firedFairing && t >= tSeparateFairing)
-                {
+                {   
+                    // ===== 오른쪽 버튼 대기 =====
+                    LaunchManager.Instance?.SetButtonOn("Right");
+                    count.BeginExternalHold();
+                    LaunchManager.Instance?.SetGuideText("페어링 분리 버튼을 누르세요.");
+                    await LaunchManager.Instance.WaitForRightButtonAsync(token);
+                    LaunchManager.Instance?.SetGuideText("");
+                    count.EndExternalHold();
+                    LaunchManager.Instance?.SetButtonOff("Right");
+                    // =========================
+                    
                     _firedFairing = true;
                     nuri.SeparateFairing().Forget();
                     
@@ -102,7 +122,17 @@ public class NuriTriggerController : MonoBehaviour
 
                 // T+ 4:30 DropStage2
                 if (!_firedDrop2 && t >= tDropStage2)
-                {
+                {   
+                    // ===== 가운데 버튼 대기 =====
+                    LaunchManager.Instance?.SetButtonOn("Middle");
+                    count.BeginExternalHold();
+                    LaunchManager.Instance?.SetGuideText("2단 분리 버튼을 누르세요");
+                    await LaunchManager.Instance.WaitForMiddleButtonAsync(token);
+                    LaunchManager.Instance?.SetGuideText("");
+                    count.EndExternalHold();
+                    LaunchManager.Instance?.SetButtonOff("Middle");
+                    // =========================
+                    
                     _firedDrop2 = true;
                     FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3800f, 0f), Quaternion.identity);
                     focus.FocusTo(pose, 2f);
@@ -127,7 +157,6 @@ public class NuriTriggerController : MonoBehaviour
                 if (!_firedSatellite && t >= tSeparateSatellite)
                 {
                     _firedSatellite = true;
-                    // TODO: 포커스 오브젝트 이벤트 설정 해야 함
                     
                     LaunchManager.Instance?.FocusImage4ThenPingPong5();
                     LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();

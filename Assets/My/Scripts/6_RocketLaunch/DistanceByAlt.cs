@@ -45,7 +45,7 @@ public class DistanceByAlt : MonoBehaviour
         if (clampToZero && distKm < 0f) distKm = 0f;
 
         // 3) 출력
-        textDistance.text = $"DIST {distKm.ToString($"F{decimals}")} km";
+        textDistance.text = $"{distKm.ToString($"F{decimals}")} KM";
     }
 
     /// <summary> 외부에서 현재 남은 거리(km) 필요 시 호출 </summary>

@@ -20,9 +20,29 @@ public class LaunchSetting
     public ImageSetting rocketPairing;
 
     public ImageSetting[] stages;
-    public ImageSetting[] main1Children;
+    public ImageSetting[] sequence;
     public ImageSetting[] oxidizers;
     public ImageSetting[] fuels;
+    
+    public TextSetting objectiveText;
+
+    public ImageSetting controllerBackground;
+    public ImageSetting buttonLeft;
+    public ImageSetting buttonMiddle;
+    public ImageSetting buttonRight;
+    public ImageSetting throttleBackground;
+    public ImageSetting throttleButton;
+    
+    public TextSetting guideText;
+    
+    public TextSetting timeText;
+    public TextSetting altitudeText;
+    public TextSetting velocityText;
+    public TextSetting distanceText;
+    public TextSetting timeValueText;
+    public TextSetting altitudeValueText;
+    public TextSetting velocityValueText;
+    public TextSetting distanceValueText;
 }
 
 public class LaunchManager : SceneManager_Base<LaunchSetting>
@@ -51,10 +71,30 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject stage3Fuel;
 
 
-    [Header("mainImage1")] 
+    [Header("MainImage1")] 
     [SerializeField] private Image[] stages;
     [SerializeField] private Image[] sequences;
+    [SerializeField] private GameObject textObjective;
 
+    [Header("MainImage2")]
+    [SerializeField] private GameObject controllerBackground;
+    [SerializeField] private GameObject buttonLeft;
+    [SerializeField] private GameObject buttonMiddle;
+    [SerializeField] private GameObject buttonRight;
+    [SerializeField] private GameObject throttleBackground;
+    [SerializeField] private GameObject throttleButton;
+    [SerializeField] private GameObject textGuide;
+    
+    [Header("MainImage3")]
+    [SerializeField] private GameObject textTime;
+    [SerializeField] private GameObject textAltitude;
+    [SerializeField] private GameObject textVelocity;
+    [SerializeField] private GameObject textDistance;
+    [SerializeField] private GameObject textTimeValue;
+    [SerializeField] private GameObject textAltitudeValue;
+    [SerializeField] private GameObject textVelocityValue;
+    [SerializeField] private GameObject textDistanceValue;
+    
     [Header("Rocket")] 
     [SerializeField] private GameObject rocketVFX;
 
@@ -128,7 +168,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(stage2Fuel, setting.fuels[1]);
         SettingImageObject(stage3Fuel, setting.fuels[2]);
 
-        // stage 이미지 세팅
+        // ===== mainImage1 =====
         if (setting.stages != null && stages != null)
         {
             int count = Mathf.Min(setting.stages.Length, stages.Length);
@@ -138,17 +178,41 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SettingImageObject(stages[i].gameObject, setting.stages[i]);
             }
         }
-
-        // mainImage1의 자식 이미지들 세팅
-        if (setting.main1Children != null && sequences != null)
+        
+        if (setting.sequence != null && sequences != null)
         {
-            int count = Mathf.Min(setting.main1Children.Length, sequences.Length);
+            int count = Mathf.Min(setting.sequence.Length, sequences.Length);
             for (int i = 0; i < count; i++)
             {
                 if (sequences[i] == null) continue;
-                SettingImageObject(sequences[i].gameObject, setting.main1Children[i]);
+                SettingImageObject(sequences[i].gameObject, setting.sequence[i]);
             }
         }
+        SettingTextObject(textObjective, setting.objectiveText, "로켓 발사를 완료하세요.").Forget();
+        
+        // ======================
+        
+        // ===== mainImage2 =====
+        SettingImageObject(controllerBackground, setting.controllerBackground);
+        SettingImageObject(buttonLeft, setting.buttonLeft);
+        SettingImageObject(buttonMiddle, setting.buttonMiddle);
+        SettingImageObject(buttonRight, setting.buttonRight);
+        SettingImageObject(throttleBackground, setting.throttleBackground);
+        SettingImageObject(throttleButton, setting.throttleButton);
+        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
+        // ======================
+        
+        // ===== mainImage3 =====
+        SettingTextObject(textTime, setting.timeText).Forget();
+        SettingTextObject(textAltitude, setting.altitudeText).Forget();
+        SettingTextObject(textVelocity, setting.velocityText).Forget();
+        SettingTextObject(textDistance, setting.distanceText).Forget();
+        SettingTextObject(textTimeValue, setting.timeValueText).Forget();
+        SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
+        SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
+        SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
+        // ======================
+        
         if (sequences != null) _alphaCts = new CancellationTokenSource[sequences.Length];
         if (stages != null) _stageCts = new CancellationTokenSource[stages.Length];
         
@@ -162,6 +226,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
+        
+        SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
 
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
@@ -170,10 +236,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         while (!cancel.IsCancellationRequested && isActiveAndEnabled)
         {
             if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) || TryConsumeSingleInput())
-            {
+            {   
+                SettingTextObject(textGuide, setting.guideText, "").Forget();
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
+                SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
 
                 StopPingPongAndSetAlpha(2, 1.0f); // 2번 고정 1
                 StartPingPongAt(3, 0.28f, 1.0f, 2.0f); // 3번 핑퐁
@@ -374,7 +442,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         return FadeOutRocketImageAsync(subRocketPairingImage, duration);
     }
 
-
     private async UniTask FadeOutRocketImageAsync(GameObject go, float duration)
     {
         if (!go) return;
@@ -467,9 +534,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
     }
 
-    /// <summary>
-    /// 단일 Graphic 알파를 목표값으로 보간
-    /// </summary>
+    /// <summary> 단일 Graphic 알파를 목표값으로 보간 </summary>
     private async UniTask LerpGraphicAlphaAsync(Graphic g, float targetA, float duration, CancellationToken token)
     {
         if (!g) return;
@@ -490,4 +555,123 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
         SetAlpha(g, targetA);
     }
+    
+    public void AnimateThrottleY(float yStart, float yEnd, float duration, float waitAtEnd)
+    {
+        PlayAnchoredY(throttleButton, yStart, yEnd, duration, waitAtEnd);
+    }
+
+    public void StopAnimateThrottleY()
+    {
+        StopAnchoredY(throttleButton);
+    }
+    
+    public void SetGuideText(string text)
+    {
+        SettingTextObject(textGuide, setting.guideText, text).Forget();
+    }
+
+    public void SetButtonOn(string whichButton)
+    {
+        switch (whichButton)
+        {
+            case "Left":
+                 SetButtonOn(buttonLeft);
+                 break;
+            case "Middle":
+                SetButtonOn(buttonMiddle);
+                break;
+            case "Right":
+                SetButtonOn(buttonRight);
+                break;
+            default:
+                Debug.LogWarning($"[LaunchManager] Unknown button name: {whichButton}");
+                break;
+        }
+    }
+    
+    public void SetButtonOff(string whichButton)
+    {
+        switch (whichButton)
+        {
+            case "Left":
+                SetButtonOff(buttonLeft);
+                break;
+            case "Middle":
+                SetButtonOff(buttonMiddle);
+                break;
+            case "Right":
+                SetButtonOff(buttonRight);
+                break;
+            default:
+                Debug.LogWarning($"[LaunchManager] Unknown button name: {whichButton}");
+                break;
+        }
+    }
+    
+    public async UniTask WaitForButtonAsync(string whichButton, CancellationToken token)
+    {
+        // 이전 입력 큐 비우기
+        ArduinoInputManager.Instance?.FlushAll();
+
+        // 대상 버튼 ID / KeyCode 결정
+        ArduinoInputManager.ButtonId targetId = ArduinoInputManager.ButtonId.None;
+        KeyCode targetKey = KeyCode.None;
+
+        switch (whichButton)
+        {
+            case "Left":
+                targetId = ArduinoInputManager.ButtonId.Button1;
+                targetKey = KeyCode.LeftArrow;
+                break;
+            case "Middle":
+                targetId = ArduinoInputManager.ButtonId.Button2;
+                targetKey = KeyCode.DownArrow;
+                break;
+            case "Right":
+                targetId = ArduinoInputManager.ButtonId.Button3;
+                targetKey = KeyCode.RightArrow;
+                break;
+            default:
+                Debug.LogWarning($"[LaunchManager] Unknown button name for WaitForButtonAsync: {whichButton}");
+                return;
+        }
+
+        while (!token.IsCancellationRequested)
+        {
+            bool pressed = false;
+
+            if (ArduinoInputManager.Instance != null)
+            {
+                if (ArduinoInputManager.Instance.TryConsumeAnyPress(out ArduinoInputManager.ButtonId btn) &&
+                    btn == targetId)
+                {
+                    pressed = true;
+                }
+            }
+
+            if (Input.GetKeyDown(targetKey))
+            {
+                pressed = true;
+            }
+
+            if (pressed)
+            {
+                if (buttonDelayTime > 0)
+                {
+                    try { await UniTask.Delay(buttonDelayTime, cancellationToken: token); } catch { }
+                }
+                return;
+            }
+
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+        }
+    }
+    
+    // ============================
+    // 별칭(Left, Middle, Right 전용) 함수들
+    // ============================
+    public UniTask WaitForLeftButtonAsync(CancellationToken token) => WaitForButtonAsync("Left", token);
+    public UniTask WaitForMiddleButtonAsync(CancellationToken token) => WaitForButtonAsync("Middle", token);
+    public UniTask WaitForRightButtonAsync(CancellationToken token) => WaitForButtonAsync("Right", token);
 }

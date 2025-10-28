@@ -12,7 +12,7 @@
   },
   "fontMap": {
 	"font1": "Fonts/TMPro/Freesentation-4Regular SDF.asset",
-	"font2": "Fonts/TMPro/NanumGothic-Regular SDF.asset"
+	"font2": "Fonts/TMPro/EliceDigitalBaeum_Bold SDF.asset"
   },
   "sounds": [
 	{ "key": "click1", "clipPath": "click1.wav", "volume": 1.0 },

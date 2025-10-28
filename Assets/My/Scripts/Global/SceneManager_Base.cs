@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
@@ -11,27 +12,25 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 {
     #region Serialized Refs
 
-    [Header("Camera")] 
-    [SerializeField] protected Camera mainCamera; // Display1
+    [Header("Camera")] [SerializeField] protected Camera mainCamera; // Display1
     [SerializeField] protected Camera camera2; // Display2
     [SerializeField] protected Camera camera3; // Display3
 
-    [Header("Canvas")]
-    [SerializeField] protected Canvas mainCanvas;
+    [Header("Canvas")] [SerializeField] protected Canvas mainCanvas;
     [SerializeField] protected Canvas subCanvas;
     [SerializeField] protected Canvas verticalCanvas;
 
-    [Header("Fade Images")] 
-    [SerializeField] protected Image fadeImage1; // Display1 Fade
+    [Header("Fade Images")] [SerializeField]
+    protected Image fadeImage1; // Display1 Fade
+
     [SerializeField] protected Image fadeImage2; // Display2 Fade
     [SerializeField] protected Image fadeImage3; // Display3 Fade
 
-    [Header("Scene Flow")]
-    [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")]
-    [SerializeField] protected int nextSceneBuildIndex = -1;
+    [Header("Scene Flow")] [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")] [SerializeField]
+    protected int nextSceneBuildIndex = -1;
 
-    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] 
-    [SerializeField] private bool useInactivityTimeout = true;
+    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] [SerializeField]
+    private bool useInactivityTimeout = true;
 
     // ========= LED Effects (공통) =========
     private CancellationTokenSource _ledCts;
@@ -57,6 +56,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     protected int buttonDelayTime;
     private float _lastDebugSkipTime;
     private const float DebugSkipCooldown = 0.25f; // 너무 빠른 중복 입력 방지
+
+    private readonly Dictionary<string, Sprite> _spriteCache = new Dictionary<string, Sprite>(); // 버튼 스프라이트 ON/OFF 용
+    private readonly Dictionary<GameObject, CancellationTokenSource> _anchoredYAnimCts = new Dictionary<GameObject, CancellationTokenSource>();
 
     protected abstract string JsonPath { get; }
 
@@ -207,7 +209,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
                 await UniTask.Yield(PlayerLoopTiming.Update, token); // 다음 프레임까지 대기
             }
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
     }
 
     /// <summary> 알파값만 변경 </summary>
@@ -621,7 +625,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             Debug.Log("[SceneManager_Base] Debug skip -> inputReceived = true");
         }
     }
-    
+
     /// <summary> 비디오 재생 시 첫 프레임을 렌더 텍스쳐에 그리고 대기하는 헬퍼 (깜빡임 방지) </summary>
     protected async UniTask<bool> WaitFirstFrameAsync(VideoPlayer vp, RawImage ri, CancellationToken token, double maxSeconds = 2.0)
     {
@@ -637,6 +641,222 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
+
         return vp != null && vp.texture != null;
     }
+
+    #region 버튼 스프라이트 ON/OFF
+
+    /// <summary> StreamingAssets의 상대 경로를 받아 Sprite를 반환한다 -> 캐시 사용. 실패 시 null 반환. </summary>
+    protected Sprite GetSpriteFromStreamingAssets(string relativePath)
+    {
+        if (string.IsNullOrEmpty(relativePath))
+        {
+            Debug.LogError("[SceneManager_Base] GetSpriteFromStreamingAssets -> path is null or empty");
+            return null;
+        }
+
+        if (_spriteCache.TryGetValue(relativePath, out Sprite cached))
+            return cached;
+
+        Texture2D tex = UIUtility.LoadTextureFromStreamingAssets(relativePath);
+        if (tex == null)
+        {
+            Debug.LogError($"[SceneManager_Base] GetSpriteFromStreamingAssets -> texture load failed: {relativePath}");
+            return null;
+        }
+
+        Sprite sp = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(0.5f, 0.5f));
+        _spriteCache[relativePath] = sp;
+        return sp;
+    }
+
+    /// <summary> 특정 버튼(GameObject)의 이미지를 지정한 상대 경로 스프라이트로 교체한다. 실패 시 아무 작업도 하지 않는다. </summary>
+    protected void SetButtonSprite(GameObject buttonObject, string relativePath)
+    {
+        if (!buttonObject)
+        {
+            Debug.LogWarning("[SceneManager_Base] SetButtonSprite -> buttonObject is null");
+            return;
+        }
+
+        Image img = buttonObject.GetComponent<Image>();
+        if (!img)
+        {
+            Debug.LogWarning("[SceneManager_Base] SetButtonSprite -> Image component not found");
+            return;
+        }
+
+        Sprite sp = GetSpriteFromStreamingAssets(relativePath);
+        if (sp != null)
+            img.sprite = sp;
+    }
+
+    /// <summary> 버튼 이미지를 On 상태로 교체한다 -> Image/MainDisplay/ButtonOn.png </summary>
+    protected void SetButtonOn(GameObject buttonObject)
+    {
+        SetButtonSprite(buttonObject, "Image/MainDisplay/ButtonOn.png");
+    }
+
+    /// <summary> 버튼 이미지를 Off 상태로 교체한다 -> Image/MainDisplay/ButtonOff.png </summary>
+    protected void SetButtonOff(GameObject buttonObject)
+    {
+        SetButtonSprite(buttonObject, "Image/MainDisplay/ButtonOff.png");
+    }
+
+    /// <summary> 여러 버튼을 한 번에 On 상태로 교체한다. </summary>
+    protected void SetButtonsOn(params GameObject[] buttons)
+    {
+        if (buttons == null) return;
+        for (int i = 0; i < buttons.Length; i++)
+            SetButtonOn(buttons[i]);
+    }
+
+    /// <summary> 여러 버튼을 한 번에 Off 상태로 교체한다. </summary>
+    protected void SetButtonsOff(params GameObject[] buttons)
+    {
+        if (buttons == null) return;
+        for (int i = 0; i < buttons.Length; i++)
+            SetButtonOff(buttons[i]);
+    }
+
+    #endregion
+
+    #region Anchored Y Animation (주로 쓰로틀 애니메이션 사용)
+
+    /// <summary> target의 RectTransform.anchoredPosition.y를 yStart -> yEnd 로 duration(초) 동안 선형 보간하여 이동 </summary>
+    protected void PlayAnchoredY(GameObject target, float yStart, float yEnd, float duration, float waitAtEnd)
+    {
+        if (!target) return;
+
+        // 기존 실행 취소/정리
+        if (_anchoredYAnimCts.TryGetValue(target, out CancellationTokenSource running) && running != null)
+        {
+            CancelAndDispose(ref running);
+            _anchoredYAnimCts[target] = null;
+        }
+
+        CancellationTokenSource cts = new CancellationTokenSource();
+        _anchoredYAnimCts[target] = cts;
+
+        float d = Mathf.Max(0.001f, duration);
+        float w = Mathf.Max(0f, waitAtEnd);
+
+        MoveAnchoredYLoopAsync(target, yStart, yEnd, d, w, cts.Token).Forget();
+    }
+
+    /// <summary> 진행 중인 target의 Y 애니메이션을 중지 </summary>
+    protected void StopAnchoredY(GameObject target)
+    {
+        if (!target) return;
+
+        if (_anchoredYAnimCts.TryGetValue(target, out CancellationTokenSource cts) && cts != null)
+        {
+            CancelAndDispose(ref cts);
+            _anchoredYAnimCts.Remove(target);
+        }
+    }
+
+    /// <summary> 모든 Anchored Y 애니메이션을 중지 </summary>
+    protected void StopAllAnchoredY()
+    {
+        if (_anchoredYAnimCts.Count == 0) return;
+
+        foreach (KeyValuePair<GameObject, CancellationTokenSource> kv in _anchoredYAnimCts)
+        {
+            CancellationTokenSource cts = kv.Value;
+            CancelAndDispose(ref cts);
+        }
+        _anchoredYAnimCts.Clear();
+    }
+
+    /// <summary> 실제 이동 비동기 루틴 </summary>
+    private async UniTask MoveAnchoredYStepAsync(GameObject target, float yFrom, float yTo, float duration, CancellationToken token)
+    {
+        if (!target) return;
+
+        RectTransform rt = target.GetComponent<RectTransform>();
+        if (!rt) return;
+
+        // 시작값 적용
+        Vector2 pos = rt.anchoredPosition;
+        pos.y = yFrom;
+        rt.anchoredPosition = pos;
+
+        float t = 0f;
+        float d = Mathf.Max(0.001f, duration);
+
+        while (t < d && !token.IsCancellationRequested)
+        {
+            t += Time.deltaTime;
+            float u = Mathf.Clamp01(t / d);          // 0..1
+            float y = Mathf.Lerp(yFrom, yTo, u);     // 선형 보간
+
+            Vector2 p = rt.anchoredPosition;
+            p.y = y;
+            rt.anchoredPosition = p;
+
+            await UniTask.Yield();
+        }
+
+        if (!token.IsCancellationRequested)
+        {
+            Vector2 p = rt.anchoredPosition;
+            p.y = yTo;
+            rt.anchoredPosition = p;
+        }
+    }
+
+    /// <summary> yStart -> yEnd 로만 이동을 반복. End에서 waitAtEnd 대기 후 Start로 스냅. </summary>
+    private async UniTask MoveAnchoredYLoopAsync(GameObject target, float yStart, float yEnd, float duration, float waitAtEnd, CancellationToken token)
+    {
+        if (!target) return;
+
+        RectTransform rt = target.GetComponent<RectTransform>();
+        if (!rt) return;
+
+        // 초기 위치를 yStart로 스냅
+        Vector2 p = rt.anchoredPosition;
+        p.y = yStart;
+        rt.anchoredPosition = p;
+
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                // 1) Start -> End 이동(단발)
+                await MoveAnchoredYStepAsync(target, yStart, yEnd, duration, token);
+                if (token.IsCancellationRequested) break;
+
+                // 2) End에서 대기
+                if (waitAtEnd > 0f)
+                {
+                    try { await UniTask.Delay(TimeSpan.FromSeconds(waitAtEnd), cancellationToken: token); }
+                    catch (OperationCanceledException) { break; }
+                }
+
+                // 3) Start로 즉시 스냅(점프)
+                if (!token.IsCancellationRequested)
+                {
+                    Vector2 snap = rt.anchoredPosition;
+                    snap.y = yStart;
+                    rt.anchoredPosition = snap;
+                }
+            }
+        }
+        catch (OperationCanceledException) { }
+        finally
+        {
+            if (_anchoredYAnimCts.TryGetValue(target, out CancellationTokenSource mine))
+            {
+                if (mine != null && mine.Token == token)
+                {
+                    CancelAndDispose(ref mine);
+                    _anchoredYAnimCts.Remove(target);
+                }
+            }
+        }
+    }
+    
+    #endregion
 }

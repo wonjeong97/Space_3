@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using TMPro;
@@ -48,6 +49,15 @@ public class RMSetting
     public ImageSetting throttleButton;
     
     public TextSetting guideText;
+
+    public TextSetting timeText;
+    public TextSetting altitudeText;
+    public TextSetting velocityText;
+    public TextSetting distanceText;
+    public TextSetting timeValueText;
+    public TextSetting altitudeValueText;
+    public TextSetting velocityValueText;
+    public TextSetting distanceValueText;
 }
 
 /// <summary>
@@ -65,7 +75,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     [SerializeField] private GameObject mainImage3;
 
     [Header("mainImage1")] 
-    [SerializeField] private Image[] main1ChildrenImages;
+    [SerializeField] private Image[] sequences;
     [SerializeField] private GameObject textObjective;
     
     [Header("mainImage2")]
@@ -79,17 +89,15 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     [Header("mainImage3")]
     [SerializeField] private GameObject rocketImage; // 발사체, 위성 선택 이미지
-    [SerializeField] private TextMeshProUGUI textVelocity;
-    [SerializeField] private TextMeshProUGUI textMaxVelocity;
+    [SerializeField] private TextMeshProUGUI textTime;
     [SerializeField] private TextMeshProUGUI textAltitude;
-    [SerializeField] private TextMeshProUGUI textSlope;
-    [SerializeField] private TextMeshProUGUI textRemainDistance;
-    [SerializeField] private Image imageVelocityBar;
-    [SerializeField] private Image imageMaxVelocityBar;
-    [SerializeField] private Image imageAltitudeBar;
-    [SerializeField] private Image imageSlopeBar;
-    [SerializeField] private Image imageRemainDistanceBar;
-
+    [SerializeField] private TextMeshProUGUI textVelocity;
+    [SerializeField] private TextMeshProUGUI textDistance;
+    [SerializeField] private TextMeshProUGUI textTimeValue;
+    [SerializeField] private TextMeshProUGUI textAltitudeValue;
+    [SerializeField] private TextMeshProUGUI textVelocityValue;
+    [SerializeField] private TextMeshProUGUI textDistanceValue;
+    
     [SerializeField] private GameObject videoPlayerObject;
     [SerializeField] private GameObject subBgImage;
     [SerializeField] private GameObject subRocketImage;
@@ -198,20 +206,20 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(subRocketImage, setting.subRocket);
 
         // ===== mainImage1 =====
-        if (setting.main1Children != null && main1ChildrenImages != null)
+        if (setting.main1Children != null && sequences != null)
         {
-            int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
+            int count = Mathf.Min(setting.main1Children.Length, sequences.Length);
             for (int i = 0; i < count; i++)
             {
-                if (main1ChildrenImages[i] == null) continue;
-                SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
+                if (sequences[i] == null) continue;
+                SettingImageObject(sequences[i].gameObject, setting.main1Children[i]);
             }
         }
         SettingTextObject(textObjective, setting.objectiveText, "위성을 선택하세요.").Forget();
 
-        if (main1ChildrenImages != null && main1ChildrenImages.Length > 0 && main1ChildrenImages[0] != null)
+        if (sequences != null && sequences.Length > 0 && sequences[0] != null)
         {
-            StartAlphaPingPong(main1ChildrenImages[0], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
+            StartAlphaPingPong(sequences[0], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
         // ======================
         
@@ -225,7 +233,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingTextObject(textGuide, setting.guideText, "버튼을 누르세요").Forget();
         // ======================
 
-        InitializeProgressBar();
+        //InitializeProgressBar();
         if (rocketImage) rocketImage.SetActive(false);
 
         // 비디오 오브젝트는 처음에 비활성화
@@ -326,14 +334,14 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(rocketImage, src.rocketImage);
 
         // 숫자 라벨 애니메이션 시작
-        StartLabelAnimation(textVelocity, ref _curVelocity, src.velocity, ref _velCts, 1, " km/s");
-        StartLabelAnimation(textMaxVelocity, ref _curMaxVelocity, src.maxVelocity, ref _maxVelCts, 1, " km/s");
-        StartLabelAnimation(textAltitude, ref _curAltitude, src.altitude, ref _altCts, 0, " km");
-        StartLabelAnimation(textSlope, ref _curSlope, src.slope, ref _slopeCts, 0, " °");
-        StartLabelAnimation(textRemainDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
+        // StartLabelAnimation(textVelocity, ref _curVelocity, src.velocity, ref _velCts, 1, " km/s");
+        // StartLabelAnimation(textMaxVelocity, ref _curMaxVelocity, src.maxVelocity, ref _maxVelCts, 1, " km/s");
+        // StartLabelAnimation(textAltitude, ref _curAltitude, src.altitude, ref _altCts, 0, " km");
+        // StartLabelAnimation(textSlope, ref _curSlope, src.slope, ref _slopeCts, 0, " °");
+        // StartLabelAnimation(textRemainDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
 
         // 진행 바 즉시 갱신
-        UpdateProgressBars(src);
+        //UpdateProgressBars(src);
     }
 
     /// <summary> 확인 버튼을 눌렀을 때 동작: 로켓→위성→장소 시퀀스 시작 </summary>
@@ -677,7 +685,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         if (n.EndsWith("Loop", StringComparison.OrdinalIgnoreCase)) return true;
 
         string fn = string.IsNullOrEmpty(vs.fileName) ? string.Empty : vs.fileName;
-        string stem = string.IsNullOrEmpty(fn) ? string.Empty : System.IO.Path.GetFileNameWithoutExtension(fn);
+        string stem = string.IsNullOrEmpty(fn) ? string.Empty : Path.GetFileNameWithoutExtension(fn);
         return stem.EndsWith("Loop", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -725,7 +733,7 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Progress Bar
 
-    private void InitializeProgressBar()
+    /*private void InitializeProgressBar()
     {
         // 진행 바 베이스 이미지 세팅
         if (setting.progressBars != null)
@@ -833,7 +841,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         StartBarAnimation(imageAltitudeBar, 0f, src.altitude, BarMaxAltitude, ref _altBarCts);
         StartBarAnimation(imageSlopeBar, 0f, src.slope, BarMaxSlope, ref _slopeBarCts);
         StartBarAnimation(imageRemainDistanceBar, 0f, src.remainDistance, BarMaxRemainDistance, ref _remainBarCts);
-    }
+    }*/
 
     #endregion
 

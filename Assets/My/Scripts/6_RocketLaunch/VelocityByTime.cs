@@ -67,14 +67,14 @@ public class VelocityByTime : MonoBehaviour
 
         if (countdown.IsCountingDown)
         {
-            textVelocity.text = "VEL 0 km/h";
+            textVelocity.text = "0 KM/H";
             return;
         }
 
         float t = countdown.TPlusSeconds;
         float kmh = Evaluate(t);
         string fmt = (decimals <= 0) ? "N0" : $"N{decimals}";
-        textVelocity.text = $"VEL {kmh.ToString(fmt, _culture)} km/h";
+        textVelocity.text = $"{kmh.ToString(fmt, _culture)} KM/H";
     }
 
     /// <summary> 외부에서 필요 시 현재 속도(km/h) 얻기 </summary>

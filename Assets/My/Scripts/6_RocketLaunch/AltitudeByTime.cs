@@ -67,13 +67,13 @@ public class AltitudeByTime : MonoBehaviour
 
         if (countdown.IsCountingDown)
         {
-            textAltitude.text = "ALT 0 km";
+            textAltitude.text = "0 KM";
             return;
         }
 
         float t = countdown.TPlusSeconds;
         float alt = Evaluate(t);
-        textAltitude.text = $"ALT {alt:F1} km";
+        textAltitude.text = $"{alt:F1} KM";
     }
 
     // -> 주어진 T+초의 고도 계산 (첫 구간만 ease)
