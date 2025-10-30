@@ -43,6 +43,9 @@ public class LaunchSetting
     public TextSetting altitudeValueText;
     public TextSetting velocityValueText;
     public TextSetting distanceValueText;
+
+    public ImageSetting slopeBackgroundImage;
+    public ImageSetting slopePointerImage;
 }
 
 public class LaunchManager : SceneManager_Base<LaunchSetting>
@@ -70,7 +73,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject stage2Fuel;
     [SerializeField] private GameObject stage3Fuel;
 
-
     [Header("MainImage1")] 
     [SerializeField] private Image[] stages;
     [SerializeField] private Image[] sequences;
@@ -94,18 +96,22 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject textAltitudeValue;
     [SerializeField] private GameObject textVelocityValue;
     [SerializeField] private GameObject textDistanceValue;
+    [SerializeField] private GameObject imageSlopeBackground;
+    [SerializeField] private GameObject imageSlopePointer;
     
     [Header("Rocket")] 
     [SerializeField] private GameObject rocketVFX;
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
-
+    
+    private float _throttleYEnd;
     private int _rocketCountdown;
     private RocketLaunch _rocketLaunch;
     private CancellationTokenSource[] _alphaCts;
     private CancellationTokenSource[] _stageCts;
     private readonly Dictionary<GameObject, CancellationTokenSource> _rocketFadeCts = new Dictionary<GameObject, CancellationTokenSource>();
-
+    private bool _needThrottleDown; 
+    private int throttleZeroDeadband = 10;
 
     protected override void Awake()
     {
@@ -189,7 +195,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             }
         }
         SettingTextObject(textObjective, setting.objectiveText, "로켓 발사를 완료하세요.").Forget();
-        
         // ======================
         
         // ===== mainImage2 =====
@@ -199,7 +204,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(buttonRight, setting.buttonRight);
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
-        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
+        SettingTextObject(textGuide, setting.guideText, "").Forget();
+        await SetInitialGuideByThrottleAsync();
         // ======================
         
         // ===== mainImage3 =====
@@ -211,6 +217,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
         SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
         SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
+        SettingImageObject(imageSlopeBackground, setting.slopeBackgroundImage);
+        SettingImageObject(imageSlopePointer, setting.slopePointerImage);
         // ======================
         
         if (sequences != null) _alphaCts = new CancellationTokenSource[sequences.Length];
@@ -226,13 +234,25 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
-        
-        SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
 
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
+        if (_needThrottleDown)
+        {
+            CancellationToken ct = DestroyToken;
+            
+            ArduinoInputManager.Instance?.Send("THROTTLE ON");  // 스로틀 스트림 시작
+            await AwaitThrottleZeroAsync(throttleZeroDeadband, ct); // 0(데드밴드)로 들어올 때까지 블로킹 대기
+            ArduinoInputManager.Instance?.Send("THROTTLE OFF"); // 스트림 중지
+
+            // UI 정리
+            SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
+            SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
+            StopAnimateThrottleY();
+        }
+        
         // 입력 대기
-        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
+        CancellationToken cancel = DestroyToken;
         while (!cancel.IsCancellationRequested && isActiveAndEnabled)
         {
             if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) || TryConsumeSingleInput())
@@ -257,8 +277,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             _rocketLaunch.Call();
         }
         else
-        {
-            Debug.LogError("[LaunchManager] rocketVFX not assigned or missing RocketLaunch component");
+        {   
+            if (!DestroyToken.IsCancellationRequested)
+                Debug.LogError("[LaunchManager] RocketLaunch 컴포넌트에서 rocketVFX이 할당되지 않거나 Missing 됨");
         }
 
         // 카운트다운 시작
@@ -271,7 +292,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     {
         if (!countdownText || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) return;
 
-        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
+        CancellationToken cancel = DestroyToken;
         float duration = Mathf.Max(0.01f, 1.0f);
 
         for (int n = _rocketCountdown; n > 0; n--)
@@ -383,8 +404,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
 
         CancellationToken token = (_stageCts != null && index >= 0 && index < _stageCts.Length)
-            ? _stageCts[index].Token
-            : this.GetCancellationTokenOnDestroy();
+            ? _stageCts[index].Token : DestroyToken;
 
         float d = Mathf.Max(0.01f, duration);
         float t = 0f;
@@ -557,13 +577,27 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     }
     
     public void AnimateThrottleY(float yStart, float yEnd, float duration, float waitAtEnd)
-    {
+    {   
+        _throttleYEnd = yEnd; 
         PlayAnchoredY(throttleButton, yStart, yEnd, duration, waitAtEnd);
     }
 
     public void StopAnimateThrottleY()
     {
         StopAnchoredY(throttleButton);
+        SnapAnchoredY(throttleButton, _throttleYEnd);
+    }
+    
+    private void SnapAnchoredY(GameObject go, float yTarget)
+    {
+        if (!go) return;
+        RectTransform rt;
+        if (go.TryGetComponent(out rt))
+        {
+            Vector2 pos = rt.anchoredPosition;
+            pos.y = yTarget;
+            rt.anchoredPosition = pos;
+        }
     }
     
     public void SetGuideText(string text)
@@ -674,4 +708,82 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     public UniTask WaitForLeftButtonAsync(CancellationToken token) => WaitForButtonAsync("Left", token);
     public UniTask WaitForMiddleButtonAsync(CancellationToken token) => WaitForButtonAsync("Middle", token);
     public UniTask WaitForRightButtonAsync(CancellationToken token) => WaitForButtonAsync("Right", token);
+    
+    /// <summary> 시작 시 아두이노에 THROTTLE 명령을 보내서 안내문 결정 </summary>
+    private async UniTask SetInitialGuideByThrottleAsync(int pollMs = 1000, int zeroDeadband = 10)
+    {
+        CancellationToken token = DestroyToken;
+
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null)
+        {
+            await SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").AttachExternalCancellation(token);
+            return;
+        }
+
+        // 1) 현재 버전 스냅샷
+        int startVer = inst.ThrottleVersion;
+
+        // 2) 1회 요청
+        try { inst.Send("THROTTLE ONCE"); }
+        catch (Exception e) { Debug.LogWarning($"[LaunchManager] THROTTLE ONCE 전송 실패: {e.Message}"); }
+
+        // 3) 새 값이 도착할 때까지 대기
+        int throttle = 0;
+        bool gotNew = false;
+        DateTime deadline = DateTime.UtcNow.AddMilliseconds(pollMs);
+
+        while (DateTime.UtcNow < deadline && !token.IsCancellationRequested)
+        {
+            if (inst.ThrottleVersion != startVer)
+            {
+                throttle = inst.LastThrottleValue; // 최신 값
+                gotNew = true;
+                break;
+            }
+            await UniTask.Delay(20, cancellationToken: token);
+        }
+
+        // 4) 판정
+        if (gotNew)
+        {
+            if (Mathf.Abs(throttle) <= zeroDeadband)
+            {   
+                _needThrottleDown = false;
+                await SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").AttachExternalCancellation(token);
+                SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
+            }
+            else
+            {   
+                _needThrottleDown = true;
+                await SettingTextObject(textGuide, setting.guideText, "스로틀을 내려주세요.").AttachExternalCancellation(token);
+                SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
+                AnimateThrottleY(0f, -110f, 0.8f, 0.2f);
+            }
+        }
+    }
+    
+    /// <summary> THROTTLE ON 상태에서 스로틀이 0(±deadband)까지 내려갈 때까지 대기. </summary>
+    private async UniTask AwaitThrottleZeroAsync(int deadband, CancellationToken ct)
+    {
+        ArduinoInputManager inst = ArduinoInputManager.Instance;
+        if (inst == null) return;
+
+        // 최신 값 변화 감지용 버전 스냅샷
+        int ver = inst.ThrottleVersion;
+
+        while (!ct.IsCancellationRequested)
+        {
+            // 새 값이 들어오면 판정
+            if (inst.ThrottleVersion != ver)
+            {
+                ver = inst.ThrottleVersion;
+                int v = inst.LastThrottleValue;
+                if (Mathf.Abs(v) <= deadband) return;
+            }
+
+            // 너무 바쁘지 않게 20ms 간격 폴링
+            await UniTask.Delay(20, cancellationToken: ct);
+        }
+    }
 }

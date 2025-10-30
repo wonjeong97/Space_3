@@ -23,7 +23,7 @@ public class UIBlink : MonoBehaviour
     {
         if (_image == null)
         {
-            Debug.LogWarning("[Blink] image not found on this GameObject or its children.");
+            Debug.LogWarning("[Blink] 게임 오브젝트 혹은 자식에서 이미지를 찾지 못함");
             return;
         }
 

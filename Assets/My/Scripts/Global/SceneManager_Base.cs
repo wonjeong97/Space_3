@@ -12,7 +12,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 {
     #region Serialized Refs
 
-    [Header("Camera")] [SerializeField] protected Camera mainCamera; // Display1
+    [Header("Camera")] 
+    [SerializeField] protected Camera mainCamera; // Display1
     [SerializeField] protected Camera camera2; // Display2
     [SerializeField] protected Camera camera3; // Display3
 
@@ -26,15 +27,11 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     [SerializeField] protected Image fadeImage2; // Display2 Fade
     [SerializeField] protected Image fadeImage3; // Display3 Fade
 
-    [Header("Scene Flow")] [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")] [SerializeField]
-    protected int nextSceneBuildIndex = -1;
+    [Header("Scene Flow")] [Tooltip("현재 씬에서 다음 씬으로 넘어갈 때 사용할 빌드 인덱스")]
+    [SerializeField] protected int nextSceneBuildIndex = -1;
 
-    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] [SerializeField]
-    private bool useInactivityTimeout = true;
-
-    // ========= LED Effects (공통) =========
-    private CancellationTokenSource _ledCts;
-    private int _blinkHalfPeriodMs = 300; // 초록 깜빡임 반주기(기본 300ms)
+    [Tooltip("이 씬에서 비활성 타임아웃을 적용할지 여부")] 
+    [SerializeField] private bool useInactivityTimeout = true;
 
     #endregion
 
@@ -59,9 +56,16 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     private readonly Dictionary<string, Sprite> _spriteCache = new Dictionary<string, Sprite>(); // 버튼 스프라이트 ON/OFF 용
     private readonly Dictionary<GameObject, CancellationTokenSource> _anchoredYAnimCts = new Dictionary<GameObject, CancellationTokenSource>();
-
+    
+    // ========= LED Effects (공통) =========
+    private CancellationTokenSource _ledCts;
+    private int _blinkHalfPeriodMs = 300; // 초록 깜빡임 반주기(기본 300ms)
+    
     protected abstract string JsonPath { get; }
-
+    
+    private CancellationToken _destroyToken;
+    private bool _destroyTokenInitialized;
+    
     #endregion
 
     #region Unity Life-Cycle
@@ -76,6 +80,12 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         if (!fadeImage1 || !fadeImage2 || !fadeImage3)
             Debug.LogError("[SceneManager] fadeImage is not assigned");
+        
+        if (!_destroyTokenInitialized)
+        {
+            _destroyToken = this.GetCancellationTokenOnDestroy();
+            _destroyTokenInitialized = true;
+        }
     }
 
     protected virtual async void Start()
@@ -283,18 +293,14 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 페이드 후 씬 로드 (async) </summary>
     protected async UniTask LoadSceneAsync(int buildIndex, Image[] fadeImages)
     {
-        // 중복 로드 가드
         if (_isLoading) return;
         _isLoading = true;
+        
+        OnBeforeSceneUnload(); // 공통 정리 (LED/입력/코루틴 등)
 
-        // 공통 정리 (LED/입력/코루틴 등)
-        OnBeforeSceneUnload();
-
-        // sceneLoaded 핸들러 등록 여부 트래킹
+        
+        CancellationToken cancel = DestroyToken; // 파괴 토큰 확보
         SceneManager.sceneLoaded += OnSceneLoaded;
-
-        // 파괴/종료 토큰
-        CancellationToken cancel = this.GetCancellationTokenOnDestroy();
 
         // 페이드아웃
         if (fadeImages != null && fadeImages.Length > 0)
@@ -305,7 +311,6 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             }
             catch (OperationCanceledException)
             {
-                // 정리 후 조기 반환
                 SceneManager.sceneLoaded -= OnSceneLoaded;
                 _isLoading = false;
                 return;
@@ -320,24 +325,21 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             if (op == null)
             {
                 Debug.LogError($"[SceneManager_Base] LoadSceneAsync returned null (buildIndex: {buildIndex})");
-                // 정리 후 조기 반환
                 SceneManager.sceneLoaded -= OnSceneLoaded;
                 _isLoading = false;
                 return;
             }
-
             op.allowSceneActivation = false;
         }
         catch (Exception e)
         {
             Debug.LogError($"[SceneManager_Base] Exception starting LoadSceneAsync: {e}");
-            // 정리 후 조기 반환
             SceneManager.sceneLoaded -= OnSceneLoaded;
             _isLoading = false;
             return;
         }
 
-        // 로딩 완료 대기 (0.9 == 준비 완료)
+        // 로딩 완료 대기
         try
         {
             while (!cancel.IsCancellationRequested && !op.isDone)
@@ -355,7 +357,6 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         }
         catch (OperationCanceledException)
         {
-            // 파괴/취소 시 정리
             SceneManager.sceneLoaded -= OnSceneLoaded;
             _isLoading = false;
         }
@@ -364,6 +365,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 씬 전환 직전 클래스의 비동기/이벤트 정리 </summary>
     protected virtual void OnBeforeSceneUnload()
     {
+        // 이미 파괴되었거나 비활성 상태면 건드리지 않음
+        if (this == null || !isActiveAndEnabled) return;
+
         canInput = false;
         inputReceived = true;
 
@@ -391,7 +395,6 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         if (!Mathf.Approximately(Time.timeScale, 1f)) Time.timeScale = 1f;
     }
-
     #endregion
 
     #region UI Builders
@@ -464,13 +467,12 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             );
         }
 
-        VideoManager.Instance.WireRawImageAndRenderTexture(
-            vp, raw, new Vector2Int(Mathf.RoundToInt(vs.size.x), Mathf.RoundToInt(vs.size.y)));
-
+        VideoManager.Instance.WireRawImageAndRenderTexture(vp, raw, new Vector2Int(Mathf.RoundToInt(vs.size.x), Mathf.RoundToInt(vs.size.y)));
         string url = VideoManager.Instance.ResolvePlayableUrl(vs.fileName);
 
-        // 외부 Task를 UniTask로 변환해 await
-        await VideoManager.Instance.PrepareAndPlayAsync(vp, url, audioSource, vs.volume, this.GetCancellationTokenOnDestroy()).AsUniTask();
+        await VideoManager.Instance
+            .PrepareAndPlayAsync(vp, url, audioSource, vs.volume, DestroyToken)
+            .AsUniTask();
     }
 
     #endregion
@@ -566,6 +568,25 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     #endregion
 
+    protected CancellationToken DestroyToken
+    {
+        get
+        {
+            if (_destroyTokenInitialized) return _destroyToken;
+
+            try
+            {
+                _destroyToken = this.GetCancellationTokenOnDestroy();
+                _destroyTokenInitialized = true;
+                return _destroyToken;
+            }
+            catch
+            {
+                return CancellationToken.None;
+            }
+        }
+    }
+    
     /// <summary> Graphic 알파를 minA~maxA로 왕복(ping-pong) 애니메이션. </summary>
     private async UniTask AnimateAlphaPingPongAsync(Graphic g, float minA, float maxA, float periodSec, CancellationToken token)
     {

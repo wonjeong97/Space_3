@@ -17,11 +17,11 @@ public class RSSetting
 /// <summary> 우주발사체의 구조와 기능 씬 관리 매니저 </summary>
 public class RSManager : SceneManager_Base<RSSetting>
 {
+    protected override string JsonPath => "JSON/RSSetting.json";
+    
     [Header("UI")]
     [SerializeField] private List<GameObject> explainImageObjs;
     [SerializeField] private GameObject videoPlayerObject;
-
-    protected override string JsonPath => "JSON/RSSetting.json";
 
     private int _index;
     private float _crossTime;
@@ -62,7 +62,7 @@ public class RSManager : SceneManager_Base<RSSetting>
         ArduinoInputManager.Instance?.SetLedAll(true);    
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
         
-        TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
+        TurnCamera3Async(DestroyToken).Forget();
         while (true)
         {   
             // 입력 대기
@@ -90,7 +90,7 @@ public class RSManager : SceneManager_Base<RSSetting>
         // ===========================================================
         if (!videoPlayerObject)
         {
-            Debug.LogError("[RSManager] videoPlayerObject is not assigned");
+            Debug.LogError("[RSManager] 비디오 플레이어 오브젝트가 할당되지 않음");
         }
         
         _vp = videoPlayerObject ? videoPlayerObject.GetComponent<VideoPlayer>() : null;
@@ -106,7 +106,7 @@ public class RSManager : SceneManager_Base<RSSetting>
             _vp.loopPointReached += OnVideoEnded;
         }
         
-        CancellationToken destroyToken = this.GetCancellationTokenOnDestroy();
+        CancellationToken destroyToken = DestroyToken;
         await WaitFirstFrameAsync(_vp, _raw, destroyToken, 2.0);
         await UniTask.Delay(TimeSpan.FromMilliseconds(50), cancellationToken: destroyToken);
         

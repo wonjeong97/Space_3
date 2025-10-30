@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO.Ports;
 using System.Threading;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -111,7 +112,29 @@ public class ArduinoInputManager : MonoBehaviour
     private const int BIT_B1 = 1 << 0;
     private const int BIT_B2 = 1 << 1;
     private const int BIT_B3 = 1 << 2;
+    
+    // 스로틀에서 받아온 마지막 값을 저장함
+    private volatile int _lastThrottleValue;
+    public int LastThrottleValue
+    {
+        get => _lastThrottleValue;
+        set => _lastThrottleValue = value;
+    }
+    
+    private volatile int _throttleVersion;          // 값 갱신 버전
+    public int ThrottleVersion => _throttleVersion; // 외부에서 읽기 전용
+    public long LastThrottleAtMs { get; private set; } // 마지막 수신 시각(ms)
 
+    public bool arduinoReady;
+
+    public bool ArduinoReady
+    {
+        get => arduinoReady;
+        private set => arduinoReady = value;
+    }
+
+    public event Action<string> LineReceived;
+    
     private void Awake()
     {
         if (_clock == null) _clock = Stopwatch.StartNew();
@@ -128,6 +151,11 @@ public class ArduinoInputManager : MonoBehaviour
 
     private void Start()
     {
+        StartAsync().Forget();
+    }
+    
+    private async UniTaskVoid StartAsync()
+    {
         try
         {
             _jsonSettings ??= JsonLoader.Instance.settings;
@@ -141,18 +169,64 @@ public class ArduinoInputManager : MonoBehaviour
             };
             _serialPort.Open();
 
-            Thread.Sleep(2000); // 아두이노 리셋 안정화 대기
-            _serialPort.DiscardInBuffer(); // 부트메시지/쓰레기 제거
+            // 아두이노 리셋 안정화 대기
+            await UniTask.Delay(2000);
+            _serialPort.DiscardInBuffer();
 
             _running = true;
             _readThread = new Thread(ReadSerial) { IsBackground = true };
             _readThread.Start();
 
-            Debug.Log($"[ArduinoInputManager] Opened {_portName} @ {_baudRate}");
+            Debug.Log($"[Arduino] 포트 오픈 {_portName} @ {_baudRate}");
+            ArduinoReady = true;
+            
+            // ===== 스로틀 OFF 후 ACK 대기 =====
+            await SendAndAwaitAckAsync("THROTTLE OFF", "ACK THROTTLE OFF", 1000);
         }
         catch (Exception e)
         {
-            Debug.LogError($"[ArduinoInputManager] 포트 열기 실패: {e.Message}");
+            Debug.LogError($"[Arduino] 포트 열기 실패: {e.Message}");
+        }
+    }
+    
+    private async UniTask<bool> SendAndAwaitAckAsync(string command, string expectedAck, int timeoutMs)
+    {
+        if (_serialPort == null || !_serialPort.IsOpen)
+        {
+            Debug.LogWarning("[Arduino] 포트가 열려있지 않음.");
+            return false;
+        }
+
+        UniTaskCompletionSource<bool> tcs = new UniTaskCompletionSource<bool>();
+
+        void OnLine(string line)
+        {
+            if (string.IsNullOrEmpty(line)) return;
+            if (line.Trim().Equals(expectedAck, StringComparison.OrdinalIgnoreCase))
+            {
+                tcs.TrySetResult(true);
+            }
+        }
+
+        LineReceived += OnLine;
+
+        try
+        {
+            Send(command); // 명령 전송
+            (bool hasResultLeft, bool result) = await UniTask.WhenAny(tcs.Task, UniTask.Delay(timeoutMs));
+
+            if (hasResultLeft)
+            {
+                Debug.Log($"[Arduino] {expectedAck} 수신됨.");
+                return true;
+            }
+
+            Debug.LogWarning($"[Arduino] {expectedAck} 수신 실패(타임아웃).");
+            return false;
+        }
+        finally
+        {
+            LineReceived -= OnLine;
         }
     }
 
@@ -166,30 +240,43 @@ public class ArduinoInputManager : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(line)) continue;
 
                 string s = line.Trim();
+                Debug.Log("[Arduino]>> "+ s);
 
-                // 아두이노 포맷: "Button 1 Pressed" 등
-                if (s.IndexOf("Button 1 Pressed", StringComparison.OrdinalIgnoreCase) >= 0)
+                // 먼저 원문 한 줄을 브로드캐스트
+                try { LineReceived?.Invoke(s); } catch { /* 구독자 예외 방지 */ }
+                
+                if (s.StartsWith("THROTTLE", StringComparison.OrdinalIgnoreCase))
+                {
+                    string[] parts = s.Split(' ');
+                    if (parts.Length >= 2 && int.TryParse(parts[1], out int throttle))
+                    {
+                        LastThrottleValue = throttle;
+                        LastThrottleAtMs = NowMs;
+                        Interlocked.Increment(ref _throttleVersion);
+                    }
+                    continue;
+                }
+
+                if (s.IndexOf("BTN 1", StringComparison.OrdinalIgnoreCase) >= 0)
                 {   
                     SoundManager.Instance?.PlayByPath("Sound/물리 버튼.mp3", 1.0f);
                     SetPressedBit(BIT_B1);
                 }
-                else if (s.IndexOf("Button 2 Pressed", StringComparison.OrdinalIgnoreCase) >= 0)
+                else if (s.IndexOf("BTN 2", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     SoundManager.Instance?.PlayByPath("Sound/물리 버튼.mp3", 1.0f);
                     SetPressedBit(BIT_B2);
                 }
-                else if (s.IndexOf("Button 3 Pressed", StringComparison.OrdinalIgnoreCase) >= 0)
+                else if (s.IndexOf("BTN 3", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
                     SoundManager.Instance?.PlayByPath("Sound/물리 버튼.mp3", 1.0f);
                     SetPressedBit(BIT_B3);
                 }
             }
-            catch (TimeoutException)
-            {
-            }
+            catch (TimeoutException) { }
             catch (Exception e)
             {
-                Debug.LogWarning($"[ArduinoInputManager] 수신 오류: {e.Message}");
+                Debug.LogWarning($"[Arduino] 수신 오류: {e.Message}");
                 Thread.Sleep(100);
             }
         }
@@ -272,7 +359,7 @@ public class ArduinoInputManager : MonoBehaviour
         if (_serialPort != null && _serialPort.IsOpen)
             _serialPort.WriteLine(ms.ToString());
         else
-            Debug.LogError("[ArduinoInputManager] SendButtonDelay: 포트가 닫혀 있음");
+            Debug.LogError("[Arduino] SendButtonDelay: 포트가 닫혀 있음");
     }
 
     // LED 제어: "LEDn ON/OFF" 전송
@@ -285,7 +372,7 @@ public class ArduinoInputManager : MonoBehaviour
         }
         catch (Exception e)
         {
-            Debug.LogError($"[ArduinoInputManager] SetLed write error: {e.Message}");
+            Debug.LogError($"[Arduino] SetLed write error: {e.Message}");
         }
     }
 
@@ -306,12 +393,12 @@ public class ArduinoInputManager : MonoBehaviour
             }
             else
             {
-                Debug.LogError("[ArduinoInputManager] Send failed: port not open.");
+                Debug.LogError("[Arduino] Send failed: port not open.");
             }
         }
         catch (Exception e)
         {
-            Debug.LogError("[ArduinoInputManager] Send exception: " + e.Message);
+            Debug.LogError("[Arduino] Send exception: " + e.Message);
         }
     }
 }

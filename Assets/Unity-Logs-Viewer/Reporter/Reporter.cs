@@ -2325,7 +2325,7 @@ public class Reporter : MonoBehaviour
 
 #if UNITY_CHANGE3
         currentScene = SceneManager.GetActiveScene().name;
-        Debug.Log("[Reporter] Scene " + currentScene + " is loaded");
+        Debug.Log($"[Reporter] {currentScene} 로드 완료");
 #else
 		currentScene = Application.loadedLevelName;
 		Debug.Log("[Reporter] Scene " +  currentScene + " is loaded");

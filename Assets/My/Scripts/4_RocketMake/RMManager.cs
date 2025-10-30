@@ -66,8 +66,8 @@ public class RMSetting
 /// </summary>
 public class RMManager : SceneManager_Base<RMSetting>
 {
-    #region Serialized
-
+    protected override string JsonPath => "JSON/RMSetting.json";
+    
     [Header("UI")] 
     [SerializeField] private GameObject backgroundImage;
     [SerializeField] private GameObject mainImage1;
@@ -102,25 +102,13 @@ public class RMManager : SceneManager_Base<RMSetting>
     [SerializeField] private GameObject subBgImage;
     [SerializeField] private GameObject subRocketImage;
 
-    #endregion
-
-    protected override string JsonPath => "JSON/RMSetting.json";
-
     private const float AnimationTime = 0.5f; // 프로그레스 바, 텍스트 등의 애니메이션 시간
     private const float BarMaxVelocity = 10f;
     private const float BarMaxAltitude = 40000f;
     private const float BarMaxSlope = 180f;
     private const float BarMaxRemainDistance = 1440f;
 
-    private enum Phase
-    {
-        SelectRocket,
-        SelectSatellite,
-        Location,
-        PlayingMake,
-        Done
-    }
-
+    private enum Phase { SelectRocket, SelectSatellite, Location, PlayingMake, Done }
     private Phase _phase = Phase.SelectRocket;
 
     private int _selectedRocket = -1;
@@ -139,8 +127,6 @@ public class RMManager : SceneManager_Base<RMSetting>
     private int _makeIndex;
 
     private float _videoFadeTime;
-
-    // RT 최적화
     private RenderTexture _lastRT;
 
     private CancellationTokenSource _main1AlphaCts;
@@ -290,7 +276,7 @@ public class RMManager : SceneManager_Base<RMSetting>
             int max = Mathf.Max(0, setting.rockets.Length - 1);
 
             int baseIndex = (_selectedRocket < 0) ? 0 : _selectedRocket;
-            _selectedRocket = Mathf.Clamp(baseIndex + ((_selectedRocket < 0) ? 0 : delta), 0, max);
+            _selectedRocket = Mathf.Clamp(baseIndex + (_selectedRocket < 0 ? 0 : delta), 0, max);
 
             SetSelected(_selectedRocket, true);
         }
@@ -468,7 +454,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         bool isLoop = IsLoopClip(next);
         double timeout = next.fileName != null && next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
 
-        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, this.GetCancellationTokenOnDestroy(), timeout);
+        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, DestroyToken, timeout);
 
         if (_vp)
         {
@@ -787,7 +773,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         img.fillClockwise = true; // 좌→우
     }
 
-    /// <summary> 0..BAR_MAX 스칼라 값을 Image.fillAmount로 애니메이션 </summary>
+    /// <summary> 0...BAR_MAX 스칼라 값을 Image.fillAmount로 애니메이션 </summary>
     private async UniTask AnimateBarAsync(Image img, float fromValue, float toValue, float duration, float barMax, CancellationToken token)
     {
         if (!img) return;

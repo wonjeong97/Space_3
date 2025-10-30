@@ -21,6 +21,8 @@ public class TutorialSetting
 /// <summary> 튜토리얼 씬 관리 매니저 </summary>
 public class TutorialManager : SceneManager_Base<TutorialSetting>
 {
+    protected override string JsonPath => "JSON/TutorialSetting.json";
+    
     [Header("UI")]
     [SerializeField] private GameObject backgroundImage; // 배경 팝업 이미지
     [SerializeField] private GameObject infoImage1; // "조작 안내"
@@ -28,42 +30,38 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
     [SerializeField] private GameObject infoImage3; // "컨트롤러의 아무 버튼을 누르면 다음 화면으로 진행됩니다."
     [SerializeField] private List<GameObject> tutorialImageObjs; // 튜토리얼 이미지
 
-    protected override string JsonPath => "JSON/TutorialSetting.json";
-
     private int _step;
     private float CrossFadeTime => fadeTime;
-
+    
     protected override async UniTask Init()
     {
         _step = 0;
 
-        // 설정 개수와 오브젝트 개수 동기화
         int count = Mathf.Min(tutorialImageObjs.Count, setting.tutorialImages.Length);
         for (int i = 0; i < count; i++)
             SettingImageObject(tutorialImageObjs[i], setting.tutorialImages[i]);
 
-        // 1번만 보이게 초기화, 나머지는 알파값 0, 비활성화
         for (int i = 0; i < tutorialImageObjs.Count; i++)
             SetActiveWithAlpha(tutorialImageObjs[i], i == 0, i == 0 ? 1f : 0f);
 
-        SettingImageObject(backgroundImage, setting.background); // 배경 팝업
+        SettingImageObject(backgroundImage, setting.background);
         SettingImageObject(infoImage1, setting.infoImage1);
         SettingImageObject(infoImage2, setting.infoImage2);
         SettingImageObject(infoImage3, setting.infoImage3);
 
-        // 이미지 세팅 반영을 위해 한 프레임 양보
         await UniTask.Yield();
 
         StartBlinkGreenAsync(500, 160);
-        TurnCamera3Async(this.GetCancellationTokenOnDestroy()).Forget();
+        TurnCamera3Async(DestroyToken).Forget();
+        
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
 
         // 입력마다 다음 단계 진행
         while (true)
         {
-            // 입력 대기 루프
-            CancellationToken cancel = this.GetCancellationTokenOnDestroy();
-            while (!cancel.IsCancellationRequested && isActiveAndEnabled)
+            CancellationToken cancel = DestroyToken;
+
+            while (!cancel.IsCancellationRequested && this != null && isActiveAndEnabled)
             {
                 if (ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) break;
                 if (TryConsumeSingleInput()) break;
@@ -77,7 +75,6 @@ public class TutorialManager : SceneManager_Base<TutorialSetting>
             }
             else
             {
-                // 마지막 단계: 다음 씬으로
                 canInput = false;
                 if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
                 inputReceived = false;

@@ -20,47 +20,39 @@ public class NewtonSetting
 /// <summary> 뉴턴의 제 1~3법칙 씬 관리 매니저 </summary>
 public class NewtonManager : SceneManager_Base<NewtonSetting>
 {
+    protected override string JsonPath => "JSON/NewtonSetting.json";
+    
     [Header("UI")] 
     [SerializeField] private GameObject videoPlayerObject;
+    
+    private VideoPlayer _vp;        // 비디오 플레이어
+    private RawImage _raw;          // 비디오 플레이어가 그리는 로우 이미지
+    private AudioSource _audio;     // 비디오 플레이어 오디오 소스
 
-    protected override string JsonPath => "JSON/NewtonSetting.json";
+    private bool _isSwitching;      // 다음 영상으로 스위칭 중인지 여부
+    private RenderTexture _lastRT;  // 영상 마지막 렌더 텍스쳐
 
-    // videoPlayerObject의 컴포넌트
-    private VideoPlayer _vp;
-    private RawImage _raw;
-    private AudioSource _audio;
-
-    private bool _isSwitching;
-    private RenderTexture _lastRT;
-
-    private enum Phase
-    {
-        Intro,
-        RuleSeq,
-        Done
-    }
-
+    private enum Phase { Intro, RuleSeq, Done }
     private Phase _phase;
 
-    private VideoSetting[] _ruleSeq; // 뉴턴의 법칙 비디오를 저장하는 배열
-    private int _ruleIndex;
+    private VideoSetting[] _ruleSeq; // 뉴턴의 법칙 비디오 저장 배열
+    private int _ruleIndex;          // 뉴턴의 법칙 비디오 인덱스
 
-    // 취소 토큰
-    private CancellationTokenSource _skipCts;
-    private CancellationToken _destroyToken;
+    private CancellationTokenSource _skipCts; // 스킵 관련 취소 토큰
 
     protected override void OnDisable()
     {
         CancelAndDispose(ref _skipCts);
-
-        if (_vp != null)
+        
+        // 비디오 플레이어 연결 이벤트를 끊고 재생 정지
+        if (_vp)
         {
             _vp.loopPointReached -= OnVideoEnded;
             _vp.Stop();
         }
 
-        // 마지막 RenderTexture 해제
-        if (_lastRT != null)
+        // 마지막 렌더 텍스쳐 정리
+        if (_lastRT)
         {
             if (_lastRT.IsCreated()) _lastRT.Release();
             Destroy(_lastRT);
@@ -70,12 +62,11 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
 
     protected override async UniTask Init()
     {
-        if (!videoPlayerObject) Debug.LogError("[NewtonManager] videoPlayerObject is not assigned");
+        if (!videoPlayerObject) Debug.LogError("[NewtonManager] 비디오 플레이어가 할당되지 않음");
 
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
         _audio = videoPlayerObject.GetComponent<AudioSource>();
-        _destroyToken = this.GetCancellationTokenOnDestroy();
 
         // 뉴턴의 법칙 비디오 저장
         _ruleSeq = setting.newtonsRuleVideos;
@@ -92,7 +83,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
 
-        TurnCamera3Async(_destroyToken).Forget();
+        TurnCamera3Async(DestroyToken).Forget();
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
     }
 
@@ -183,12 +174,10 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
                 _vp.Pause();
                 _vp.playbackSpeed = 0f;
             }
-            catch (ObjectDisposedException)
-            {
-            }
+            catch (ObjectDisposedException) { }
             catch (Exception e)
             {
-                Debug.LogWarning($"[NewtonManager] Pause/playbackSpeed guard failed: {e.Message}");
+                Debug.LogWarning($"[NewtonManager] Pause/playbackSpeed 가드 실패: {e.Message}");
             }
         }
 
@@ -200,7 +189,7 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         bool isLoop = IsLoopClip(next);
         double timeout = next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
 
-        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, _destroyToken, timeout);
+        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, DestroyToken, timeout);
 
         if (!ok)
         {
@@ -213,8 +202,8 @@ public class NewtonManager : SceneManager_Base<NewtonSetting>
         // 검은 화면이 덮여있는 동안 첫 프레임이 실제로 그려질 때까지 잠깐 재생
         if (withFade)
         {
-            await WaitFirstFrameAsync(_vp, _raw, _destroyToken, 2.0);
-            await UniTask.Delay(TimeSpan.FromMilliseconds(50), cancellationToken: _destroyToken);
+            await WaitFirstFrameAsync(_vp, _raw, DestroyToken, 2.0);
+            await UniTask.Delay(TimeSpan.FromMilliseconds(50), cancellationToken: DestroyToken);
         }
         else
         {

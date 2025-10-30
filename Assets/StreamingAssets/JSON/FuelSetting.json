@@ -1,6 +1,6 @@
 {
   "popupFadeTime": 1,
-  "fuelFillSpeed": 5,
+  "fuelFillSpeed": 10,
   "main1": {
 	"position": { "x": 340, "y": 540 },
 	"size": { "x": 600, "y": 800 },
@@ -17,9 +17,9 @@
 	"sourceImage": "Image/MainDisplay/3_Guide.png"
   },
   "fuelPopup": {
-	"position": { "x": "960", "y": 540 },
-	"size": { "x": 1250, "y": 900 },
-	"sourceImage": "Image/RocketFuel/Popup.png"
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"sourceImage": "Image/RocketFuel/Fuel_Popup_Black.png"
   },
   "subBg": {
 	"position": { "x": "960", "y": 270 },

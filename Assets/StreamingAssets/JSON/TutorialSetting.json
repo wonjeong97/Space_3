@@ -26,7 +26,7 @@
   "tutorialImages": [
 	{
 	  "position": { "x": 960, "y": 635 },
-	  "size": { "x": 1100, "y": 575 },
+	  "size": { "x": 931, "y": 575 },
 	  "sourceImage": "Image/Tutorial/1_Tutorial.png",
 	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
 	},

@@ -219,7 +219,11 @@ public class CountController : MonoBehaviour
 
                             // -> 이후는 자동 SLP 진행 모드로 전환 + 입력 잠금(스냅)
                             _autoSlopeEnabled = true;
-                            if (slope != null) slope.LockInput(true);
+                            if (slope != null)
+                            {
+                                slope.LockInput(true);
+                                slope.EnableExternalAnalog(false);
+                            }
                         }
                     }
                 }

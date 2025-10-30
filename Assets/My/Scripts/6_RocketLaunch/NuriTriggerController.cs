@@ -84,10 +84,18 @@ public class NuriTriggerController : MonoBehaviour
                     LaunchManager.Instance?.SetButtonOn("Left");
                     count.BeginExternalHold(); // T+ 시간 멈춤
                     LaunchManager.Instance?.SetGuideText("1단 분리 버튼을 누르세요.");
+                    ArduinoInputManager.Instance?.SetLed(1, true);
+                    LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
+                    
                     await LaunchManager.Instance.WaitForLeftButtonAsync(token);
+                    
                     LaunchManager.Instance?.SetGuideText("");
                     count.EndExternalHold();
                     LaunchManager.Instance?.SetButtonOff("Left");
+                    
+                    ArduinoInputManager.Instance?.SetLed(1, false);
+                    LaunchManager.Instance?.PublicStopLedEffects();
+                    LedStrip.Range(0, 9, 255, 0, 0);
                     // ========================
                     
                     _firedDrop1 = true;
@@ -107,10 +115,19 @@ public class NuriTriggerController : MonoBehaviour
                     LaunchManager.Instance?.SetButtonOn("Right");
                     count.BeginExternalHold();
                     LaunchManager.Instance?.SetGuideText("페어링 분리 버튼을 누르세요.");
+                    
+                    ArduinoInputManager.Instance?.SetLed(3, true);
+                    LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
+                    
                     await LaunchManager.Instance.WaitForRightButtonAsync(token);
+                    
                     LaunchManager.Instance?.SetGuideText("");
                     count.EndExternalHold();
                     LaunchManager.Instance?.SetButtonOff("Right");
+                    
+                    ArduinoInputManager.Instance?.SetLed(3, false);
+                    LaunchManager.Instance?.PublicStopLedEffects();
+                    LedStrip.Range(0, 9, 255, 0, 0);
                     // =========================
                     
                     _firedFairing = true;
@@ -127,10 +144,19 @@ public class NuriTriggerController : MonoBehaviour
                     LaunchManager.Instance?.SetButtonOn("Middle");
                     count.BeginExternalHold();
                     LaunchManager.Instance?.SetGuideText("2단 분리 버튼을 누르세요");
+                    
+                    ArduinoInputManager.Instance?.SetLed(2, true);
+                    LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
+                    
                     await LaunchManager.Instance.WaitForMiddleButtonAsync(token);
+                    
                     LaunchManager.Instance?.SetGuideText("");
                     count.EndExternalHold();
                     LaunchManager.Instance?.SetButtonOff("Middle");
+                    
+                    ArduinoInputManager.Instance?.SetLed(2, false);
+                    LaunchManager.Instance?.PublicStopLedEffects();
+                    LedStrip.Range(0, 9, 255, 0, 0);
                     // =========================
                     
                     _firedDrop2 = true;

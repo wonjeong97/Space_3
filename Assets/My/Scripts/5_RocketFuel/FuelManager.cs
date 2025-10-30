@@ -37,6 +37,8 @@ public class FuelSetting
 /// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
 public class FuelManager : SceneManager_Base<FuelSetting>
 {
+    protected override string JsonPath => "JSON/FuelSetting.json";
+    
     [Header("UI")] 
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
@@ -68,22 +70,12 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject throttleButton;
     [SerializeField] private GameObject textGuide;
 
-
-    protected override string JsonPath => "JSON/FuelSetting.json";
-
     private float _popupFadeTime, _fuelFillSpeed;
     private Image _fuel1Image, _fuel2Image, _fuel3Image;
 
-    private enum Phase
-    {
-        RocketMove,
-        FuelInjection1,
-        FuelInjection2,
-        FuelInjection3,
-        Done
-    }
-
+    private enum Phase { RocketMove, FuelInjection1, FuelInjection2, FuelInjection3, Done }
     private Phase _phase = Phase.RocketMove;
+    
     private CancellationTokenSource _popupFadeCts;
     private CancellationTokenSource _blinkCts;
     private CancellationTokenSource _main1AlphaCts;
@@ -91,10 +83,9 @@ public class FuelManager : SceneManager_Base<FuelSetting>
     protected override void OnDisable()
     {
         try
-        {
-            _popupFadeCts?.Cancel();
-            _blinkCts?.Cancel();
-            _main1AlphaCts?.Cancel();
+        {   
+            CancelAndDispose(ref _blinkCts);
+            CancelAndDispose(ref _main1AlphaCts);
             CancelAndDispose(ref _popupFadeCts);
             
             ArduinoInputManager.Instance?.SetLedAll(false);
@@ -103,14 +94,6 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         {
             Debug.LogError($"[FuelManager] OnDisable error: {e}");
         }
-
-        _popupFadeCts?.Dispose();
-        _popupFadeCts = null;
-        _blinkCts?.Dispose();
-        _blinkCts = null;
-        _main1AlphaCts?.Dispose();
-        _main1AlphaCts = null;
-        
     }
 
     protected override async UniTask Init()
@@ -136,13 +119,13 @@ public class FuelManager : SceneManager_Base<FuelSetting>
                 SettingImageObject(sequences[i].gameObject, setting.main1Children[i]);
             }
         }
-        
         if (sequences != null && sequences.Length > 1 && sequences[1] != null)
         {
             StartAlphaPingPong(sequences[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
         SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요").Forget();
         // ======================
+        
         // ===== mainImage2 =====
         SettingImageObject(controllerBackground, setting.controllerBackground);
         SettingImageObject(buttonLeft, setting.buttonLeft);
@@ -385,10 +368,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
         }
     }
     
-    /// <summary>
-    /// 디버그 스킵 입력 처리
-    /// - 모든 연료 주입 과정을 중단하고 즉시 다음 씬으로 이동
-    /// </summary>
+    /// <summary> 디버그 스킵 입력 처리 - 모든 연료 주입 과정을 중단하고 즉시 다음 씬으로 이동 </summary>
     protected override void OnDebugSkip()
     {
         try
@@ -412,7 +392,7 @@ public class FuelManager : SceneManager_Base<FuelSetting>
             }
             else
             {
-                Debug.Log("[FuelManager] Debug skip pressed, but nextSceneBuildIndex is not set.");
+                Debug.Log("[FuelManager] 디버그 스킵을 실행했으나, 다음 씬이 설정되어있지 않음");
             }
         }
         catch (Exception e)

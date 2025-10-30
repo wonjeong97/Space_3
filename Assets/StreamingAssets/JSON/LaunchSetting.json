@@ -269,6 +269,16 @@
 	"fontSize": 30,
 	"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 },
 	"alignment": 516
+  },
+  "slopeBackgroundImage": {
+	"position": { "x": 300, "y": 635 },
+	"size": { "x": 310, "y": 310 },
+	"sourceImage": "Image/MainDisplay/SlopeBackground.png"
+  },
+  "slopePointerImage": {
+	"position": { "x": 0, "y": 0 },
+	"size": { "x": 310, "y": 75 },
+	"rotation": { "x": 0, "y": 0, "z": 90 },
+	"sourceImage": "Image/MainDisplay/SlopePointer.png"
   }
-  
 }
