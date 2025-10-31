@@ -47,7 +47,7 @@ public class RMSetting
     public ImageSetting buttonRight;
     public ImageSetting throttleBackground;
     public ImageSetting throttleButton;
-    
+
     public TextSetting guideText;
 
     public TextSetting timeText;
@@ -62,22 +62,23 @@ public class RMSetting
 
 /// <summary>
 /// 우주발사체를 다단(3단)으로 제작하는 이유 씬 매니저
-/// 발사체, 위성 선택 -> 발사 장소 영상 -> 발사체 다단 제작 영상 → 다음 씬
+/// 발사체, 위성 선택 -> 발사 장소 영상 -> 발사체 다단 제작 영상 -> 다음 씬
 /// </summary>
 public class RMManager : SceneManager_Base<RMSetting>
 {
+    // JSON 경로
     protected override string JsonPath => "JSON/RMSetting.json";
-    
-    [Header("UI")] 
+
+    [Header("UI")]
     [SerializeField] private GameObject backgroundImage;
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
 
-    [Header("mainImage1")] 
+    [Header("mainImage1")]
     [SerializeField] private Image[] sequences;
     [SerializeField] private GameObject textObjective;
-    
+
     [Header("mainImage2")]
     [SerializeField] private GameObject controllerBackground;
     [SerializeField] private GameObject buttonLeft;
@@ -97,7 +98,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     [SerializeField] private TextMeshProUGUI textAltitudeValue;
     [SerializeField] private TextMeshProUGUI textVelocityValue;
     [SerializeField] private TextMeshProUGUI textDistanceValue;
-    
+
     [SerializeField] private GameObject videoPlayerObject;
     [SerializeField] private GameObject subBgImage;
     [SerializeField] private GameObject subRocketImage;
@@ -137,49 +138,89 @@ public class RMManager : SceneManager_Base<RMSetting>
     // 현재 표시값을 기억해 중복 파싱 없이 애니메이션 시작점으로 사용
     private float _curVelocity, _curMaxVelocity, _curAltitude, _curSlope, _curRemainDistance;
 
-    #region Unity
+    #region Logging helpers
 
+    // [ClassName] Method-> 메시지 형태 유지
+    private static void Log(string method, string msg)
+    {
+        Debug.Log($"[RMManager] {method}-> {msg}");
+    }
+
+    private static void LogWarn(string method, string msg)
+    {
+        Debug.LogWarning($"[RMManager] {method}-> {msg}");
+    }
+
+    private static void LogError(string method, string msg)
+    {
+        Debug.LogError($"[RMManager] {method}-> {msg}");
+    }
+
+    #endregion
+
+    #region Unity lifecycle
+
+    /// <summary> 리소스/이벤트/토큰 정리 </summary>
     protected override void OnDisable()
     {
-        if (_vp)
+        try
         {
-            _vp.loopPointReached -= OnLocationEnded;
-            _vp.loopPointReached -= OnMakeEnded;
-            _vp.Stop();
+            if (_vp != null)
+            {
+                _vp.loopPointReached -= OnLocationEnded;
+                _vp.loopPointReached -= OnMakeEnded;
+                if (_vp.isPlaying) _vp.Stop();
+            }
+
+            if (_audio != null) _audio.Stop();
+
+            CancelAndDispose(ref _skipCts);
+            CancelAndDispose(ref _main1AlphaCts);
+            CancelAndDispose(ref _velCts);
+            CancelAndDispose(ref _maxVelCts);
+            CancelAndDispose(ref _altCts);
+            CancelAndDispose(ref _slopeCts);
+            CancelAndDispose(ref _remainCts);
+            CancelAndDispose(ref _velBarCts);
+            CancelAndDispose(ref _maxBarCts);
+            CancelAndDispose(ref _altBarCts);
+            CancelAndDispose(ref _slopeBarCts);
+            CancelAndDispose(ref _remainBarCts);
+
+            // RawImage가 잡고 있는 텍스처 분리 후 파기
+            if (_raw != null) _raw.texture = null;
+
+            if (_lastRT != null)
+            {
+                if (_lastRT.IsCreated()) _lastRT.Release();
+                Destroy(_lastRT);
+                _lastRT = null;
+            }
         }
-
-        CancelAndDispose(ref _skipCts);
-        CancelAndDispose(ref _main1AlphaCts);
-        CancelAndDispose(ref _velCts);
-        CancelAndDispose(ref _maxVelCts);
-        CancelAndDispose(ref _altCts);
-        CancelAndDispose(ref _slopeCts);
-        CancelAndDispose(ref _remainCts);
-        CancelAndDispose(ref _velBarCts);
-        CancelAndDispose(ref _maxBarCts);
-        CancelAndDispose(ref _altBarCts);
-        CancelAndDispose(ref _slopeBarCts);
-        CancelAndDispose(ref _remainBarCts);
-
-        if (_lastRT)
+        catch (Exception e)
         {
-            if (_lastRT.IsCreated()) _lastRT.Release();
-            Destroy(_lastRT);
-            _lastRT = null;
+            LogError(nameof(OnDisable), e.ToString());
         }
     }
 
+    /// <summary> 초기 세팅 및 입력 루프 시작 </summary>
     protected override async UniTask Init()
     {
         if (videoPlayerObject == null)
         {
-            Debug.LogError("[RMManager] videoPlayerObject is not assigned");
+            LogError(nameof(Init), "videoPlayerObject is not assigned");
             return;
         }
 
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
         _audio = videoPlayerObject.GetComponent<AudioSource>();
+
+        if (_vp == null || _raw == null)
+        {
+            LogError(nameof(Init), "VideoPlayer or RawImage component missing on videoPlayerObject");
+            return;
+        }
 
         _videoFadeTime = Mathf.Max(0f, setting.videoFadeTime);
 
@@ -191,7 +232,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(subBgImage, setting.subBg);
         SettingImageObject(subRocketImage, setting.subRocket);
 
-        // ===== mainImage1 =====
+        // mainImage1 시퀀스 이미지 세팅
         if (setting.main1Children != null && sequences != null)
         {
             int count = Mathf.Min(setting.main1Children.Length, sequences.Length);
@@ -207,9 +248,8 @@ public class RMManager : SceneManager_Base<RMSetting>
         {
             StartAlphaPingPong(sequences[0], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
-        // ======================
-        
-        // ===== mainImage2 =====
+
+        // mainImage2 컨트롤 UI
         SettingImageObject(controllerBackground, setting.controllerBackground);
         SettingImageObject(buttonLeft, setting.buttonLeft);
         SettingImageObject(buttonMiddle, setting.buttonMiddle);
@@ -217,24 +257,32 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
         SettingTextObject(textGuide, setting.guideText, "버튼을 누르세요").Forget();
-        // ======================
 
-        //InitializeProgressBar();
-        if (rocketImage) rocketImage.SetActive(false);
+        // 선택 이미지 비활성
+        if (rocketImage != null) rocketImage.SetActive(false);
 
-        // 비디오 오브젝트는 처음에 비활성화
-        if (_raw)
+        // 비디오 오브젝트 초기 상태 비활성/알파 0
+        if (_raw != null)
         {
             Color c = _raw.color;
             _raw.color = new Color(c.r, c.g, c.b, 0f);
+            _raw.texture = null;
         }
-
         videoPlayerObject.SetActive(false);
+
+        // 널 가드
+        if (setting.rockets == null) setting.rockets = Array.Empty<RocketSetting>();
+        if (setting.satellites == null) setting.satellites = Array.Empty<RocketSetting>();
+        if (setting.locationVideo == null) setting.locationVideo = Array.Empty<VideoSetting>();
+        if (setting.rocketMakeVideo == null) setting.rocketMakeVideo = Array.Empty<VideoSetting>();
 
         _locIndex = 0;
         _makeIndex = 0;
 
+        // 시작 페이드 아웃
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
+
+        // LED 효과 시작
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
 
@@ -266,24 +314,31 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Selection / Confirm
 
-    /// <summary> 사용자의 입력에 따라 인덱스를 바꾸고 이미지를 변경함 </summary>
+    /// <summary> 사용자의 입력에 따라 인덱스를 바꾸고 이미지를 변경 </summary>
     private void MoveSelection(int delta)
     {
         if (!canInput) return;
 
         if (_phase == Phase.SelectRocket)
         {
-            int max = Mathf.Max(0, setting.rockets.Length - 1);
+            if (setting.rockets.Length == 0) return;
 
-            int baseIndex = (_selectedRocket < 0) ? 0 : _selectedRocket;
-            _selectedRocket = Mathf.Clamp(baseIndex + (_selectedRocket < 0 ? 0 : delta), 0, max);
+            if (_selectedRocket < 0)
+                _selectedRocket = 0;
+            else
+                _selectedRocket = Mathf.Clamp(_selectedRocket + delta, 0, setting.rockets.Length - 1);
 
             SetSelected(_selectedRocket, true);
         }
         else if (_phase == Phase.SelectSatellite)
         {
-            int max = Mathf.Max(0, setting.satellites.Length - 1);
-            _selectedSatellite = Mathf.Clamp((_selectedSatellite < 0 ? 0 : _selectedSatellite) + delta, 0, max);
+            if (setting.satellites.Length == 0) return;
+
+            if (_selectedSatellite < 0)
+                _selectedSatellite = 0;
+            else
+                _selectedSatellite = Mathf.Clamp(_selectedSatellite + delta, 0, setting.satellites.Length - 1);
+
             SetSelected(_selectedSatellite, false);
         }
     }
@@ -291,11 +346,16 @@ public class RMManager : SceneManager_Base<RMSetting>
     /// <summary> 로켓/위성 선택 시 UI와 수치/바를 갱신 </summary>
     private void SetSelected(int index, bool isRocket)
     {
-        if (!rocketImage) return;
+        if (rocketImage == null) return;
+
+        RocketSetting[] arr = isRocket ? setting.rockets : setting.satellites;
+        if (arr == null || arr.Length == 0) return;
+        if (index < 0 || index >= arr.Length) return;
+
         if (!rocketImage.activeInHierarchy) rocketImage.SetActive(true);
 
-        // 첫 진입 점프 방지: 초기값 NaN 한 번 세팅
-        if (_curVelocity == 0f && textVelocity && string.IsNullOrEmpty(textVelocity.text))
+        // 첫 진입 시 현재값 NaN으로 초기화해 점프 방지
+        if (!float.IsNaN(_curVelocity) && string.IsNullOrEmpty(textVelocity?.text) && _curVelocity == 0f)
         {
             _curVelocity = float.NaN;
             _curMaxVelocity = float.NaN;
@@ -304,30 +364,18 @@ public class RMManager : SceneManager_Base<RMSetting>
             _curRemainDistance = float.NaN;
         }
 
-        RocketSetting src;
-        if (isRocket)
-        {
-            if (index < 0 || index >= setting.rockets.Length) return;
-            src = setting.rockets[index];
-        }
-        else
-        {
-            if (index < 0 || index >= setting.satellites.Length) return;
-            src = setting.satellites[index];
-        }
+        RocketSetting src = arr[index];
 
         // 이미지 교체
         SettingImageObject(rocketImage, src.rocketImage);
 
-        // 숫자 라벨 애니메이션 시작
+        // 숫자 라벨 애니메이션 (필요 시 주석 해제)
         // StartLabelAnimation(textVelocity, ref _curVelocity, src.velocity, ref _velCts, 1, " km/s");
-        // StartLabelAnimation(textMaxVelocity, ref _curMaxVelocity, src.maxVelocity, ref _maxVelCts, 1, " km/s");
         // StartLabelAnimation(textAltitude, ref _curAltitude, src.altitude, ref _altCts, 0, " km");
-        // StartLabelAnimation(textSlope, ref _curSlope, src.slope, ref _slopeCts, 0, " °");
-        // StartLabelAnimation(textRemainDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
+        // StartLabelAnimation(textDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
 
-        // 진행 바 즉시 갱신
-        //UpdateProgressBars(src);
+        // 진행 바 갱신 (필요 시 주석 해제)
+        // UpdateProgressBars(src);
     }
 
     /// <summary> 확인 버튼을 눌렀을 때 동작: 로켓→위성→장소 시퀀스 시작 </summary>
@@ -337,11 +385,17 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         if (_phase == Phase.SelectRocket)
         {
+            if (setting.rockets.Length == 0)
+            {
+                LogWarn(nameof(ConfirmAsync), "No rockets in setting");
+                return false;
+            }
+
             if (_selectedRocket < 0)
             {
                 _selectedRocket = 0;
                 SetSelected(_selectedRocket, true);
-                return false;
+                return false; // 사용자에게 첫 선택을 보여주고 한 번 더 누르게
             }
 
             _phase = Phase.SelectSatellite;
@@ -356,8 +410,9 @@ public class RMManager : SceneManager_Base<RMSetting>
             StopLedEffects();
             ArduinoInputManager.Instance?.SetLedAll(false);
             LedStrip.Range(0, 9, 255, 0, 0);
+
             await StartLocationSequenceAsync();
-            return true;
+            return true; // 입력 루프 탈출
         }
 
         return false;
@@ -367,7 +422,9 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Video Sequences (arrays)
 
-    /// <summary> 장소 영상 배열 시퀀스 시작 </summary>
+    /// <summary>
+    /// 장소 영상 배열 시퀀스 시작
+    /// </summary>
     private async UniTask StartLocationSequenceAsync()
     {
         // '거치' 알파 애니메이션 해제
@@ -375,9 +432,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         _locIndex = 0;
 
         // 영상 재생 전 뒷배경 청소
-        if (mainImage1) mainImage1.SetActive(false);
-        if (mainImage2) mainImage2.SetActive(false);
-        if (mainImage3) mainImage3.SetActive(false);
+        if (mainImage1 != null) mainImage1.SetActive(false);
+        if (mainImage2 != null) mainImage2.SetActive(false);
+        if (mainImage3 != null) mainImage3.SetActive(false);
 
         if (setting.locationVideo == null || setting.locationVideo.Length == 0)
         {
@@ -388,7 +445,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         await SwitchAndPlayNextAsync(setting.locationVideo[_locIndex], true);
     }
 
-    /// <summary> 제작 영상 배열 시퀀스 시작 </summary>
+    /// <summary>
+    /// 제작 영상 배열 시퀀스 시작
+    /// </summary>
     private async UniTask StartMakeSequenceAsync()
     {
         _phase = Phase.PlayingMake;
@@ -396,7 +455,8 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         if (setting.rocketMakeVideo == null || setting.rocketMakeVideo.Length == 0)
         {
-            OnMakeSequenceCompleted();
+            _phase = Phase.Done;
+            await LoadSceneAsync(5, new[] { fadeImage1, fadeImage2, fadeImage3 });
             return;
         }
 
@@ -417,27 +477,24 @@ public class RMManager : SceneManager_Base<RMSetting>
         CancelAndDispose(ref _skipCts);
         inputReceived = false;
 
-        // 다음 클립 RT 준비 시, 페이드가 없을 때는 마지막 프레임을 유지
         bool holdLastFrame = !withFade;
 
-        if (withFade)
-            await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
+        if (withFade) await FadeImageAsync(0f, 1f, fadeTime, new[] { fadeImage1 });
 
         // 비디오 오브젝트 활성화 및 Rect 적용
-        if (!videoPlayerObject.activeSelf)
-            videoPlayerObject.SetActive(true);
+        if (!videoPlayerObject.activeSelf) videoPlayerObject.SetActive(true);
 
-        if (videoPlayerObject.TryGetComponent(out RectTransform rt))
+        if (videoPlayerObject.TryGetComponent(out RectTransform rtx))
         {
             UIUtility.ApplyRect(
-                rt,
+                rtx,
                 size: next.size,
                 anchoredPos: new Vector2(next.position.x, -next.position.y),
                 rotation: Vector3.zero
             );
         }
 
-        // 현재 프레임 고정(Stop 대신 Pause/속도 0)
+        // 현재 프레임 고정
         if (_vp != null)
         {
             _vp.Pause();
@@ -449,17 +506,24 @@ public class RMManager : SceneManager_Base<RMSetting>
         RenderTexture keepShowing = _raw != null ? _raw.texture as RenderTexture : null;
         RenderTexture rtForNext = VideoManager.Instance.EnsureRenderTexture(_vp, _raw, desired, reuseIfSame: holdLastFrame);
 
-        // 다음 영상 준비, RawImage는 그대로 마지막 프레임을 계속 보여줌
+        // 다음 영상 준비
         string url = VideoManager.Instance.ResolvePlayableUrl(next.fileName);
         bool isLoop = IsLoopClip(next);
-        double timeout = next.fileName != null && next.fileName.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ? 20.0 : 10.0;
+        double timeout = (next.fileName?.EndsWith(".webm", StringComparison.OrdinalIgnoreCase) ?? false) ? 20.0 : 10.0;
 
-        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, DestroyToken, timeout);
-
-        if (_vp)
+        if (_vp != null)
         {
             _vp.loopPointReached -= OnLocationEnded;
             _vp.loopPointReached -= OnMakeEnded;
+        }
+
+        bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, DestroyToken, timeout);
+        if (!ok)
+        {
+            LogError(nameof(SwitchAndPlayNextAsync), $"Prepare failed: {url}");
+            _isSwitching = false;
+            if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
+            return;
         }
 
         if (!isLoop)
@@ -468,28 +532,21 @@ public class RMManager : SceneManager_Base<RMSetting>
             if (_phase == Phase.PlayingMake) _vp.loopPointReached += OnMakeEnded;
         }
 
-        if (!ok)
-        {
-            Debug.LogError("[RMManager] Prepare failed: " + url);
-            _isSwitching = false;
-            if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
-            return;
-        }
+        BindInactivityPolicyToVideo(_vp, isLoop, DestroyToken);
 
-        // 첫 프레임 생성까지 가드 대기(프레임/텍스처 체크)
+        // 첫 프레임 생성까지 가드 대기
         int guard = 0;
         while (guard++ < 5 && _vp != null && _vp.texture == null && _vp.frame <= 0)
             await UniTask.Yield();
 
         // 화면에 스왑 (사이즈 동일 재사용이면 이미 보이는 중이므로 스왑 불필요)
-        if (_raw != null && rtForNext != null && keepShowing != rtForNext)
+        if (_raw != null && rtForNext != null && !ReferenceEquals(keepShowing, rtForNext))
         {
             if (_lastRT != null && _lastRT != rtForNext && _lastRT != keepShowing)
             {
                 if (_lastRT.IsCreated()) _lastRT.Release();
                 Destroy(_lastRT);
             }
-
             _raw.texture = rtForNext; // 깜빡임 없이 교체
             _lastRT = rtForNext;
         }
@@ -564,7 +621,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         if (_phase == Phase.PlayingMake && makeIndexAtStart != _makeIndex) return;
 
         // Loop 종료 처리
-        if (_vp)
+        if (_vp != null)
         {
             _vp.loopPointReached -= OnLocationEnded;
             _vp.loopPointReached -= OnMakeEnded;
@@ -599,17 +656,20 @@ public class RMManager : SceneManager_Base<RMSetting>
             }
             else
             {
-                OnMakeSequenceCompleted();
+                _phase = Phase.Done;
+                await LoadSceneAsync(5, new[] { fadeImage1, fadeImage2, fadeImage3 });
             }
         }
     }
 
-    /// <summary> 장소 영상 하나가 자연 종료되면 다음 장소(또는 제작 시퀀스)로 </summary>
+    /// <summary>
+    /// 장소 영상 하나가 자연 종료되면 다음 장소(또는 제작 시퀀스)로
+    /// </summary>
     private async void OnLocationEnded(VideoPlayer vp)
     {
         try
         {
-            if (_vp) _vp.loopPointReached -= OnLocationEnded;
+            if (_vp != null) _vp.loopPointReached -= OnLocationEnded;
 
             _locIndex++;
             if (setting.locationVideo != null && _locIndex < setting.locationVideo.Length)
@@ -623,16 +683,18 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
         catch (Exception e)
         {
-            Debug.LogError($"[RMManager] OnLocationEnded Exception: {e}");
+            LogError(nameof(OnLocationEnded), e.ToString());
         }
     }
 
-    /// <summary> 제작 영상 하나가 자연 종료되면 다음 제작(또는 다음 씬)으로 </summary>
+    /// <summary>
+    /// 제작 영상 하나가 자연 종료되면 다음 제작(또는 다음 씬)으로
+    /// </summary>
     private async void OnMakeEnded(VideoPlayer vp)
     {
         try
         {
-            _vp.loopPointReached -= OnMakeEnded;
+            if (_vp != null) _vp.loopPointReached -= OnMakeEnded;
 
             _makeIndex++;
             if (setting.rocketMakeVideo != null && _makeIndex < setting.rocketMakeVideo.Length)
@@ -641,21 +703,14 @@ public class RMManager : SceneManager_Base<RMSetting>
             }
             else
             {
-                OnMakeSequenceCompleted();
+                _phase = Phase.Done;
+                await LoadSceneAsync(5, new[] { fadeImage1, fadeImage2, fadeImage3 });
             }
         }
         catch (Exception e)
         {
-            Debug.LogError($"[RMManager] OnMakeEnded Exception: {e}");
+            LogError(nameof(OnMakeEnded), e.ToString());
         }
-    }
-
-    /// <summary> 제작 시퀀스 종료 → 다음 씬 </summary>
-    private void OnMakeSequenceCompleted()
-    {
-        int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 5;
-        LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 }).Forget();
-        _phase = Phase.Done;
     }
 
     /// <summary>
@@ -679,7 +734,9 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Value Animation
 
-    /// <summary> 라벨 값 변경을 애니메이션으로 표시 </summary>
+    /// <summary>
+    /// 라벨 값 변경을 애니메이션으로 표시
+    /// </summary>
     private async UniTask AnimateNumberChangeAsync(TextMeshProUGUI label, float from, float to, int decimals, string unit, CancellationToken token)
     {
         if (!label) return;
@@ -692,6 +749,7 @@ public class RMManager : SceneManager_Base<RMSetting>
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / AnimationTime);
 
+            // smoothstep
             float eased = t * t * (3f - 2f * t);
             float value = Mathf.Lerp(from, to, eased);
 
@@ -703,7 +761,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         label.SetText($"{to.ToString($"N{decimals}")}{unit}");
     }
 
-    /// <summary> 항목별 애니메이션 시작 헬퍼: 이전 애니메이션 취소->신규 토큰으로 시작 </summary>
+    /// <summary>
+    /// 항목별 애니메이션 시작 헬퍼: 이전 애니메이션 취소->신규 토큰으로 시작
+    /// </summary>
     private void StartLabelAnimation(TextMeshProUGUI label, ref float current, float next,
         ref CancellationTokenSource cts, int decimals, string unit)
     {
@@ -717,9 +777,10 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #endregion
 
-    #region Progress Bar
+    #region Progress Bar (옵션: 필요 시 사용)
 
-    /*private void InitializeProgressBar()
+    /*
+    private void InitializeProgressBar()
     {
         // 진행 바 베이스 이미지 세팅
         if (setting.progressBars != null)
@@ -763,17 +824,15 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
     }
 
-    /// <summary> Image 타입을 Filled로 강제하고 좌→우 채우기로 표준화 </summary>
     private static void EnsureFilled(Image img)
     {
         if (!img) return;
         if (img.type != Image.Type.Filled) img.type = Image.Type.Filled;
         if (img.fillMethod != Image.FillMethod.Horizontal) img.fillMethod = Image.FillMethod.Horizontal;
         img.fillOrigin = 0; // Left
-        img.fillClockwise = true; // 좌→우
+        img.fillClockwise = true; // 좌->우
     }
 
-    /// <summary> 0...BAR_MAX 스칼라 값을 Image.fillAmount로 애니메이션 </summary>
     private async UniTask AnimateBarAsync(Image img, float fromValue, float toValue, float duration, float barMax, CancellationToken token)
     {
         if (!img) return;
@@ -790,7 +849,6 @@ public class RMManager : SceneManager_Base<RMSetting>
             float u = Mathf.Clamp01(t / duration);
 
             float s = u * u * (3f - 2f * u);
-
             img.fillAmount = Mathf.Lerp(from, to, s);
             await UniTask.Yield();
         }
@@ -798,7 +856,6 @@ public class RMManager : SceneManager_Base<RMSetting>
         img.fillAmount = to;
     }
 
-    /// <summary> 이전 애니메이션 취소 후 새 애니메이션 시작 </summary>
     private void StartBarAnimation(Image img, float currentValue, float nextValue, float barMax, ref CancellationTokenSource cts, float duration = AnimationTime)
     {
         if (!img) return;
@@ -817,7 +874,6 @@ public class RMManager : SceneManager_Base<RMSetting>
         AnimateBarAsync(img, cur, nextValue, duration, barMax, cts.Token).Forget();
     }
 
-    /// <summary> 선택된 데이터로 모든 진행 바를 한 번에 갱신 </summary>
     private void UpdateProgressBars(RocketSetting src)
     {
         if (src == null) return;
@@ -827,9 +883,12 @@ public class RMManager : SceneManager_Base<RMSetting>
         StartBarAnimation(imageAltitudeBar, 0f, src.altitude, BarMaxAltitude, ref _altBarCts);
         StartBarAnimation(imageSlopeBar, 0f, src.slope, BarMaxSlope, ref _slopeBarCts);
         StartBarAnimation(imageRemainDistanceBar, 0f, src.remainDistance, BarMaxRemainDistance, ref _remainBarCts);
-    }*/
+    }
+    */
 
     #endregion
+
+    #region Debug
 
     /// <summary>
     /// 디버그 스킵 입력 처리
@@ -839,11 +898,13 @@ public class RMManager : SceneManager_Base<RMSetting>
     {
         try
         {
+            if (_phase == Phase.Done) return;
+
             // 루프 대기 태스크 취소
             CancelAndDispose(ref _skipCts);
 
             // 비디오 이벤트 해제 및 정지
-            if (_vp)
+            if (_vp != null)
             {
                 _vp.loopPointReached -= OnLocationEnded;
                 _vp.loopPointReached -= OnMakeEnded;
@@ -855,7 +916,7 @@ public class RMManager : SceneManager_Base<RMSetting>
             ArduinoInputManager.Instance?.SetLedAll(false);
             LedStrip.Range(0, 9, 255, 0, 0);
 
-            // 4) 상태 정리 후 다음 씬 전환
+            // 상태 정리 후 다음 씬 전환
             _isSwitching = false;
             _phase = Phase.Done;
 
@@ -864,7 +925,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
         catch (Exception e)
         {
-            Debug.LogError($"[RMManager] OnDebugSkip Exception: {e}");
+            LogError(nameof(OnDebugSkip), e.ToString());
         }
     }
+
+    #endregion
 }

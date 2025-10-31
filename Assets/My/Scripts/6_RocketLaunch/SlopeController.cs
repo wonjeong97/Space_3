@@ -178,7 +178,7 @@ public class SlopeController : MonoBehaviour
         }
 
         // 4) 목표각 자동 잠금
-        if (autoLockOnTarget && !_inputLocked)
+        if (autoLockOnTarget && !_inputLocked && LaunchManager.Instance)
         {
             if (Mathf.Abs(CurrentSlopeDeg - autoLockTargetDeg) <= Mathf.Max(0f, autoLockToleranceDeg))
             {
@@ -194,6 +194,7 @@ public class SlopeController : MonoBehaviour
                     else ApplyPointerRotationImmediate();
                 }
                 _inputLocked = true;
+                LaunchManager.Instance.PauseInactivityTimer();
             }
         }
 

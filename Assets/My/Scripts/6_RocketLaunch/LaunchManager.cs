@@ -23,7 +23,7 @@ public class LaunchSetting
     public ImageSetting[] sequence;
     public ImageSetting[] oxidizers;
     public ImageSetting[] fuels;
-    
+
     public TextSetting objectiveText;
 
     public ImageSetting controllerBackground;
@@ -32,9 +32,9 @@ public class LaunchSetting
     public ImageSetting buttonRight;
     public ImageSetting throttleBackground;
     public ImageSetting throttleButton;
-    
+
     public TextSetting guideText;
-    
+
     public TextSetting timeText;
     public TextSetting altitudeText;
     public TextSetting velocityText;
@@ -48,11 +48,16 @@ public class LaunchSetting
     public ImageSetting slopePointerImage;
 }
 
+/// <summary>
+/// 발사 시나리오 UI 매니저
+/// - 초기 안내 -> 버튼 입력 대기 -> 카운트다운 -> 로켓 런치
+/// - 서브 디스플레이 스테이지 페이드 아웃 제공
+/// </summary>
 public class LaunchManager : SceneManager_Base<LaunchSetting>
 {
     public static LaunchManager Instance;
 
-    [Header("UI")] 
+    [Header("UI")]
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
     [SerializeField] private GameObject mainImage3;
@@ -63,17 +68,17 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject subRocketStage3Image;
     [SerializeField] private GameObject subRocketPairingImage;
 
-    [Header("Oxidizers")] 
+    [Header("Oxidizers")]
     [SerializeField] private GameObject stage1Oxidizer;
     [SerializeField] private GameObject stage2Oxidizer;
     [SerializeField] private GameObject stage3Oxidizer;
 
-    [Header("Fuels")] 
+    [Header("Fuels")]
     [SerializeField] private GameObject stage1Fuel;
     [SerializeField] private GameObject stage2Fuel;
     [SerializeField] private GameObject stage3Fuel;
 
-    [Header("MainImage1")] 
+    [Header("MainImage1")]
     [SerializeField] private Image[] stages;
     [SerializeField] private Image[] sequences;
     [SerializeField] private GameObject textObjective;
@@ -86,7 +91,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject throttleBackground;
     [SerializeField] private GameObject throttleButton;
     [SerializeField] private GameObject textGuide;
-    
+
     [Header("MainImage3")]
     [SerializeField] private GameObject textTime;
     [SerializeField] private GameObject textAltitude;
@@ -98,63 +103,99 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject textDistanceValue;
     [SerializeField] private GameObject imageSlopeBackground;
     [SerializeField] private GameObject imageSlopePointer;
-    
-    [Header("Rocket")] 
+
+    [Header("Rocket")]
     [SerializeField] private GameObject rocketVFX;
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
-    
+
     private float _throttleYEnd;
     private int _rocketCountdown;
     private RocketLaunch _rocketLaunch;
+
     private CancellationTokenSource[] _alphaCts;
     private CancellationTokenSource[] _stageCts;
     private readonly Dictionary<GameObject, CancellationTokenSource> _rocketFadeCts = new Dictionary<GameObject, CancellationTokenSource>();
-    private bool _needThrottleDown; 
-    private int throttleZeroDeadband = 10;
+
+    private bool _needThrottleDown;
+    private readonly int _throttleZeroDeadband = 10;
+
+    #region Logging helpers
+
+    private static void Log(string method, string msg)
+    {
+        Debug.Log($"[LaunchManager] {method}-> {msg}");
+    }
+
+    private static void LogWarn(string method, string msg)
+    {
+        Debug.LogWarning($"[LaunchManager] {method}-> {msg}");
+    }
+
+    private static void LogError(string method, string msg)
+    {
+        Debug.LogError($"[LaunchManager] {method}-> {msg}");
+    }
+
+    #endregion
+
+    #region Unity lifecycle
 
     protected override void Awake()
     {
         base.Awake();
 
-        if (Instance == null) Instance = this;
-        else if (Instance != this) Destroy(gameObject);
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
     }
 
     protected override void OnDisable()
     {
         base.OnDisable();
 
-        if (_alphaCts != null)
+        try
         {
-            for (int i = 0; i < _alphaCts.Length; i++)
+            if (_alphaCts != null)
             {
-                CancelAndDispose(ref _alphaCts[i]);
+                for (int i = 0; i < _alphaCts.Length; i++)
+                {
+                    CancelAndDispose(ref _alphaCts[i]);
+                }
+            }
+
+            if (_stageCts != null)
+            {
+                for (int i = 0; i < _stageCts.Length; i++)
+                {
+                    CancelAndDispose(ref _stageCts[i]);
+                }
+            }
+
+            if (_rocketFadeCts != null)
+            {
+                foreach (KeyValuePair<GameObject, CancellationTokenSource> kv in _rocketFadeCts)
+                {
+                    CancellationTokenSource cts = kv.Value;
+                    CancelAndDispose(ref cts);
+                }
+                _rocketFadeCts.Clear();
             }
         }
-
-        if (_stageCts != null)
+        catch (Exception e)
         {
-            for (int i = 0; i < _stageCts.Length; i++)
-            {
-                CancelAndDispose(ref _stageCts[i]);
-            }
-        }
-
-        if (_rocketFadeCts != null)
-        {
-            foreach (KeyValuePair<GameObject, CancellationTokenSource> kv in _rocketFadeCts)
-            {
-                CancellationTokenSource cts = kv.Value;
-                CancelAndDispose(ref cts);
-            }
-
-            _rocketFadeCts.Clear();
+            LogError(nameof(OnDisable), e.ToString());
         }
     }
 
     protected override async UniTask Init()
     {
+        // 이미지 배치
         SettingImageObject(mainImage1, setting.main1);
         SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
@@ -164,17 +205,30 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(subRocketStage3Image, setting.rocketStage3);
         SettingImageObject(subRocketPairingImage, setting.rocketPairing);
 
-        // 산화제 이미지 세팅
-        SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
-        SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
-        SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
+        // 산화제/연료 배열 길이 가드
+        if (setting.oxidizers != null && setting.oxidizers.Length >= 3)
+        {
+            SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
+            SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
+            SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
+        }
+        else
+        {
+            LogWarn(nameof(Init), "oxidizers length < 3. Skipped stage oxidizer setup.");
+        }
 
-        // 연료 이미지 세팅
-        SettingImageObject(stage1Fuel, setting.fuels[0]);
-        SettingImageObject(stage2Fuel, setting.fuels[1]);
-        SettingImageObject(stage3Fuel, setting.fuels[2]);
+        if (setting.fuels != null && setting.fuels.Length >= 3)
+        {
+            SettingImageObject(stage1Fuel, setting.fuels[0]);
+            SettingImageObject(stage2Fuel, setting.fuels[1]);
+            SettingImageObject(stage3Fuel, setting.fuels[2]);
+        }
+        else
+        {
+            LogWarn(nameof(Init), "fuels length < 3. Skipped stage fuel setup.");
+        }
 
-        // ===== mainImage1 =====
+        // mainImage1: 단계/시퀀스 세팅
         if (setting.stages != null && stages != null)
         {
             int count = Mathf.Min(setting.stages.Length, stages.Length);
@@ -184,7 +238,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SettingImageObject(stages[i].gameObject, setting.stages[i]);
             }
         }
-        
+
         if (setting.sequence != null && sequences != null)
         {
             int count = Mathf.Min(setting.sequence.Length, sequences.Length);
@@ -194,21 +248,21 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SettingImageObject(sequences[i].gameObject, setting.sequence[i]);
             }
         }
+
         SettingTextObject(textObjective, setting.objectiveText, "로켓 발사를 완료하세요.").Forget();
-        // ======================
-        
-        // ===== mainImage2 =====
+
+        // mainImage2: 컨트롤러 UI
         SettingImageObject(controllerBackground, setting.controllerBackground);
         SettingImageObject(buttonLeft, setting.buttonLeft);
         SettingImageObject(buttonMiddle, setting.buttonMiddle);
         SettingImageObject(buttonRight, setting.buttonRight);
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
-        SettingTextObject(textGuide, setting.guideText, "").Forget();
+        SettingTextObject(textGuide, setting.guideText, string.Empty).Forget();
+
         await SetInitialGuideByThrottleAsync();
-        // ======================
-        
-        // ===== mainImage3 =====
+
+        // mainImage3: 계기판 텍스트/이미지
         SettingTextObject(textTime, setting.timeText).Forget();
         SettingTextObject(textAltitude, setting.altitudeText).Forget();
         SettingTextObject(textVelocity, setting.velocityText).Forget();
@@ -219,90 +273,113 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
         SettingImageObject(imageSlopeBackground, setting.slopeBackgroundImage);
         SettingImageObject(imageSlopePointer, setting.slopePointerImage);
-        // ======================
-        
+
         if (sequences != null) _alphaCts = new CancellationTokenSource[sequences.Length];
         if (stages != null) _stageCts = new CancellationTokenSource[stages.Length];
-        
+
+        // 카운트다운 텍스트 초기화
         _rocketCountdown = Mathf.Max(1, setting.rocketCountdown);
-        if (countdownText && countdownText.TryGetComponent(out TextMeshProUGUI tmp))
+        if (countdownText != null && countdownText.TryGetComponent(out TextMeshProUGUI tmp))
         {
             tmp.text = _rocketCountdown.ToString();
             SetAlpha(tmp, 0f);
         }
 
+        // 시퀀스 핑퐁 애니메이션
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
+
+        // LED 시작
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
 
+        // 첫 페이드
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
+        // 스로틀 내려야 한다면 대기
         if (_needThrottleDown)
         {
             CancellationToken ct = DestroyToken;
-            
-            ArduinoInputManager.Instance?.Send("THROTTLE ON");  // 스로틀 스트림 시작
-            await AwaitThrottleZeroAsync(throttleZeroDeadband, ct); // 0(데드밴드)로 들어올 때까지 블로킹 대기
-            ArduinoInputManager.Instance?.Send("THROTTLE OFF"); // 스트림 중지
 
-            // UI 정리
+            try { ArduinoInputManager.Instance?.Send("THROTTLE ON"); }
+            catch (Exception e) { LogWarn(nameof(Init), "Send THROTTLE ON failed: " + e.Message); }
+
+            await AwaitThrottleZeroAsync(_throttleZeroDeadband, ct);
+
+            try { ArduinoInputManager.Instance?.Send("THROTTLE OFF"); }
+            catch (Exception e) { LogWarn(nameof(Init), "Send THROTTLE OFF failed: " + e.Message); }
+
             SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
             SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
             StopAnimateThrottleY();
         }
-        
-        // 입력 대기
+
+        // 입력 대기 루프
         CancellationToken cancel = DestroyToken;
         while (!cancel.IsCancellationRequested && isActiveAndEnabled)
         {
-            if ((ArduinoInputManager.Instance && ArduinoInputManager.Instance.TryConsumeAnyPress(out _)) || TryConsumeSingleInput())
-            {   
-                SettingTextObject(textGuide, setting.guideText, "").Forget();
+            bool arduinoPressed = ArduinoInputManager.Instance != null &&
+                                  ArduinoInputManager.Instance.TryConsumeAnyPress(out _);
+
+            if (arduinoPressed || TryConsumeSingleInput())
+            {
+                SettingTextObject(textGuide, setting.guideText, string.Empty).Forget();
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
+
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
 
-                StopPingPongAndSetAlpha(2, 1.0f); // 2번 고정 1
-                StartPingPongAt(3, 0.28f, 1.0f, 2.0f); // 3번 핑퐁
-
+                // 2번 고정, 3번 핑퐁
+                StopPingPongAndSetAlpha(2, 1.0f);
+                StartPingPongAt(3, 0.28f, 1.0f, 2.0f);
                 break;
             }
 
+            ArduinoInputManager.Instance?.FlushAll();
             await UniTask.Yield();
         }
 
+        // 로켓 런치 시작
         if (rocketVFX != null && rocketVFX.TryGetComponent(out _rocketLaunch))
         {
             _rocketLaunch.Call();
         }
         else
-        {   
+        {
             if (!DestroyToken.IsCancellationRequested)
-                Debug.LogError("[LaunchManager] RocketLaunch 컴포넌트에서 rocketVFX이 할당되지 않거나 Missing 됨");
+                LogError(nameof(Init), "RocketLaunch component missing or rocketVFX not assigned");
         }
 
         // 카운트다운 시작
         RunCountdownAsync().Forget();
         CountController.Instance?.RunCountdownAsync().Forget();
+
+        // 무입력 복귀 일시 중지
+        PauseInactivityTimer();
     }
 
-    /// <summary> 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 부드럽게 페이드 </summary>
+    #endregion
+
+    #region Countdown
+
+    /// <summary>
+    /// 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 페이드
+    /// </summary>
     private async UniTask RunCountdownAsync()
     {
-        if (!countdownText || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) return;
+        if (countdownText == null || !countdownText.TryGetComponent(out TextMeshProUGUI tmp)) return;
 
         CancellationToken cancel = DestroyToken;
-        float duration = Mathf.Max(0.01f, 1.0f);
+        float duration = 1.0f;
 
         for (int n = _rocketCountdown; n > 0; n--)
         {
             if (cancel.IsCancellationRequested) return;
 
-            tmp.text = n.ToString(); // 숫자 갱신 및 완전 표시
+            tmp.text = n.ToString();
             SetAlpha(tmp, 1f);
 
-            float t = 0f; // 알파 1 -> 0 페이드
+            float t = 0f;
             while (t < duration)
             {
                 if (cancel.IsCancellationRequested) return;
@@ -312,16 +389,23 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 await UniTask.Yield();
             }
 
-            // 다음 숫자 전환 직전 완전 투명 보장
             SetAlpha(tmp, 0f);
         }
     }
+
+    #endregion
+
+    #region Scene transition
 
     public async UniTask LoadNextSceneAsync()
     {
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 0;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
     }
+
+    #endregion
+
+    #region Sequence alpha helpers
 
     /// <summary> 인덱스 범위/널 체크 후 Graphic 반환 </summary>
     private bool TryGetChildGraphic(int index, out Graphic g)
@@ -334,7 +418,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         return true;
     }
 
-    /// <summary> 특정 시퀀스 인덱스의 핑퐁을 중지하고 알파를 고정값으로 설정 </summary>
+    /// <summary> 특정 시퀀스 인덱스의 핑퐁을 중지하고 알파를 고정 </summary>
     private void StopPingPongAndSetAlpha(int index, float alpha)
     {
         if (_alphaCts != null && index >= 0 && index < _alphaCts.Length)
@@ -348,14 +432,13 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
     }
 
-    /// <summary> 특정 시퀀스 인덱스의 핑퐁 시작(기존 실행 중이면 교체) </summary>
+    /// <summary> 특정 시퀀스 인덱스의 핑퐁 시작 </summary>
     private void StartPingPongAt(int index, float minA, float maxA, float periodSec)
     {
         if (sequences == null) return;
         if (index < 0 || index >= sequences.Length) return;
         if (sequences[index] == null) return;
 
-        // 배열 초기화
         if (_alphaCts == null || _alphaCts.Length != sequences.Length)
         {
             int len = sequences.Length;
@@ -367,33 +450,35 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             CancelAndDispose(ref _alphaCts[index]);
         }
 
-        // 시작
         StartAlphaPingPong(sequences[index], minA, maxA, periodSec, ref _alphaCts[index]);
     }
 
-    /// <summary> 외부 호출: 3번 알파 1로 고정, 4번 핑퐁 시작 </summary>
+    /// <summary> 외부 호출: 3번 알파 1로 고정 -> 4번 핑퐁 </summary>
     public void FocusImage3ThenPingPong4()
     {
         StopPingPongAndSetAlpha(3, 1.0f);
         StartPingPongAt(4, 0.28f, 1.0f, 2.0f);
     }
 
-    /// <summary> 외부 호출: 4번 알파 1로 고정, 5번 핑퐁 시작 </summary>
+    /// <summary> 외부 호출: 4번 알파 1로 고정 -> 5번 핑퐁 </summary>
     public void FocusImage4ThenPingPong5()
     {
         StopPingPongAndSetAlpha(4, 1.0f);
         StartPingPongAt(5, 0.28f, 1.0f, 2.0f);
     }
 
-    /// <summary> 로켓 발사 중 스테이지 이미지를 페이드인 함 </summary>
+    #endregion
+
+    #region Stage images fade-in (main)
+
+    /// <summary> 로켓 발사 중 스테이지 이미지를 페이드인 </summary>
     private async UniTask FadeInStageAsync(int index, float duration = 0.6f)
     {
         if (!TryGetStageGraphic(index, out Graphic g)) return;
 
-        // 기존 진행 중이면 취소
         if (_stageCts == null || (stages != null && _stageCts.Length != stages.Length))
         {
-            int len = stages?.Length ?? 0;
+            int len = stages != null ? stages.Length : 0;
             _stageCts = (len > 0) ? new CancellationTokenSource[len] : null;
         }
 
@@ -404,12 +489,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
 
         CancellationToken token = (_stageCts != null && index >= 0 && index < _stageCts.Length)
-            ? _stageCts[index].Token : DestroyToken;
+            ? _stageCts[index].Token
+            : DestroyToken;
 
         float d = Mathf.Max(0.01f, duration);
         float t = 0f;
 
-        // 시작 알파 보정
         float startA = g.color.a;
         while (t < d)
         {
@@ -438,25 +523,25 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         return true;
     }
 
-    /// <summary> 서브 화면: 1단 이미지 페이드아웃 </summary>
+    #endregion
+
+    #region Sub display fades
+
     public UniTask FadeOutSubRocketStage1Async(float duration = 0.6f)
     {
         return FadeOutRocketImageAsync(subRocketStage1Image, duration);
     }
 
-    /// <summary> 서브 화면: 2단 이미지 페이드아웃 </summary>
     public UniTask FadeOutSubRocketStage2Async(float duration = 0.6f)
     {
         return FadeOutRocketImageAsync(subRocketStage2Image, duration);
     }
 
-    /// <summary> 서브 화면: 3단 이미지 페이드아웃 </summary>
     public UniTask FadeOutSubRocketStage3Async(float duration = 0.6f)
     {
         return FadeOutRocketImageAsync(subRocketStage3Image, duration);
     }
 
-    /// <summary> 서브 화면: 페어링 이미지 페이드아웃 </summary>
     public UniTask FadeOutSubRocketPairingAsync(float duration = 0.6f)
     {
         return FadeOutRocketImageAsync(subRocketPairingImage, duration);
@@ -466,7 +551,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     {
         if (!go) return;
 
-        // 중복 실행 취소
         if (_rocketFadeCts.TryGetValue(go, out CancellationTokenSource running) && running != null)
         {
             CancelAndDispose(ref running);
@@ -480,7 +564,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
         try
         {
-            // 1) CanvasGroup 우선
             if (go.TryGetComponent(out CanvasGroup cg))
             {
                 float start = cg.alpha;
@@ -498,18 +581,15 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 return;
             }
 
-            // 2) 단일 Graphic
             if (go.TryGetComponent(out Graphic g))
             {
                 await LerpGraphicAlphaAsync(g, 0f, d, token);
                 return;
             }
 
-            // 3) 자식 Graphics 전체
             Graphic[] gs = go.GetComponentsInChildren<Graphic>(true);
             if (gs != null && gs.Length > 0)
             {
-                // 시작 알파 스냅샷
                 float[] starts = new float[gs.Length];
                 for (int i = 0; i < gs.Length; i++)
                 {
@@ -529,9 +609,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                         float a = Mathf.Lerp(starts[i], 0f, u);
                         SetAlpha(gi, a);
                     }
-
                     await UniTask.Yield();
                 }
+
                 foreach (Graphic t1 in gs)
                 {
                     if (t1) SetAlpha(t1, 0f);
@@ -541,7 +621,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         catch (OperationCanceledException) { }
         finally
         {
-            // 정리
             if (_rocketFadeCts.TryGetValue(go, out CancellationTokenSource mine) && mine == cts)
             {
                 CancelAndDispose(ref cts);
@@ -554,7 +633,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
     }
 
-    /// <summary> 단일 Graphic 알파를 목표값으로 보간 </summary>
     private async UniTask LerpGraphicAlphaAsync(Graphic g, float targetA, float duration, CancellationToken token)
     {
         if (!g) return;
@@ -575,10 +653,14 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
         SetAlpha(g, targetA);
     }
-    
+
+    #endregion
+
+    #region Throttle UI helpers
+
     public void AnimateThrottleY(float yStart, float yEnd, float duration, float waitAtEnd)
-    {   
-        _throttleYEnd = yEnd; 
+    {
+        _throttleYEnd = yEnd;
         PlayAnchoredY(throttleButton, yStart, yEnd, duration, waitAtEnd);
     }
 
@@ -587,7 +669,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         StopAnchoredY(throttleButton);
         SnapAnchoredY(throttleButton, _throttleYEnd);
     }
-    
+
     private void SnapAnchoredY(GameObject go, float yTarget)
     {
         if (!go) return;
@@ -599,19 +681,23 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             rt.anchoredPosition = pos;
         }
     }
-    
+
     public void SetGuideText(string text)
     {
         SettingTextObject(textGuide, setting.guideText, text).Forget();
     }
+
+    #endregion
+
+    #region Button helpers (Left/Middle/Right)
 
     public void SetButtonOn(string whichButton)
     {
         switch (whichButton)
         {
             case "Left":
-                 SetButtonOn(buttonLeft);
-                 break;
+                SetButtonOn(buttonLeft);
+                break;
             case "Middle":
                 SetButtonOn(buttonMiddle);
                 break;
@@ -619,11 +705,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SetButtonOn(buttonRight);
                 break;
             default:
-                Debug.LogWarning($"[LaunchManager] Unknown button name: {whichButton}");
+                LogWarn(nameof(SetButtonOn), "Unknown button name: " + whichButton);
                 break;
         }
     }
-    
+
     public void SetButtonOff(string whichButton)
     {
         switch (whichButton)
@@ -638,17 +724,15 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SetButtonOff(buttonRight);
                 break;
             default:
-                Debug.LogWarning($"[LaunchManager] Unknown button name: {whichButton}");
+                LogWarn(nameof(SetButtonOff), "Unknown button name: " + whichButton);
                 break;
         }
     }
-    
+
     public async UniTask WaitForButtonAsync(string whichButton, CancellationToken token)
     {
-        // 이전 입력 큐 비우기
         ArduinoInputManager.Instance?.FlushAll();
 
-        // 대상 버튼 ID / KeyCode 결정
         ArduinoInputManager.ButtonId targetId = ArduinoInputManager.ButtonId.None;
         KeyCode targetKey = KeyCode.None;
 
@@ -667,7 +751,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 targetKey = KeyCode.RightArrow;
                 break;
             default:
-                Debug.LogWarning($"[LaunchManager] Unknown button name for WaitForButtonAsync: {whichButton}");
+                LogWarn(nameof(WaitForButtonAsync), "Unknown button name: " + whichButton);
                 return;
         }
 
@@ -693,7 +777,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             {
                 if (buttonDelayTime > 0)
                 {
-                    try { await UniTask.Delay(buttonDelayTime, cancellationToken: token); } catch { }
+                    try
+                    {
+                        await UniTask.Delay(buttonDelayTime, cancellationToken: token);
+                    }
+                    catch (OperationCanceledException) { }
                 }
                 return;
             }
@@ -701,15 +789,18 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
     }
-    
-    // ============================
-    // 별칭(Left, Middle, Right 전용) 함수들
-    // ============================
+
     public UniTask WaitForLeftButtonAsync(CancellationToken token) => WaitForButtonAsync("Left", token);
     public UniTask WaitForMiddleButtonAsync(CancellationToken token) => WaitForButtonAsync("Middle", token);
     public UniTask WaitForRightButtonAsync(CancellationToken token) => WaitForButtonAsync("Right", token);
-    
-    /// <summary> 시작 시 아두이노에 THROTTLE 명령을 보내서 안내문 결정 </summary>
+
+    #endregion
+
+    #region Throttle logic
+
+    /// <summary>
+    /// 시작 시 아두이노의 스로틀 값을 확인해 초기 안내문을 결정
+    /// </summary>
     private async UniTask SetInitialGuideByThrottleAsync(int pollMs = 1000, int zeroDeadband = 10)
     {
         CancellationToken token = DestroyToken;
@@ -721,14 +812,14 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             return;
         }
 
-        // 1) 현재 버전 스냅샷
         int startVer = inst.ThrottleVersion;
 
-        // 2) 1회 요청
         try { inst.Send("THROTTLE ONCE"); }
-        catch (Exception e) { Debug.LogWarning($"[LaunchManager] THROTTLE ONCE 전송 실패: {e.Message}"); }
+        catch (Exception e)
+        {
+            LogWarn(nameof(SetInitialGuideByThrottleAsync), "THROTTLE ONCE send failed: " + e.Message);
+        }
 
-        // 3) 새 값이 도착할 때까지 대기
         int throttle = 0;
         bool gotNew = false;
         DateTime deadline = DateTime.UtcNow.AddMilliseconds(pollMs);
@@ -737,44 +828,50 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             if (inst.ThrottleVersion != startVer)
             {
-                throttle = inst.LastThrottleValue; // 최신 값
+                throttle = inst.LastThrottleValue;
                 gotNew = true;
                 break;
             }
             await UniTask.Delay(20, cancellationToken: token);
         }
 
-        // 4) 판정
         if (gotNew)
         {
             if (Mathf.Abs(throttle) <= zeroDeadband)
-            {   
+            {
                 _needThrottleDown = false;
                 await SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").AttachExternalCancellation(token);
                 SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
             }
             else
-            {   
+            {
                 _needThrottleDown = true;
                 await SettingTextObject(textGuide, setting.guideText, "스로틀을 내려주세요.").AttachExternalCancellation(token);
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
                 AnimateThrottleY(0f, -110f, 0.8f, 0.2f);
             }
         }
+        else
+        {
+            // 응답이 없으면 보수적으로 버튼 입력 대기
+            _needThrottleDown = false;
+            await SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").AttachExternalCancellation(token);
+            SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
+        }
     }
-    
-    /// <summary> THROTTLE ON 상태에서 스로틀이 0(±deadband)까지 내려갈 때까지 대기. </summary>
+
+    /// <summary>
+    /// THROTTLE ON 상태에서 스로틀이 0(±deadband)까지 내려갈 때까지 대기
+    /// </summary>
     private async UniTask AwaitThrottleZeroAsync(int deadband, CancellationToken ct)
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
         if (inst == null) return;
 
-        // 최신 값 변화 감지용 버전 스냅샷
         int ver = inst.ThrottleVersion;
 
         while (!ct.IsCancellationRequested)
         {
-            // 새 값이 들어오면 판정
             if (inst.ThrottleVersion != ver)
             {
                 ver = inst.ThrottleVersion;
@@ -782,8 +879,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 if (Mathf.Abs(v) <= deadband) return;
             }
 
-            // 너무 바쁘지 않게 20ms 간격 폴링
             await UniTask.Delay(20, cancellationToken: ct);
         }
     }
+
+    #endregion
 }

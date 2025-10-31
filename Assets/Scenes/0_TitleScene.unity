@@ -355,8 +355,8 @@ MonoBehaviour:
   nextSceneBuildIndex: 1
   useInactivityTimeout: 0
   backgroundImage: {fileID: 1265246154}
-  titleImage: {fileID: 193978919}
   infoImage: {fileID: 1884999327}
+  titleImage: {fileID: 193978919}
 --- !u!1 &525326773
 GameObject:
   m_ObjectHideFlags: 0
@@ -1579,6 +1579,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 96d6ac48c719f3c4ab4cf0bdadbe20d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  arduinoReady: 0
 --- !u!4 &1458926021
 Transform:
   m_ObjectHideFlags: 0
@@ -1775,6 +1776,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   reporter: {fileID: 602040264}
+  ackTimeoutMs: 1000
 --- !u!4 &1661062866
 Transform:
   m_ObjectHideFlags: 0

@@ -26,6 +26,8 @@ public class RocketFollowCam : MonoBehaviour
     private Vector3 initialLocalOffset; // 디자이너가 고정값을 직접 넣어도 됨
     [SerializeField, Tooltip("초기 상대 회전 오프셋(타겟 기준). CopyTargetWithOffset에서 사용")]
     private Quaternion initialRotOffset = Quaternion.identity;
+    
+    [SerializeField] private bool bFollowTarget = false;
 
     private Camera _cam;
     private Vector3 _posVelocity;   // SmoothDamp 내부 속도
@@ -46,7 +48,7 @@ public class RocketFollowCam : MonoBehaviour
     // -> LateUpdate: 타겟 로컬 오프셋을 기준으로 위치 추종 -> 선택한 회전 모드로 회전 추종
     private void LateUpdate()
     {
-        if (_cam == null || target == null) return;
+        if (!_cam || !target || !bFollowTarget) return;
 
         // 1) 위치 추종: 타겟 로컬 오프셋을 월드로 변환하여 스무딩 이동
         Vector3 desiredPos = target.TransformPoint(initialLocalOffset);

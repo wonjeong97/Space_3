@@ -41,7 +41,7 @@ public class CountController : MonoBehaviour
     [SerializeField] private TextMeshProUGUI textHint;
 
     [Header("Speed")]
-    [SerializeField] private float deltaTimeSpeed = 3f;
+    [SerializeField] private float deltaTimeSpeed = 5f;
 
     [Header("Checkpoint (T+ 0:51 에서 정지 후 SLP 맞추면 진행)")]
     [SerializeField] private SlopeController slope;      // 현재 SLP 확인/설정용
@@ -110,7 +110,7 @@ public class CountController : MonoBehaviour
         _checkpointHolding = false;
         _checkpointCleared = false;
         _autoSlopeEnabled = false;
-        bool _firedGreenLed = false;
+        bool firedGreenLed = false;
 
         UpdateHint(false);
 
@@ -172,15 +172,16 @@ public class CountController : MonoBehaviour
                         // 안내 문구 출력
                         UpdateHint(true);
                         LaunchManager.Instance?.FadeInStagePublicAsync(2).Forget(); // 2. 피치 기동 이미지 페이드 인
-                        if (!_firedGreenLed)
+                        if (!firedGreenLed)
                         {
-                            _firedGreenLed = true;
+                            firedGreenLed = true;
                             LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
                         }
                         
                         // 스로틀 버튼 애니메이션 실행
                         LaunchManager.Instance?.AnimateThrottleY(-110f, 0f, 0.8f, 0.2f);
                         LaunchManager.Instance?.SetGuideText("스로틀을 올리세요.");
+                        LaunchManager.Instance?.ResumeInactivityTimer();
                         
                         // 표기/내부 시간 고정
                         if (lockTimeAtCheckpoint)

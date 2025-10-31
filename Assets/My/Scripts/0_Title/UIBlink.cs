@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class UIBlink : MonoBehaviour
 {
     [SerializeField] private float _periodSeconds = 2f; // 한 사이클(밝아졌다 어두워짐) 시간
-    
+
     private readonly int _minAlpha255 = 0;
     private readonly int _maxAlpha255 = 255;
 
@@ -57,8 +57,8 @@ public class UIBlink : MonoBehaviour
     }
 
     private void SetAlpha01(float a01)
-    {        
+    {
         Color c = _image.color;
-        _image.color = new Color(c.r, c.g, c.b, a01);        
+        _image.color = new Color(c.r, c.g, c.b, a01);
     }
 }
