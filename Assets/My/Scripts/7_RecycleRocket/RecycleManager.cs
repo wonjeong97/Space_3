@@ -43,25 +43,6 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
     private float _popupFadeTime;
     private float _gameCloseTime;
 
-    #region Logging helpers
-
-    private static void Log(string method, string msg)
-    {
-        Debug.Log($"[RecycleManager] {method}-> {msg}");
-    }
-
-    private static void LogWarn(string method, string msg)
-    {
-        Debug.LogWarning($"[RecycleManager] {method}-> {msg}");
-    }
-
-    private static void LogError(string method, string msg)
-    {
-        Debug.LogError($"[RecycleManager] {method}-> {msg}");
-    }
-
-    #endregion
-
     #region Unity lifecycle
 
     /// <summary> 파괴/비활성화 시 LED 이펙트 등 외부 리소스 정리 </summary>
@@ -75,7 +56,7 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
         }
         catch (Exception e)
         {
-            LogError(nameof(OnDisable), e.ToString());
+            LogUtil.LogError(nameof(RecycleManager), nameof(OnDisable), e.ToString());
         }
     }
 
@@ -145,7 +126,7 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
         }
         catch (Exception e)
         {
-            LogWarn(nameof(Init), "CrossFadeAsync failed: " + e.Message);
+            LogUtil.LogWarn(nameof(RecycleManager), nameof(Init), "CrossFadeAsync failed: " + e.Message);
             // 실패해도 종료 타이머는 계속 진행
         }
 

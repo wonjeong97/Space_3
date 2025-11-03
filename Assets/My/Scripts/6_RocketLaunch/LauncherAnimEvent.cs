@@ -13,21 +13,10 @@ public class LauncherAnimEvent : MonoBehaviour
     [SerializeField] private bool keepWorldPosition = true;
     
     [SerializeField] private GameObject launcherObj;
-
-    private static void Log(string method, string msg)
-    {
-        Debug.Log($"[LauncherAnimEvent] {method}-> {msg}");
-    }
-
-    private static void LogWarn(string method, string msg)
-    {
-        Debug.LogWarning($"[LauncherAnimEvent] {method}-> {msg}");
-    }
-
-    private static void LogError(string method, string msg)
-    {
-        Debug.LogError($"[LauncherAnimEvent] {method}-> {msg}");
-    }
+    [SerializeField] private ParticleSystem launcherSmoke01;
+    [SerializeField] private ParticleSystem launcherSmoke02;
+    [SerializeField] private ParticleSystem launcherSmoke03;
+    [SerializeField] private ParticleSystem launcherSmoke04;
 
     // ======================
     // Public API
@@ -38,7 +27,7 @@ public class LauncherAnimEvent : MonoBehaviour
     {
         if (childToDetach == null)
         {
-            LogWarn(nameof(DetachChildNow), "childToDetach is null");
+            LogUtil.LogWarn(nameof(LauncherAnimEvent), nameof(DetachChildNow), "childToDetach is null");
             return;
         }
         InternalDetach(childToDetach);
@@ -53,18 +42,37 @@ public class LauncherAnimEvent : MonoBehaviour
     {
         if (child.parent != transform && child.parent != null)
         {
-            LogWarn(nameof(InternalDetach), $"'{child.name}' is not a direct child of '{name}'. Detaching anyway.");
+            LogUtil.LogWarn(nameof(LauncherAnimEvent),nameof(InternalDetach), $"'{child.name}' is not a direct child of '{name}'. Detaching anyway.");
         }
 
         Transform newParent = reparentTo != null ? reparentTo : null; // null -> 씬 루트
         child.SetParent(newParent, keepWorldPosition);
 
         string parentName = newParent != null ? newParent.name : "Scene Root";
-        Log(nameof(InternalDetach), $"Detached '{child.name}' -> {parentName}");
+        LogUtil.Log(nameof(LauncherAnimEvent),nameof(InternalDetach), $"Detached '{child.name}' -> {parentName}");
     }
 
     public void DeactivateLauncher()
     {
         if (launcherObj != null) launcherObj.SetActive(false);
+    }
+
+    public void SetRocketReady()
+    {
+        if (LaunchManager.Instance)
+        {
+            LaunchManager.Instance.RocketReady = true;
+        }
+    }
+
+    public void StartLauncherSmoke()
+    {
+        if (launcherSmoke01 && launcherSmoke02 && launcherSmoke03 && launcherSmoke04)
+        {
+            launcherSmoke01.Play();
+            launcherSmoke02.Play();
+            launcherSmoke03.Play();
+            launcherSmoke04.Play();
+        }
     }
 }

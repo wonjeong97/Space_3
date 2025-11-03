@@ -74,6 +74,7 @@ public class CountController : MonoBehaviour
     };
 
     public float TPlusSeconds { get; private set; }
+    public float TMinusSeconds { get; private set; }
     public bool  IsCountingDown { get; private set; } = true;
 
     // 내부 상태 -> 체크포인트
@@ -106,6 +107,8 @@ public class CountController : MonoBehaviour
         IsCountingDown = true;
 
         TPlusSeconds = 0f;
+        TMinusSeconds = time;
+        
         _checkpointArmed = false;
         _checkpointHolding = false;
         _checkpointCleared = false;
@@ -135,6 +138,7 @@ public class CountController : MonoBehaviour
             {
                 // T- 구간 -> 1:1 감소
                 time -= Time.deltaTime;
+                TMinusSeconds = Mathf.Max(0f, time);
                 if (time <= 0f)
                 {
                     time = 0f;

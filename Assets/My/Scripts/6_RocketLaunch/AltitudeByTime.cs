@@ -95,7 +95,7 @@ public sealed class AltitudeByTime : MonoBehaviour
     /// <summary> 프레임 갱신: 카운트 상태에 따라 고도 텍스트 업데이트 </summary>
     private void Update()
     {
-        if (countdown == null || textAltitude == null) return;
+        if (!countdown || !textAltitude) return;
 
         // T- 구간은 0 KM 표기
         if (countdown.IsCountingDown)

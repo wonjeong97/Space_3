@@ -56,6 +56,7 @@ public class LaunchSetting
 public class LaunchManager : SceneManager_Base<LaunchSetting>
 {
     public static LaunchManager Instance;
+    private static readonly int Trigger = Animator.StringToHash("Trigger");
 
     [Header("UI")]
     [SerializeField] private GameObject mainImage1;
@@ -105,6 +106,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject imageSlopePointer;
 
     [Header("Rocket")]
+    [SerializeField] private GameObject launcherObj;
+    [SerializeField] private Animator launcherAnimator;
     [SerializeField] private GameObject rocketVFX;
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
@@ -120,24 +123,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     private bool _needThrottleDown;
     private readonly int _throttleZeroDeadband = 10;
 
-    #region Logging helpers
-
-    private static void Log(string method, string msg)
-    {
-        Debug.Log($"[LaunchManager] {method}-> {msg}");
-    }
-
-    private static void LogWarn(string method, string msg)
-    {
-        Debug.LogWarning($"[LaunchManager] {method}-> {msg}");
-    }
-
-    private static void LogError(string method, string msg)
-    {
-        Debug.LogError($"[LaunchManager] {method}-> {msg}");
-    }
-
-    #endregion
+    public bool RocketReady { get; set; }
 
     #region Unity lifecycle
 
@@ -189,7 +175,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
         catch (Exception e)
         {
-            LogError(nameof(OnDisable), e.ToString());
+            LogUtil.LogError(nameof(LaunchManager),nameof(OnDisable), e.ToString());
         }
     }
 
@@ -214,7 +200,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
         else
         {
-            LogWarn(nameof(Init), "oxidizers length < 3. Skipped stage oxidizer setup.");
+            LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "oxidizers length < 3. Skipped stage oxidizer setup.");
         }
 
         if (setting.fuels != null && setting.fuels.Length >= 3)
@@ -225,7 +211,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         }
         else
         {
-            LogWarn(nameof(Init), "fuels length < 3. Skipped stage fuel setup.");
+            LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "fuels length < 3. Skipped stage fuel setup.");
         }
 
         // mainImage1: 단계/시퀀스 세팅
@@ -267,7 +253,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingTextObject(textAltitude, setting.altitudeText).Forget();
         SettingTextObject(textVelocity, setting.velocityText).Forget();
         SettingTextObject(textDistance, setting.distanceText).Forget();
-        SettingTextObject(textTimeValue, setting.timeValueText).Forget();
+        SettingTextObject(textTimeValue, setting.timeValueText, "T - 00:00:10").Forget();
         SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
         SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
         SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
@@ -288,38 +274,49 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         // 시퀀스 핑퐁 애니메이션
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
 
-        // LED 시작
-        ArduinoInputManager.Instance?.SetLedAll(true);
-        StartBlinkGreenAsync(500, 160);
-
         // 첫 페이드
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
-
+       
+        StopLedEffects();
+        ArduinoInputManager.Instance?.SetLedAll(false);
+        LedStrip.Range(0, 9, 255, 0, 0);
+        
         // 스로틀 내려야 한다면 대기
         if (_needThrottleDown)
         {
             CancellationToken ct = DestroyToken;
 
             try { ArduinoInputManager.Instance?.Send("THROTTLE ON"); }
-            catch (Exception e) { LogWarn(nameof(Init), "Send THROTTLE ON failed: " + e.Message); }
+            catch (Exception e) { LogUtil.LogWarn(nameof(LaunchManager), nameof(Init), "Send THROTTLE ON failed: " + e.Message); }
 
             await AwaitThrottleZeroAsync(_throttleZeroDeadband, ct);
 
             try { ArduinoInputManager.Instance?.Send("THROTTLE OFF"); }
-            catch (Exception e) { LogWarn(nameof(Init), "Send THROTTLE OFF failed: " + e.Message); }
-
-            SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
-            SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
+            catch (Exception e) { LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "Send THROTTLE OFF failed: " + e.Message); }
+            
+            SettingTextObject(textGuide, setting.guideText, "로켓 거치 중").Forget();
             StopAnimateThrottleY();
         }
+        
+        launcherAnimator?.SetTrigger(Trigger);
+
+        // 거치 애니메이션 동안 입력 차단
+        while (!RocketReady)
+        {
+            await UniTask.Yield();
+        }
+        
+        SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
+        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
+        
+        ArduinoInputManager.Instance?.SetLedAll(true);
+        StartBlinkGreenAsync(500, 160);
 
         // 입력 대기 루프
         CancellationToken cancel = DestroyToken;
         while (!cancel.IsCancellationRequested && isActiveAndEnabled)
         {
-            bool arduinoPressed = ArduinoInputManager.Instance != null &&
-                                  ArduinoInputManager.Instance.TryConsumeAnyPress(out _);
-
+            bool arduinoPressed = ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumeAnyPress(out _);
             if (arduinoPressed || TryConsumeSingleInput())
             {
                 SettingTextObject(textGuide, setting.guideText, string.Empty).Forget();
@@ -347,7 +344,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         else
         {
             if (!DestroyToken.IsCancellationRequested)
-                LogError(nameof(Init), "RocketLaunch component missing or rocketVFX not assigned");
+                LogUtil.LogError(nameof(LaunchManager),nameof(Init), "RocketLaunch component missing or rocketVFX not assigned");
         }
 
         // 카운트다운 시작
@@ -705,7 +702,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SetButtonOn(buttonRight);
                 break;
             default:
-                LogWarn(nameof(SetButtonOn), "Unknown button name: " + whichButton);
+                LogUtil.LogWarn(nameof(LaunchManager),nameof(SetButtonOn), "Unknown button name: " + whichButton);
                 break;
         }
     }
@@ -724,7 +721,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 SetButtonOff(buttonRight);
                 break;
             default:
-                LogWarn(nameof(SetButtonOff), "Unknown button name: " + whichButton);
+                LogUtil.LogWarn(nameof(LaunchManager),nameof(SetButtonOff), "Unknown button name: " + whichButton);
                 break;
         }
     }
@@ -751,7 +748,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 targetKey = KeyCode.RightArrow;
                 break;
             default:
-                LogWarn(nameof(WaitForButtonAsync), "Unknown button name: " + whichButton);
+                LogUtil.LogWarn(nameof(LaunchManager),nameof(WaitForButtonAsync), "Unknown button name: " + whichButton);
                 return;
         }
 
@@ -798,9 +795,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     #region Throttle logic
 
-    /// <summary>
-    /// 시작 시 아두이노의 스로틀 값을 확인해 초기 안내문을 결정
-    /// </summary>
+    /// <summary> 시작 시 아두이노의 스로틀 값을 확인해 초기 안내문을 결정 </summary>
     private async UniTask SetInitialGuideByThrottleAsync(int pollMs = 1000, int zeroDeadband = 10)
     {
         CancellationToken token = DestroyToken;
@@ -817,7 +812,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         try { inst.Send("THROTTLE ONCE"); }
         catch (Exception e)
         {
-            LogWarn(nameof(SetInitialGuideByThrottleAsync), "THROTTLE ONCE send failed: " + e.Message);
+            LogUtil.LogWarn(nameof(LaunchManager),nameof(SetInitialGuideByThrottleAsync), "THROTTLE ONCE send failed: " + e.Message);
         }
 
         int throttle = 0;
@@ -840,8 +835,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             if (Mathf.Abs(throttle) <= zeroDeadband)
             {
                 _needThrottleDown = false;
-                await SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").AttachExternalCancellation(token);
-                SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
+                await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중").AttachExternalCancellation(token);
+                SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
             }
             else
             {
@@ -855,14 +850,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             // 응답이 없으면 보수적으로 버튼 입력 대기
             _needThrottleDown = false;
-            await SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").AttachExternalCancellation(token);
-            SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
+            await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중").AttachExternalCancellation(token);
+            SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
         }
     }
 
-    /// <summary>
-    /// THROTTLE ON 상태에서 스로틀이 0(±deadband)까지 내려갈 때까지 대기
-    /// </summary>
+    /// <summary> THROTTLE ON 상태에서 스로틀이 0(±deadband)까지 내려갈 때까지 대기 </summary>
     private async UniTask AwaitThrottleZeroAsync(int deadband, CancellationToken ct)
     {
         ArduinoInputManager inst = ArduinoInputManager.Instance;
@@ -884,4 +877,15 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     }
 
     #endregion
+    
+    [ContextMenu("call")]
+    public async UniTaskVoid CallEndRocket()
+    {
+        float newFadeTime = fadeTime + 3;
+        await FadeImageAsync(0f, 1f, newFadeTime, new[] { fadeImage3 });
+        
+        launcherObj?.SetActive(false);
+        
+        await FadeImageAsync(1f, 0f, newFadeTime, new[] { fadeImage3 });
+    }
 }

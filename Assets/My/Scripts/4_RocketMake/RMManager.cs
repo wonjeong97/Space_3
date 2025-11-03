@@ -143,26 +143,6 @@ public class RMManager : SceneManager_Base<RMSetting>
     private TextMeshProUGUI _lblTime, _lblAltitude, _lblVelocity, _lblDistance;
     private TextMeshProUGUI _valTime, _valAltitude, _valVelocity, _valDistance;
 
-    #region Logging helpers
-
-    // [ClassName] Method-> 메시지 형태 유지
-    private static void Log(string method, string msg)
-    {
-        Debug.Log($"[RMManager] {method}-> {msg}");
-    }
-
-    private static void LogWarn(string method, string msg)
-    {
-        Debug.LogWarning($"[RMManager] {method}-> {msg}");
-    }
-
-    private static void LogError(string method, string msg)
-    {
-        Debug.LogError($"[RMManager] {method}-> {msg}");
-    }
-
-    #endregion
-
     #region Unity lifecycle
 
     /// <summary> 리소스/이벤트/토큰 정리 </summary>
@@ -204,7 +184,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
         catch (Exception e)
         {
-            LogError(nameof(OnDisable), e.ToString());
+            LogUtil.LogError(nameof(RMManager), nameof(OnDisable), e.ToString());
         }
     }
 
@@ -213,7 +193,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     {
         if (videoPlayerObject == null)
         {
-            LogError(nameof(Init), "videoPlayerObject is not assigned");
+            LogUtil.LogError(nameof(RMManager), nameof(Init), "videoPlayerObject is not assigned");
             return;
         }
 
@@ -223,7 +203,7 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         if (_vp == null || _raw == null)
         {
-            LogError(nameof(Init), "VideoPlayer or RawImage component missing on videoPlayerObject");
+            LogUtil.LogError(nameof(RMManager), nameof(Init), "VideoPlayer or RawImage component missing on videoPlayerObject");
             return;
         }
 
@@ -417,7 +397,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         {
             if (setting.rockets.Length == 0)
             {
-                LogWarn(nameof(ConfirmAsync), "No rockets in setting");
+                LogUtil.LogWarn(nameof(RMManager), nameof(ConfirmAsync), "No rockets in setting");
                 return false;
             }
 
@@ -548,7 +528,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         bool ok = await VideoManager.Instance.PrepareAndPlayAsync(_vp, url, _audio, next.volume, DestroyToken, timeout);
         if (!ok)
         {
-            LogError(nameof(SwitchAndPlayNextAsync), $"Prepare failed: {url}");
+            LogUtil.LogError(nameof(RMManager), nameof(SwitchAndPlayNextAsync), $"Prepare failed: {url}");
             _isSwitching = false;
             if (withFade) await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1 });
             return;
@@ -711,7 +691,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
         catch (Exception e)
         {
-            LogError(nameof(OnLocationEnded), e.ToString());
+            LogUtil.LogError(nameof(RMManager), nameof(OnLocationEnded), e.ToString());
         }
     }
 
@@ -737,7 +717,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
         catch (Exception e)
         {
-            LogError(nameof(OnMakeEnded), e.ToString());
+            LogUtil.LogError(nameof(RMManager), nameof(OnMakeEnded), e.ToString());
         }
     }
 
@@ -953,7 +933,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         }
         catch (Exception e)
         {
-            LogError(nameof(OnDebugSkip), e.ToString());
+            LogUtil.LogError(nameof(RMManager), nameof(OnDebugSkip), e.ToString());
         }
     }
 

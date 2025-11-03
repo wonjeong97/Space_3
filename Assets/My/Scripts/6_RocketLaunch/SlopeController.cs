@@ -25,6 +25,8 @@ public class SlopeController : MonoBehaviour
     [SerializeField] private bool snapToTargetOnLock = true;
 
     [Header("Rocket Rotation Link")]
+    [SerializeField] private bool enableRotateX = false;  // X축 회전 적용 여부
+    [SerializeField] private bool enableRotateY = true;   // Y축 회전 적용 여부
     [SerializeField] private Transform rocketTransform;
     [SerializeField] private bool useLocalRotation = true;
     [SerializeField] private bool smoothRotation = false;
@@ -69,6 +71,8 @@ public class SlopeController : MonoBehaviour
     private bool _throttleOffSent;  // 잠금 후 OFF를 한 번만 보냄
     private bool _lastLocked;       // 이전 프레임의 잠금 상태
     
+    private Vector3 _rocketBaseEuler;
+    
     public float CurrentSlopeDeg { get; private set; }
     public bool IsInputLocked => _inputLocked;
 
@@ -83,6 +87,10 @@ public class SlopeController : MonoBehaviour
         _lastLocked = _inputLocked;
         _throttleOnSent = false;
         _throttleOffSent = false;
+        
+        if (rocketTransform)
+            _rocketBaseEuler = useLocalRotation ? rocketTransform.localEulerAngles : rocketTransform.eulerAngles;
+
 
         UpdateLabel();                // 텍스트는 필요 없으면 textSlope 비워두면 됨
         ApplyRocketRotationImmediate();
@@ -231,18 +239,24 @@ public class SlopeController : MonoBehaviour
         textSlope.text = $"SLP {CurrentSlopeDeg.ToString($"F{Mathf.Max(0, decimals)}")} º";
     }
 
-    // -> 로켓 회전 목표값(월드/로컬 X). rotX = 90 - SLP
-    private float GetTargetRocketEulerX()
+    // -> 목표 회전값 계산
+    private Vector3 GetTargetRocketEuler()
     {
-        float targetX = 90f - CurrentSlopeDeg;
-        return Mathf.Clamp(targetX, 0f, 90f);
+        float targetAngle = Mathf.Clamp(90f - CurrentSlopeDeg, 0f, 90f);
+        Vector3 euler = _rocketBaseEuler;
+
+        if (enableRotateX) euler.x = _rocketBaseEuler.x + targetAngle;
+        if (enableRotateY) euler.y = _rocketBaseEuler.y + targetAngle;
+
+        return euler;
     }
 
     private void ApplyRocketRotationImmediate()
     {
         if (!rocketTransform) return;
-        Vector3 euler = useLocalRotation ? rocketTransform.localEulerAngles : rocketTransform.eulerAngles;
-        euler.x = GetTargetRocketEulerX();
+        if (!enableRotateX && !enableRotateY) return;
+
+        Vector3 euler = GetTargetRocketEuler();
         if (useLocalRotation) rocketTransform.localEulerAngles = euler;
         else rocketTransform.eulerAngles = euler;
     }
@@ -250,12 +264,20 @@ public class SlopeController : MonoBehaviour
     private void LerpRocketRotationToTarget()
     {
         if (!rocketTransform) return;
-        Vector3 euler = useLocalRotation ? rocketTransform.localEulerAngles : rocketTransform.eulerAngles;
-        float targetX = GetTargetRocketEulerX();
-        float newX = Mathf.LerpAngle(euler.x, targetX, Mathf.Clamp01(rotationLerpSpeed * Time.deltaTime));
-        euler.x = newX;
-        if (useLocalRotation) rocketTransform.localEulerAngles = euler;
-        else rocketTransform.eulerAngles = euler;
+        if (!enableRotateX && !enableRotateY) return;
+
+        Vector3 current = useLocalRotation ? rocketTransform.localEulerAngles : rocketTransform.eulerAngles;
+        float targetAngle = Mathf.Clamp(90f - CurrentSlopeDeg, 0f, 90f);
+
+        float dstX = enableRotateX ? (_rocketBaseEuler.x + targetAngle) : current.x;
+        float dstY = enableRotateY ? (_rocketBaseEuler.y + targetAngle) : current.y;
+
+        float t = Mathf.Clamp01(rotationLerpSpeed * Time.deltaTime);
+        current.x = Mathf.LerpAngle(current.x, dstX, t);
+        current.y = Mathf.LerpAngle(current.y, dstY, t);
+
+        if (useLocalRotation) rocketTransform.localEulerAngles = current;
+        else rocketTransform.eulerAngles = current;
     }
 
     // ===== 바늘 회전 관련 =====

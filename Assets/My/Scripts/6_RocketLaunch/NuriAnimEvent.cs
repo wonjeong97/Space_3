@@ -14,6 +14,9 @@ public struct JetEngine
 
 public class NuriAnimEvent : MonoBehaviour
 {
+    [Header("Animator")] 
+    [SerializeField] private Animator separateAnimator;
+    
     [Header("Fairing")]
     [SerializeField] private GameObject fairing1;
     [SerializeField] private GameObject fairing2;
@@ -37,6 +40,12 @@ public class NuriAnimEvent : MonoBehaviour
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
 
+    [ContextMenu("test call")]
+    public void Test()
+    {
+        separateAnimator?.SetTrigger("Stage01");
+    }
+    
     /// <summary> 1단 분리: 1단 제트 축소 → 연기 → 분리 → 2단 점화/확장 → 폐기 </summary>
     public async UniTask DropStage1()
     {
@@ -55,15 +64,9 @@ public class NuriAnimEvent : MonoBehaviour
 
             stage1Smoke?.Play();
             await UniTask.Delay(3000, cancellationToken: token);
-
-            stage1.transform.SetParent(null, true);
-            if (stage1.TryGetComponent(out Rigidbody rb))
-            {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-                rb.collisionDetectionMode = collisionMode;
-                rb.interpolation = interpolation;
-            }
+            
+            separateAnimator?.SetTrigger("Stage01");
+            
             await UniTask.Delay(3000, cancellationToken: token);
 
             foreach (JetEngine vfx in stage2VfXs)
@@ -102,51 +105,14 @@ public class NuriAnimEvent : MonoBehaviour
             fairingSmoke?.Play();
             fairingSmokeVertical?.Play();
             await UniTask.Delay(3000, cancellationToken: token);
-
-            int rocketLayer = LayerMask.NameToLayer("Nuri");
-            int rocketMask = 1 << rocketLayer;
-
-            fairing1.transform.SetParent(null, true);
-            fairing2.transform.SetParent(null, true);
-
-            Rigidbody rb1 = fairing1.GetComponent<Rigidbody>();
-            Rigidbody rb2 = fairing2.GetComponent<Rigidbody>();
-
-            if (rb1) rb1.excludeLayers &= ~rocketMask;
-            if (rb2) rb2.excludeLayers &= ~rocketMask;
-
-            foreach (Collider col in fairing1.GetComponentsInChildren<Collider>(true))
-            {
-                col.excludeLayers &= ~rocketMask;
-                col.includeLayers = ~0;
-            }
-            foreach (Collider col in fairing2.GetComponentsInChildren<Collider>(true))
-            {
-                col.excludeLayers &= ~rocketMask;
-                col.includeLayers = ~0;
-            }
-
-            if (rb1)
-            {
-                rb1.isKinematic = false;
-                rb1.useGravity = true;
-                rb1.collisionDetectionMode = collisionMode;
-                rb1.interpolation = interpolation;
-            }
-
-            if (rb2)
-            {
-                rb2.isKinematic = false;
-                rb2.useGravity = true;
-                rb2.collisionDetectionMode = collisionMode;
-                rb2.interpolation = interpolation;
-            }
-
-            await UniTask.Delay(5000, cancellationToken: token);
+            
+            separateAnimator?.SetTrigger("Fairing");
+           
+            await UniTask.Delay(2000, cancellationToken: token);
             fairingSmoke?.Stop();
             fairingSmokeVertical?.Stop();
 
-            await UniTask.Delay(10000, cancellationToken: token);
+            await UniTask.Delay(2000, cancellationToken: token);
 
             if (fairingSmoke) Destroy(fairingSmoke.gameObject);
             if (fairing1) Destroy(fairing1);
@@ -179,14 +145,8 @@ public class NuriAnimEvent : MonoBehaviour
             stage2Smoke?.Play();
             await UniTask.Delay(3000, cancellationToken: token);
 
-            stage2.transform.SetParent(null, true);
-            if (stage2.TryGetComponent(out Rigidbody rb))
-            {
-                rb.isKinematic = false;
-                rb.useGravity = true;
-                rb.collisionDetectionMode = collisionMode;
-                rb.interpolation = interpolation;
-            }
+            separateAnimator?.SetTrigger("Stage02");
+            
             await UniTask.Delay(3000, cancellationToken: token);
             
             foreach (JetEngine vfx in stage3VfXs)
