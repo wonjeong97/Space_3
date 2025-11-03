@@ -39,6 +39,7 @@ public class RMSetting
     public VideoSetting[] locationVideo;
     public VideoSetting[] rocketMakeVideo;
 
+    public ImageSetting stageBgImage;
     public TextSetting objectiveText;
 
     public ImageSetting controllerBackground;
@@ -76,6 +77,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     [SerializeField] private GameObject mainImage3;
 
     [Header("mainImage1")]
+    [SerializeField] private GameObject imageStageBg;
     [SerializeField] private Image[] sequences;
     [SerializeField] private GameObject textObjective;
 
@@ -90,14 +92,14 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     [Header("mainImage3")]
     [SerializeField] private GameObject rocketImage; // 발사체, 위성 선택 이미지
-    [SerializeField] private TextMeshProUGUI textTime;
-    [SerializeField] private TextMeshProUGUI textAltitude;
-    [SerializeField] private TextMeshProUGUI textVelocity;
-    [SerializeField] private TextMeshProUGUI textDistance;
-    [SerializeField] private TextMeshProUGUI textTimeValue;
-    [SerializeField] private TextMeshProUGUI textAltitudeValue;
-    [SerializeField] private TextMeshProUGUI textVelocityValue;
-    [SerializeField] private TextMeshProUGUI textDistanceValue;
+    [SerializeField] private GameObject textTime;
+    [SerializeField] private GameObject textAltitude;
+    [SerializeField] private GameObject textVelocity;
+    [SerializeField] private GameObject textDistance;
+    [SerializeField] private GameObject textTimeValue;
+    [SerializeField] private GameObject textAltitudeValue;
+    [SerializeField] private GameObject textVelocityValue;
+    [SerializeField] private GameObject textDistanceValue;
 
     [SerializeField] private GameObject videoPlayerObject;
     [SerializeField] private GameObject subBgImage;
@@ -137,6 +139,9 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     // 현재 표시값을 기억해 중복 파싱 없이 애니메이션 시작점으로 사용
     private float _curVelocity, _curMaxVelocity, _curAltitude, _curSlope, _curRemainDistance;
+    
+    private TextMeshProUGUI _lblTime, _lblAltitude, _lblVelocity, _lblDistance;
+    private TextMeshProUGUI _valTime, _valAltitude, _valVelocity, _valDistance;
 
     #region Logging helpers
 
@@ -231,6 +236,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(subBgImage, setting.subBg);
         SettingImageObject(subRocketImage, setting.subRocket);
+        
+        // mainImage1 StageBG 세팅
+        SettingImageObject(imageStageBg, setting.stageBgImage);
 
         // mainImage1 시퀀스 이미지 세팅
         if (setting.main1Children != null && sequences != null)
@@ -257,6 +265,27 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
         SettingTextObject(textGuide, setting.guideText, "버튼을 누르세요").Forget();
+        
+        // mainImage3 텍스트
+        SettingTextObject(textTime, setting.timeText).Forget();
+        SettingTextObject(textAltitude, setting.altitudeText).Forget();
+        SettingTextObject(textVelocity, setting.velocityText).Forget();
+        SettingTextObject(textDistance, setting.distanceText).Forget();
+        SettingTextObject(textTimeValue, setting.timeValueText).Forget();
+        SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
+        SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
+        SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
+        
+        // TMP 컴포넌트 캐시
+        _lblTime      = textTime            ? textTime.GetComponent<TextMeshProUGUI>() : null;
+        _lblAltitude  = textAltitude        ? textAltitude.GetComponent<TextMeshProUGUI>() : null;
+        _lblVelocity  = textVelocity        ? textVelocity.GetComponent<TextMeshProUGUI>() : null;
+        _lblDistance  = textDistance        ? textDistance.GetComponent<TextMeshProUGUI>() : null;
+
+        _valTime      = textTimeValue       ? textTimeValue.GetComponent<TextMeshProUGUI>() : null;
+        _valAltitude  = textAltitudeValue   ? textAltitudeValue.GetComponent<TextMeshProUGUI>() : null;
+        _valVelocity  = textVelocityValue   ? textVelocityValue.GetComponent<TextMeshProUGUI>() : null;
+        _valDistance  = textDistanceValue   ? textDistanceValue.GetComponent<TextMeshProUGUI>() : null;
 
         // 선택 이미지 비활성
         if (rocketImage != null) rocketImage.SetActive(false);
@@ -347,6 +376,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     private void SetSelected(int index, bool isRocket)
     {
         if (rocketImage == null) return;
+        if (rocketImage == null) return;
 
         RocketSetting[] arr = isRocket ? setting.rockets : setting.satellites;
         if (arr == null || arr.Length == 0) return;
@@ -355,7 +385,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         if (!rocketImage.activeInHierarchy) rocketImage.SetActive(true);
 
         // 첫 진입 시 현재값 NaN으로 초기화해 점프 방지
-        if (!float.IsNaN(_curVelocity) && string.IsNullOrEmpty(textVelocity?.text) && _curVelocity == 0f)
+        if (!float.IsNaN(_curVelocity) && string.IsNullOrEmpty(_valVelocity?.text) && _curVelocity == 0f)
         {
             _curVelocity = float.NaN;
             _curMaxVelocity = float.NaN;
@@ -370,9 +400,9 @@ public class RMManager : SceneManager_Base<RMSetting>
         SettingImageObject(rocketImage, src.rocketImage);
 
         // 숫자 라벨 애니메이션 (필요 시 주석 해제)
-        // StartLabelAnimation(textVelocity, ref _curVelocity, src.velocity, ref _velCts, 1, " km/s");
-        // StartLabelAnimation(textAltitude, ref _curAltitude, src.altitude, ref _altCts, 0, " km");
-        // StartLabelAnimation(textDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
+        // StartLabelAnimation(_valVelocity, ref _curVelocity, src.velocity, ref _velCts, 1, " km/s");
+        // StartLabelAnimation(_valAltitude, ref _curAltitude, src.altitude, ref _altCts, 0, " km");
+        // StartLabelAnimation(_valDistance, ref _curRemainDistance, src.remainDistance, ref _remainCts, 0, " km");
 
         // 진행 바 갱신 (필요 시 주석 해제)
         // UpdateProgressBars(src);
@@ -421,10 +451,8 @@ public class RMManager : SceneManager_Base<RMSetting>
     #endregion
 
     #region Video Sequences (arrays)
-
-    /// <summary>
-    /// 장소 영상 배열 시퀀스 시작
-    /// </summary>
+    
+    /// <summary> 장소 영상 배열 시퀀스 시작 </summary>
     private async UniTask StartLocationSequenceAsync()
     {
         // '거치' 알파 애니메이션 해제
