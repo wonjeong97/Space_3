@@ -22,6 +22,7 @@ public class FuelSetting
     public ImageSetting[] oxidizers;
     public ImageSetting[] fuels;
     
+    public ImageSetting stageBgImage;
     public TextSetting objectiveText;
     
     public ImageSetting controllerBackground;
@@ -32,6 +33,15 @@ public class FuelSetting
     public ImageSetting throttleButton;
     
     public TextSetting guideText;
+    
+    public TextSetting timeText;
+    public TextSetting altitudeText;
+    public TextSetting velocityText;
+    public TextSetting distanceText;
+    public TextSetting timeValueText;
+    public TextSetting altitudeValueText;
+    public TextSetting velocityValueText;
+    public TextSetting distanceValueText;
 }
 
 /// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
@@ -62,6 +72,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject stage3Fuel;
     
     [Header("mainImage1")]
+    [SerializeField] private GameObject imageStageBg;
     [SerializeField] private Image[] sequences;              // 메인1 하위 단계별 강조 이미지들
     [SerializeField] private GameObject textObjective;       // 목표 텍스트
     
@@ -73,6 +84,17 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject throttleBackground;
     [SerializeField] private GameObject throttleButton;
     [SerializeField] private GameObject textGuide;
+    
+    [Header("mainImage3")]
+    [SerializeField] private GameObject textTime;
+    [SerializeField] private GameObject textAltitude;
+    [SerializeField] private GameObject textVelocity;
+    [SerializeField] private GameObject textDistance;
+    [SerializeField] private GameObject textTimeValue;
+    [SerializeField] private GameObject textAltitudeValue;
+    [SerializeField] private GameObject textVelocityValue;
+    [SerializeField] private GameObject textDistanceValue;
+
 
     #endregion
 
@@ -125,13 +147,13 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         _fuelFillSpeed = Mathf.Max(0f, setting.fuelFillSpeed);
 
         // 고정 이미지 세팅
-        try { SettingImageObject(backgroundImage, setting.main1); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> backgroundImage 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(mainImage1, setting.main1); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> mainImage1 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(mainImage2, setting.main2); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> mainImage2 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(mainImage3, setting.main3); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> mainImage3 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(popupImage, setting.fuelPopup); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> popupImage 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(subBgImage, setting.subBg); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> subBgImage 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(subRocketImage, setting.subRocket); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> subRocketImage 세팅 중 예외: {e.Message}"); }
+        SettingImageObject(backgroundImage, setting.main1);
+        SettingImageObject(mainImage1, setting.main1);
+        SettingImageObject(mainImage2, setting.main2); 
+        SettingImageObject(mainImage3, setting.main3);
+        SettingImageObject(popupImage, setting.fuelPopup);
+        SettingImageObject(subBgImage, setting.subBg);
+        SettingImageObject(subRocketImage, setting.subRocket);
         
         // ===== mainImage1 =====
         if (setting.main1Children != null && sequences != null)
@@ -148,30 +170,41 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         {
             StartAlphaPingPong(sequences[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
+        SettingImageObject(imageStageBg, setting.stageBgImage);
         SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요").Forget();
         
         // ===== mainImage2 =====
-        try { SettingImageObject(controllerBackground, setting.controllerBackground); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> controllerBackground 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(buttonLeft, setting.buttonLeft); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> buttonLeft 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(buttonMiddle, setting.buttonMiddle); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> buttonMiddle 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(buttonRight, setting.buttonRight); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> buttonRight 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(throttleBackground, setting.throttleBackground); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> throttleBackground 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(throttleButton, setting.throttleButton); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> throttleButton 세팅 중 예외: {e.Message}"); }
+        SettingImageObject(controllerBackground, setting.controllerBackground);
+        SettingImageObject(buttonLeft, setting.buttonLeft);
+        SettingImageObject(buttonMiddle, setting.buttonMiddle);
+        SettingImageObject(buttonRight, setting.buttonRight);
+        SettingImageObject(throttleBackground, setting.throttleBackground);
+        SettingImageObject(throttleButton, setting.throttleButton);
         SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
         
+        // ===== mainImage2 =====
+        SettingTextObject(textTime, setting.timeText).Forget();
+        SettingTextObject(textAltitude, setting.altitudeText).Forget();
+        SettingTextObject(textVelocity, setting.velocityText).Forget();
+        SettingTextObject(textDistance, setting.distanceText).Forget();
+        SettingTextObject(textTimeValue, setting.timeValueText).Forget();
+        SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
+        SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
+        SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
+        
         // 산화제 이미지 세팅
-        try { SettingImageObject(stage1Oxidizer, setting.oxidizers[0]); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> stage1Oxidizer 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(stage2Oxidizer, setting.oxidizers[1]); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> stage2Oxidizer 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(stage3Oxidizer, setting.oxidizers[2]); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> stage3Oxidizer 세팅 중 예외: {e.Message}"); }
+        SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
+        SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
+        SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
         
         // 연료 이미지 세팅
-        try { SettingImageObject(stage1Fuel, setting.fuels[0]); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> stage1Fuel 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(stage2Fuel, setting.fuels[1]); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> stage2Fuel 세팅 중 예외: {e.Message}"); }
-        try { SettingImageObject(stage3Fuel, setting.fuels[2]); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> stage3Fuel 세팅 중 예외: {e.Message}"); }
-
+        SettingImageObject(stage1Fuel, setting.fuels[0]);
+        SettingImageObject(stage2Fuel, setting.fuels[1]);
+        SettingImageObject(stage3Fuel, setting.fuels[2]);
+        
         InitFuelImage(); // fillAmount 0으로 초기화
 
-        try { ArduinoInputManager.Instance?.SetLedAll(true); } catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> LED 전체 켜기 중 예외: {e.Message}"); }
+        ArduinoInputManager.Instance?.SetLedAll(true);
         SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
 
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
