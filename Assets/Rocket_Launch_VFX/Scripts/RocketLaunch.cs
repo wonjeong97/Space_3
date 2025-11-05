@@ -1,5 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -20,7 +19,7 @@ public class RocketLaunch : MonoBehaviour
     public ParticleSystem flamesBParticles;
     public ParticleSystem sparksParticles;
     public ParticleSystem takeOffSmokeParticles;
-    public GameObject launchSmoke;
+    public ParticleSystem launchSmokeParticle;
 
     [Header("T- Trigger Times (seconds)")]
     [Tooltip("T- 이 값 이하가 되면 사전 연기(takeOffSmoke)를 켬")]
@@ -30,7 +29,7 @@ public class RocketLaunch : MonoBehaviour
     [SerializeField] private float tMinusEngineOn = 1f;
 
     [Tooltip("T- 이 값 이하가 되면 이륙 연기 및 제트 배기 VFX를 켬 (보통 0)")]
-    [SerializeField] private float tMinusLaunchVfx = 0f;
+    [SerializeField] private float tMinusLaunchVfx = 0.5f;
 
     [Header("T+ Stop Time (seconds)")]
     [Tooltip("T+ 이 값 이상이 되면 모든 VFX를 정리하고 시퀀스를 종료")]
@@ -40,12 +39,10 @@ public class RocketLaunch : MonoBehaviour
     [Tooltip("루프를 끈 뒤 완전 Stop()까지 기다릴 시간(초)")]
     [SerializeField] private float stopDelaySeconds = 5f;
 
-    private ParticleSystem _launchSmokeParticle;
     private JetVFXAnim _stage01JetEngineVFX;
 
     private void Awake()
     {
-        _launchSmokeParticle = launchSmoke ? launchSmoke.GetComponent<ParticleSystem>() : null;
         _stage01JetEngineVFX = stage01Flame ? stage01Flame.GetComponent<JetVFXAnim>() : null;
     }
 
@@ -72,50 +69,54 @@ public class RocketLaunch : MonoBehaviour
         bool firedEngineOn = false;
         bool firedLaunchVfx = false;
         bool finished = false;
-
+        
         while (CountController.Instance && !finished)
         {
             if (CountController.Instance.IsCountingDown)
-            {
+            {   
                 // T- 구간
                 float tMinus = CountController.Instance.TMinusSeconds;
-
+                
                 // 1) 사전 연기 (T- 10)
                 if (!firedPreSmoke && tMinus <= tMinusPreSmoke)
                 {
                     firedPreSmoke = true;
-                    SafePlay(takeOffSmokeParticles);
+                    SafePlay(engineSmokeParticles);
+                    
+                    Debug.Log("사전 연기");
                 }
 
                 // 2) 엔진 점화 VFX (T- 1)
                 if (!firedEngineOn && tMinus <= tMinusEngineOn)
-                {
+                {   
+                    Debug.Log("엔진 점화");
                     firedEngineOn = true;
 
                     LaunchManager.Instance?.FadeInStagePublicAsync(1).Forget();
 
                     SafeSetActive(flamesLight, true);
-                    SafePlay(engineSmokeParticles);
+                    SafePlay(takeOffSmokeParticles);
                     SafePlay(turbulenceSmokeParticles);
                     SafePlay(flamesAParticles);
                     SafePlay(flamesBParticles);
                     SafePlay(sparksParticles);
+                    SafePlay(launchSmokeParticle);
                 }
 
                 // 3) 이륙 VFX (T- 0)
                 if (!firedLaunchVfx && tMinus <= tMinusLaunchVfx)
-                {
+                {   
+                    Debug.Log("이륙");
                     firedLaunchVfx = true;
                     
                     nuriAnimEvent?.StopBottomSmoke();
-                    SafePlay(_launchSmokeParticle);
-
+                    
                     // 1단 제트 플레임 확장 애니메이션
                     _stage01JetEngineVFX?.Expand();
                 }
             }
             else
-            {
+            {   
                 // T+ 구간
                 float tPlus = CountController.Instance.TPlusSeconds;
 
@@ -136,7 +137,7 @@ public class RocketLaunch : MonoBehaviour
         SafeStop(flamesAParticles,           stopDelaySeconds);
         SafeStop(flamesBParticles,           stopDelaySeconds);
         SafeStop(sparksParticles,            stopDelaySeconds);
-        SafeStop(_launchSmokeParticle,       stopDelaySeconds);
+        SafeStop(launchSmokeParticle,       stopDelaySeconds);
         SafeStop(takeOffSmokeParticles,      stopDelaySeconds);
 
         // 필요하다면 파티클 정지 후 Destroy까지 하고 싶을 때는

@@ -16,26 +16,42 @@ public class JetVFXAnim : MonoBehaviour
     private Vector3 _originalScaleB;
     private Vector3 _originalScaleC;
 
+    private ParticleSystem _ps1;
+    private ParticleSystem _ps2;
+    private ParticleSystem _ps3;
+
     private void Awake()
     {
-        if (targetA) _originalScaleA = targetA.transform.localScale;
-        if (targetB) _originalScaleB = targetB.transform.localScale;
-        if (targetC) _originalScaleC = targetC.transform.localScale;
+        if (targetA && targetB && targetC)
+        {
+            _originalScaleA = targetA.transform.localScale;
+            _originalScaleB = targetB.transform.localScale;
+            _originalScaleC = targetC.transform.localScale;
+            
+            _ps1 = targetA.GetComponent<ParticleSystem>();
+            _ps2 = targetB.GetComponent<ParticleSystem>();
+            _ps3 = targetC.GetComponent<ParticleSystem>();
+        }
     }
 
     /// <summary> target들을 0 → 원래 크기로 확장 </summary>
     public void Expand()
     {
+        if (!targetA || !targetB || !targetC) return;
         StopAllCoroutines();
-        if (targetA) StartCoroutine(ScaleAnim(targetA.transform, Vector3.zero, _originalScaleA));
-        if (targetB) StartCoroutine(ScaleAnim(targetB.transform, Vector3.zero, _originalScaleB));
-        if (targetC) StartCoroutine(ScaleAnim(targetC.transform, Vector3.zero, _originalScaleC));
+        
+        _ps1.Play();
+        _ps2.Play();
+        _ps3.Play();
+        
+        StartCoroutine(ScaleAnim(targetA.transform, Vector3.zero, _originalScaleA));
+        StartCoroutine(ScaleAnim(targetB.transform, Vector3.zero, _originalScaleB));
+        StartCoroutine(ScaleAnim(targetC.transform, Vector3.zero, _originalScaleC));
     }
 
     /// <summary> target들을 원래 크기 → 0으로 축소 </summary>
     public void Shrink()
     {
-        StopAllCoroutines();
         if (targetA) StartCoroutine(ScaleAnim(targetA.transform, _originalScaleA, Vector3.zero));
         if (targetB) StartCoroutine(ScaleAnim(targetB.transform, _originalScaleB, Vector3.zero));
         if (targetC) StartCoroutine(ScaleAnim(targetC.transform, _originalScaleC, Vector3.zero));

@@ -87,7 +87,7 @@ public sealed class RocketYController : MonoBehaviour
 
     private void Update()
     {
-        if (target == null || altitudeKeys == null || altitudeKeys.Length == 0) return;
+        if (!target || altitudeKeys == null || altitudeKeys.Length == 0) return;
 
         float tPlus = GetTPlus();
         float altitudeKm = EvaluateAltitudeKm(tPlus);

@@ -14,7 +14,7 @@ public sealed class SoundManager : MonoBehaviour
     [Header("Audio Sources")]
     [SerializeField] private AudioSource buttonSource; // 버튼용
     [SerializeField] private AudioSource rocketSource; // 로켓/배경용
-    [SerializeField] private AudioSource _crossSource; // 크로스페이드용 내부 소스
+    [SerializeField] private AudioSource crossSource; // 크로스페이드용 내부 소스
 
     private readonly Dictionary<string, AudioClip> _clipCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, SoundSetting> _soundMap = new(StringComparer.OrdinalIgnoreCase);
@@ -42,12 +42,17 @@ public sealed class SoundManager : MonoBehaviour
             rocketSource.loop = false;
             rocketSource.spatialBlend = 0f;
         }
-        _crossSource = gameObject.AddComponent<AudioSource>();
-        _crossSource.playOnAwake = false;
-        _crossSource.loop = false;
-        _crossSource.spatialBlend = 0f;
-        _crossSource.volume = 0f;
+        crossSource = gameObject.AddComponent<AudioSource>();
+        crossSource.playOnAwake = false;
+        crossSource.loop = false;
+        crossSource.spatialBlend = 0f;
+        crossSource.volume = 0f;
 
+       
+    }
+
+    private void Start()
+    {
         // 설정 파일에서 사운드 매핑 구성
         Settings s = JsonLoader.Instance?.settings;
         if (s?.sounds != null)
@@ -60,7 +65,7 @@ public sealed class SoundManager : MonoBehaviour
         }
 
         _loadCts = new CancellationTokenSource();
-        _ = PreloadButtonIfAnyAsync(_loadCts.Token);
+        PreloadButtonIfAnyAsync(_loadCts.Token).Forget();
     }
 
     private void OnDestroy()
@@ -164,10 +169,10 @@ public sealed class SoundManager : MonoBehaviour
         float fadeTime = Mathf.Max(0.1f, duration);
         float t = 0f;
 
-        _crossSource.clip = newClip;
-        _crossSource.volume = 0f;
-        _crossSource.loop = loop;
-        _crossSource.Play();
+        crossSource.clip = newClip;
+        crossSource.volume = 0f;
+        crossSource.loop = loop;
+        crossSource.Play();
 
         float originalVol = rocketSource.isPlaying ? rocketSource.volume : 0f;
         float targetVol = Mathf.Clamp01(targetVolume);
@@ -182,7 +187,7 @@ public sealed class SoundManager : MonoBehaviour
             if (rocketSource.isPlaying)
                 rocketSource.volume = Mathf.Lerp(originalVol, 0f, progress);
 
-            _crossSource.volume = Mathf.Lerp(0f, targetVol, progress);
+            crossSource.volume = Mathf.Lerp(0f, targetVol, progress);
             await UniTask.Yield();
         }
 
@@ -193,9 +198,9 @@ public sealed class SoundManager : MonoBehaviour
         rocketSource.loop = loop;
         rocketSource.Play();
 
-        _crossSource.Stop();
-        _crossSource.clip = null;
-        _crossSource.volume = 0f;
+        crossSource.Stop();
+        crossSource.clip = null;
+        crossSource.volume = 0f;
     }
 
     // ==============================================================

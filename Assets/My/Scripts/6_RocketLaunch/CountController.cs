@@ -94,6 +94,7 @@ public class CountController : MonoBehaviour
         else if (Instance != this) Destroy(gameObject);
 
         BuildSlopeCaches();
+        TMinusSeconds = 11f;
     }
 
     /// <summary>

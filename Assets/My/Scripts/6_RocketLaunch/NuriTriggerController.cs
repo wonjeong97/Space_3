@@ -19,6 +19,7 @@ public class NuriTriggerController : MonoBehaviour
     [SerializeField] private float tDropStage1 = 2f * 60f + 5f; // 2:05
     [SerializeField] private float tSeparateFairing = 3f * 60f + 56f; // 3:56
     [SerializeField] private float tDropStage2 = 4f * 60f + 30f; // 4:30
+    [SerializeField] private float tFadeBackground = 3f * 60f + 40f; // 5:50
     [SerializeField] private float tStage3Off = 12f * 60f + 14f; // 12:14
     [SerializeField] private float tSeparateSatellite = 13f * 60f + 5f; // 13:05
     [SerializeField] private float tCallNextScene = 15f * 60f; // 15:00
@@ -29,6 +30,7 @@ public class NuriTriggerController : MonoBehaviour
     private bool _firedDrop1;
     private bool _firedFairing;
     private bool _firedDrop2;
+    private bool _firedFade;
     private bool _firedStage3Off;
     private bool _firedSatellite;
     private bool _firedNextScene;
@@ -176,6 +178,13 @@ public class NuriTriggerController : MonoBehaviour
 
                     LaunchManager.Instance.FadeInStagePublicAsync(5).Forget();
                     LaunchManager.Instance.FadeOutSubRocketStage2Async().Forget();
+                }
+                
+                // T+ 5:50
+                if (!_firedFade && t >= tFadeBackground && LaunchManager.Instance != null)
+                {
+                    _firedFade = true;
+                    await LaunchManager.Instance.CallEndRocket();
                 }
 
                 // T+ 12:14 Stage3Off

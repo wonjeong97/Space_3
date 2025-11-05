@@ -41,9 +41,9 @@ public class NuriAnimEvent : MonoBehaviour
 
     private void Awake()
     {
-        _jetVFXAnimStage1 = stage1.GetComponent<JetVFXAnim>();
-        _jetVFXAnimStage2 = stage2.GetComponent<JetVFXAnim>();
-        _jetVFXAnimStage3 = stage3.GetComponent<JetVFXAnim>();
+        _jetVFXAnimStage1 = stage1Flame.GetComponent<JetVFXAnim>();
+        _jetVFXAnimStage2 = stage2Flame.GetComponent<JetVFXAnim>();
+        _jetVFXAnimStage3 = stage3Flame.GetComponent<JetVFXAnim>();
     }
 
     public void StartBottomSmoke()
@@ -185,11 +185,6 @@ public class NuriAnimEvent : MonoBehaviour
         {
             Debug.LogError(e);
         }
-    }
-
-    public void FadeBackground()
-    {
-        LaunchManager.Instance?.CallEndRocket();
     }
 
     /// <summary> 다음 씬 호출 </summary>

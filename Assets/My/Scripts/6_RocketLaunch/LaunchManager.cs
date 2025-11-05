@@ -889,12 +889,13 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     #endregion
     
-    public async UniTaskVoid CallEndRocket()
+    public async UniTask CallEndRocket()
     {
         float newFadeTime = fadeTime + 2;
         await FadeImageAsync(0f, 1f, newFadeTime, new[] { fadeImage3 });
         
         launcherObj?.SetActive(false);
+        await UniTask.Delay(2000, cancellationToken: DestroyToken);
         
         await FadeImageAsync(1f, 0f, newFadeTime, new[] { fadeImage3 });
     }
