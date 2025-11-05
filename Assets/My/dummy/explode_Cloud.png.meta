@@ -1,0 +1,5900 @@
+fileFormatVersion: 2
+guid: ff716075265aa3a46bda06e4e339a989
+TextureImporter:
+  internalIDToNameTable: []
+  externalObjects: {}
+  serializedVersion: 13
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 1
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+    flipGreenChannel: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMipmapLimit: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
+    wrapU: 1
+    wrapV: 1
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 1
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 1000
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  swizzle: 50462976
+  cookieLightType: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 16384
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 0
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Windows Store Apps
+    maxTextureSize: 2048
+    resizeAlgorithm: 0
+    textureFormat: -1
+    textureCompression: 1
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    ignorePlatformSupport: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: explode_Cloud_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e381b37a50e47543af9188dd201a902
+      internalID: -565075274
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_1
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d006973100050e34da05271f763a9d34
+      internalID: -449700161
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_2
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c19c1e1f868cc04b9e90b561bce6741
+      internalID: 1610712691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_3
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee39dfd6493754c43893db318d8949fc
+      internalID: -508454115
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_4
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 72a9bf186f725ec4a9570efc3006f4a1
+      internalID: -1518026476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_5
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b8a5e87526ef5441a55bb34c08316ab
+      internalID: -989423007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_6
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 34cae51272ab08243acf461a09a48b40
+      internalID: 1967016215
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_7
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1efbacefbbdd0a54aa1d775406b4c3c0
+      internalID: -1844073724
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_8
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0860b819dba62d84d9cc584372ec0dae
+      internalID: -1310220269
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_9
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 15660
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6431b61f26830a84087589f2cf518afa
+      internalID: -156579152
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 63a5c7927820b4549bdd5749d4a5bc23
+      internalID: 356389217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_11
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 968238b12cb80b24db72e28a88719df9
+      internalID: -444351850
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_12
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ae6f203604c7c55478988d2b29f9ee45
+      internalID: 1551252619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_13
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 87083d93e06bded4bacd2e74f35e4705
+      internalID: -1591904370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_14
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: df9a8f2262de45f4ab4e09ca6d2a783e
+      internalID: -454073373
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_15
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0d2042aceb031ec4b92de7bf28696624
+      internalID: -1350366101
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_16
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fcdb6db3ee307645bf9ad0dc029924a
+      internalID: 1406279667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_17
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 941d37e20bd76d04388916e8c42636fa
+      internalID: -1109022826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_18
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 869f7a92697d18a4785223e6226e0b5e
+      internalID: 1736547695
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_19
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 15120
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec87eee72c731e74fa08944da9dc0747
+      internalID: -1914327275
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15df8c107a163604d86b7286d6e6aede
+      internalID: -718454626
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_21
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d4b91415cbaa470448def1fbfda5d632
+      internalID: 1341674382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_22
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b7f7d163f241ee4d96efe0cd2ee53cb
+      internalID: 1060059146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_23
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b901de11f75bb04e90c8412a17c7fc9
+      internalID: -954951296
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_24
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f742585595662024c9753aa64e37022a
+      internalID: 1092788674
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_25
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2ab487ce4082c14895b1cbbb4be82d4
+      internalID: -184205205
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_26
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5fa0d934251ecd842b98a43736a174b6
+      internalID: 1215281170
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_27
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 30d7a471358bcc24583f41f0c9446bbb
+      internalID: -533962639
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_28
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86fd46bf43912f849a32a7e6ec5e554b
+      internalID: 2069537007
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_29
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 14580
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91f3ca04f5624b14190e8a86957727aa
+      internalID: 1372521406
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9511aa38ef65a2142a08ef3d14068848
+      internalID: -852562632
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_31
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d82642c04b2282041887e92be85b7f76
+      internalID: 1050595734
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_32
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d521dcc8295296f4eab10a9e61dc5e49
+      internalID: 901459483
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_33
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61ed002e0d7b8e24999f8db169d2787f
+      internalID: -1763455947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_34
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2c8e8bc1239ade54a94e1c0af0839180
+      internalID: 1305594661
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_35
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 274e8aafb15e5b44b8b33efbd93cd987
+      internalID: -1416763133
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_36
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70d7bf55110a0d2419d17183f216f38e
+      internalID: 139100440
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_37
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c454ee7865b1a34e80a781380ec0ad0
+      internalID: -582285673
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_38
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 972e6ad244c4405449d4dbd6a51141a8
+      internalID: 1651345151
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_39
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 14040
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 482a49657b8ecbc41aba95fd0697c12b
+      internalID: 1341849390
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_40
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5142cf9a2ef01d247bed48b03c178796
+      internalID: -1107210333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_41
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8e7a0d5006fe8040ad49a2c884babfc
+      internalID: -2087764742
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_42
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfed551803a3ba44ca8a6cdc88df8f80
+      internalID: -583684760
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_43
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 29ea888e2e4804440b18e19c34261758
+      internalID: 665172283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_44
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17bd8d7328e41e24e900e9957d9567ac
+      internalID: -1149940322
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_45
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 219feea44676bf245a5242d31e8efdff
+      internalID: 30295318
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_46
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f47c9e42246104240b4e3d946cfe941e
+      internalID: -1601132129
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_47
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fc25b9b10ce3fbb4398dadcf0fe4712e
+      internalID: 905231252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_48
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6b259b8ac48aef47804cec9f004fb40
+      internalID: -247481780
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_49
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 13500
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2a6216b06bc4c014fab6f80244b260bb
+      internalID: 1356995027
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_50
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8868c8d0454441f47926a243ad7350a5
+      internalID: -740340475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_51
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0e2059878b263ed4299d0c2fae427e1f
+      internalID: -120889208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_52
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6623a5896f512a949af88733c86aec81
+      internalID: -769629423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_53
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6664899af10504f4da3d5e49be20321d
+      internalID: 2034168571
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_54
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 272e4566ee5720745ada9a085af3a630
+      internalID: 49812888
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_55
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5dc85971340de7f48985bd80130b4fd1
+      internalID: -1798926853
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_56
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bf95927a63452d7438c21a224004e994
+      internalID: -84743686
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_57
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77e3bc57483502944a6a67ee634a42ea
+      internalID: -1079365619
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_58
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d6b4f9970c8e442478f1e817e369a991
+      internalID: -1452141644
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_59
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 12960
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2ee349ddc4de405448eecd808ddbdf32
+      internalID: -118302166
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_60
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 85768e7f885d1c241b98067822f3afea
+      internalID: 92149807
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_61
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77fb4c545ca335c4ea37c38a2e28593a
+      internalID: 405910682
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_62
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 38e6a0ca239fbff4799cd178fe059874
+      internalID: -346605919
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_63
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d9611851375f72d4381c25842108e03c
+      internalID: 1012104095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_64
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0955314479c7af749a862c40dc46cd92
+      internalID: -2009824953
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_65
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 43198aa4146f9ae4cb5c41edd2b87511
+      internalID: 2039809364
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_66
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e8879b81a9019f64cbb093365a55dbed
+      internalID: 1195459749
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_67
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fb3cded8b1ce8834eba77ea5f9db88aa
+      internalID: 1740107937
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_68
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 122f7f08b6bc7d9439bc1a780a4b7924
+      internalID: -607179431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_69
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 12420
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 894c9d4c29e773d44a46e05799c8ce0d
+      internalID: -542941865
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_70
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eefde85828833df419f35979efae2a64
+      internalID: -1779876753
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_71
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89f116d88467f73498a96b2649d51e43
+      internalID: 36532593
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_72
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35bc4ce8658c218438b0ad3ced99c65e
+      internalID: -976375992
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_73
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 760950adb303aa94ebf0a617f0fa8f8c
+      internalID: -1847701207
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_74
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 77927bebd893ae1409ada37f3bd2b279
+      internalID: -788295947
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_75
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 81bb5c7ea3644c84b8c0d2587cd7e1da
+      internalID: -680009702
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_76
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 99629e158245f6b4289c7f0dd7430a03
+      internalID: 1406045426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_77
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 060eef65c9f1d4d46a6df8ca8ed57f58
+      internalID: 1084674570
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_78
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 55f47508a22c1df4ba54aa250b27078b
+      internalID: -1681161420
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_79
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 11880
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8d2dd5b75f59734428e276068bf25ca2
+      internalID: 1925910423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_80
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17ae464c7b8af4a479dc3030ba176704
+      internalID: -843705158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_81
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78e5e63ab566b8643aeab0f89890c6f2
+      internalID: 822442574
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_82
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d1b094424d182f489037e357ed76845
+      internalID: -861737543
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_83
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33f6fe35f96b57f498fe857f0febc203
+      internalID: -60910179
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_84
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b666857b07b86c4a9f934e04ce83c1d
+      internalID: 454060641
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_85
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6544640dddd0de428e52dabe62a122e
+      internalID: -1920035834
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_86
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7601eff1dace24742b70a6806462d5d9
+      internalID: -1511184646
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_87
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 11a0725e4412aff4289188e1c8f3f9c1
+      internalID: 1122722711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_88
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 65d4a64ca222f7e4997d59f773eb6cae
+      internalID: 515049454
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_89
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 11340
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f178630e29d140e4a9d1f83de0d13d88
+      internalID: 203011109
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_90
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adfec7556af2fe34ea4258b138beda34
+      internalID: 846140545
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_91
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 241ae501dec0a284ab2c79ca38208b19
+      internalID: 1788520894
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_92
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 98da46bc1b3987345a514acf18d7d4c0
+      internalID: 259084316
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_93
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1873158e60cf54f45ba95a9bef79c896
+      internalID: -1655316084
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_94
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 970188b2ed3155e40ae9c1a62ec5bbf8
+      internalID: 2031658225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_95
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 04647768387d36e4abc44607f2a8f42c
+      internalID: 362736790
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_96
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cad5dc5dd291d4344bfb75819f2da330
+      internalID: -544974548
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_97
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 957bca31e7cf1e94199556bf094ad604
+      internalID: 232910278
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_98
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f5f24fb3ddea2c41a3e1714e1981673
+      internalID: 1255651696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_99
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 10800
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19abc19f0e791b04b93d62147b7d560a
+      internalID: 2073315501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_100
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 131170954f41fde4498c64efc5521f50
+      internalID: -942401999
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_101
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e23a9a5840d34924b94f8f3e424aecf3
+      internalID: -546002855
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_102
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 28c2846abc51ada4db20a10a1569c67e
+      internalID: -2071190799
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_103
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 271c89a82378dad4a97b80c64ff818c0
+      internalID: 1393708014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_104
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f5ed6938149b5343bbe19961edfeaca
+      internalID: 1467722773
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_105
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92c9cdb74a1b43742a25a3681223dee0
+      internalID: 734471282
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_106
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 17941695ad3c5774ebc568983235c7c6
+      internalID: -1803832222
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_107
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6e22e9ca1c504f140934a552aa948c68
+      internalID: 1918334013
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_108
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: da1bcffbd6b3b9348ae224bfdf0facdb
+      internalID: -1608248399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_109
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 10260
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05bec2cc0e16c124e987ccdd530f4f1a
+      internalID: 496317411
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_110
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8c997386fea401a44b6cd49b6f127083
+      internalID: -1159368171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_111
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dad34304593c85f42a4b75c7108fbc8c
+      internalID: 73457463
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_112
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 142170a1579c46c409f6f87eb8db8c56
+      internalID: 1182424227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_113
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96473303a787d9346bc67dd9c0f4eab1
+      internalID: 2114961501
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_114
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 34685f5af888d664f829980ee7274591
+      internalID: 986926821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_115
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f3ace54c80075540a7b834303ce87c6
+      internalID: 1527766787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_116
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a90c19d613ff95e4e9d6abbff171a6fa
+      internalID: -575919526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_117
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27aec0ecb7f56184e96937cd08411821
+      internalID: -269255289
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_118
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8833862150bebc84cbd11040a5397a13
+      internalID: -507165333
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_119
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 9720
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fe65610f9d36f54283310246b1ab185
+      internalID: 298213295
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_120
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aff3e9234acf342468c5fbcdd0d37854
+      internalID: 2037186229
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_121
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 97d8ccf5bd0091640a9ae0e7ae55f6ab
+      internalID: 291032292
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_122
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8abb3931b2e15bd41990d7a89bb45842
+      internalID: 999627495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_123
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c5d88f81a618b94cb2714a084cd5e9a
+      internalID: -25159132
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_124
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 20a28c597ce4a534c98e1ed0f6b149a5
+      internalID: -1865705202
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_125
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aa6c949f65662e44fb1b6ad9f5b6cb5c
+      internalID: 160848064
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_126
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37f31806c23fe264da05aca8dce48aeb
+      internalID: -1007224537
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_127
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b9fc6cc8fa2518b429b0f7b5eb59bd56
+      internalID: -333215612
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_128
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7728bda226d551a44ae7e2bb4e3c50c6
+      internalID: -1827873703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_129
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 9180
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 092212831fc917942aa359795ad31156
+      internalID: -1363563802
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_130
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a19cf9e7773badb41878349588c30f8a
+      internalID: 1176911848
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_131
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3116ef0e729dcd43b0486d1ea415042
+      internalID: -1946225784
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_132
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 963e4c355bb8fde44ae3f83a71a673c1
+      internalID: 1053455203
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_133
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70f32389bc4ca224abced28456a8e77a
+      internalID: -610153721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_134
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3577c6a238ba5b499817737b3e9fd1c
+      internalID: 1441383691
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_135
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89dbaa4ddbdb78e4ca33c1bb38d349ce
+      internalID: 283591050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_136
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59da7b76abd17904390659312ffee6f7
+      internalID: -1297104258
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_137
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4b7fe522bd3f1c34e9bd93695da4a777
+      internalID: 75664476
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_138
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ccf06cfa97d557240863553119621e3d
+      internalID: -1053164676
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_139
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 8640
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b4301562fe120b54ebfa3f3d6b55001b
+      internalID: 2016846768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_140
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13864b8631120174d8d7bf6403c0cc67
+      internalID: 38744687
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_141
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 436c9e065b6b29743b3103053cc92869
+      internalID: 2037297877
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_142
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49641a85efe8bed4e944e854dbec516d
+      internalID: -1883375103
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_143
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e4292c2068b29f346a178ac31e27087c
+      internalID: 192605183
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_144
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0cf7872f11301ab4997c278e54aaaa96
+      internalID: -812337423
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_145
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 664cb83ddc7da2d49bcd0c3feb48f4bb
+      internalID: -1955546344
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_146
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5383f7a2a4262a6499285121d50d7d65
+      internalID: 1962745523
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_147
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3f48cb2a98ae5594b9fc415c70ad27c6
+      internalID: -1979418050
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_148
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b9fdd14ea8a30d4781ce93cef179fe4
+      internalID: 1589346774
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_149
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 8100
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d47bbaae9049ff4795f04e0de7095c3
+      internalID: 1126432963
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_150
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7cafd6857bd42e649b2ca20cbeef8bf4
+      internalID: -656820822
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_151
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 447ca76eb97e7fb4e998574d4deb4be3
+      internalID: -891539379
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_152
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 94b5a0fddd662974aa76ae1761fb030f
+      internalID: 1660129004
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_153
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9a83ca20f35e20f42910a0706478401e
+      internalID: 892525238
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_154
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8b4c2aaec9bdc044aa55e4031c5bc2cc
+      internalID: -1340354553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_155
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b09893820ab9fa748a71e19801ac9f99
+      internalID: 19040223
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_156
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7054ae010d234824db943522075ef173
+      internalID: 842474106
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_157
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 46f0444fcbc70e14c88e5b74f3d3d149
+      internalID: 1074583819
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_158
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 15ffc07946335b94a991e171c0e806fd
+      internalID: -1884236225
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_159
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 7560
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b7d866fdd580d8498bf4ee8178781e5
+      internalID: -92911232
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_160
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b4ab3dbf8b9f8346983178a497344d1
+      internalID: -307302300
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_161
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 86c5006bb2b60884898ca09b8446d186
+      internalID: 407099227
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_162
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d0310326cf924d244829632587e4bf5d
+      internalID: 831858217
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_163
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: de3ed39bdff716b49a339eede0f04ec7
+      internalID: 708893031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_164
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a946e80f16b55b44acab901dfb78f4e
+      internalID: 675156286
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_165
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed63152454afcb048b3d977f870e5153
+      internalID: 1834321771
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_166
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 18e26f7ac25cda2448ceee0dd6341873
+      internalID: 2006740856
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_167
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cd087ed1236ed8c4aac40b0141fe15a5
+      internalID: 656004648
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_168
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c86867e7ef5e044469ecd14b9b5040f6
+      internalID: -147034555
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_169
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 7020
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a95fc9ad7f01f594abd2c86ae24ec5e9
+      internalID: 440882353
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_170
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5cda76596258eb84295b2267409ec8a1
+      internalID: 775850961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_171
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c564135793ac9a4e8f74ca5c2bdf382
+      internalID: 69218954
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_172
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 593bcab4224d53744ab2e90ffc1b9aa8
+      internalID: 752260696
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_173
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 78cee6d42c7148543a363f9f5915e83b
+      internalID: 967704891
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_174
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c6d3a90276e65ff4985ac21a915223fc
+      internalID: 248492615
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_175
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9c52d99df446fe438b11a22df379688
+      internalID: -311328837
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_176
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33e08f5aa98f91043ae387e353ffee7a
+      internalID: -1883322441
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_177
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 893f8b2f133c8ed4d9ff1b58608469dd
+      internalID: -2059262514
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_178
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 82f34ad3bb1cdc24db89dba7639406f4
+      internalID: -636259564
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_179
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 6480
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d49a336bc168b714f8ea09a8c173377a
+      internalID: 448264698
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_180
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 533896ee4dab42f41b7777814c3e8c20
+      internalID: -1621025900
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_181
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 431541c2426920f498a51cc36d51d8b9
+      internalID: -1889929949
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_182
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d992d78aa6b2b664e80e22adfac2bc3f
+      internalID: 2135988874
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_183
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5c73fc022bdf88f44a8e6c8c0559f2fa
+      internalID: 1316007111
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_184
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6600224ac61e6f145b2db726302d2e97
+      internalID: -32910432
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_185
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 62884f1d7cb5f504e8a2aae42881cf6d
+      internalID: 497583965
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_186
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c1d8b39a7e145544b9f6006874568389
+      internalID: 1036001091
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_187
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5bf305770d1b11e42984caee452af9e2
+      internalID: -1156601561
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_188
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ed015dee86793f4a888f8864c821086
+      internalID: 1759151341
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_189
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 5940
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0c0370d341aeccb499ca9375acad8994
+      internalID: 1502838259
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_190
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 16e92b278eef488429ccdc19ca7d5588
+      internalID: -1030968165
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_191
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fd592fea45eece4f853020acca84438
+      internalID: -1713000592
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_192
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2d92378f2d887914f97782d94d57dcc8
+      internalID: 2097331599
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_193
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: eef53ed6c50a4b44f84ea300a5a1af93
+      internalID: 1844865843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_194
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec6d8bf39c4a35c4599d3981918e75b1
+      internalID: -1557844617
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_195
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2f7914d9a6f304d46aef1a8cbf7222a4
+      internalID: 2072406709
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_196
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 35cc1a4bd0d7cb94e9b07a6f78af97e0
+      internalID: -473333381
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_197
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7f0c22339caadc6478c6f99916012383
+      internalID: -1986839208
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_198
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8d9cd915c864b547863c1a4e6104675
+      internalID: 331510018
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_199
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 5400
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 76ce235ff3986674a9855b4d26f0cf74
+      internalID: 929059380
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_200
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0a004261a7a8f78409c64df313fa70b4
+      internalID: -1560557781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_201
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d221c1d945cfc9946a80de20a44fcff6
+      internalID: 1193273241
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_202
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96f8fcb844d120743b64231749650503
+      internalID: 464389634
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_203
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f1bf243eeb2e084d90d1e4613ec567f
+      internalID: -1188947173
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_204
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d7d1ce9e7eaf08a47b9dd150625c8df5
+      internalID: 1552236795
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_205
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: acbe77de25ed25240b534c2eae50efea
+      internalID: 2068962826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_206
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4ac330104cd54b14b9dae351af140b96
+      internalID: -1004358603
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_207
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92743756b1186794c8a2e61fce94403f
+      internalID: -524553058
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_208
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9f4376099ce784240a7bc4debd2978f5
+      internalID: -1274402185
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_209
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 4860
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba54acda2c35e3f4284932e64948bf95
+      internalID: -1240926821
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_210
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5ecfd96f7c0ee9c48a6a1aae45254c40
+      internalID: -238353382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_211
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 802e180fd3d62c24fb301b4014d3b985
+      internalID: 1031625431
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_212
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4d14953d0025a8041877393a790a6ed5
+      internalID: -1417351450
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_213
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0906c5a3dfaa021439b195ca9e1a52df
+      internalID: -48659973
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_214
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 92e7ef7f622fe4849aa12a831fcf2d4a
+      internalID: -1253617961
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_215
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e69bbdf86ae1cbd46961d21c41ea456c
+      internalID: 1451216826
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_216
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a8eb26d96b009a3479f559adb17503e1
+      internalID: -514165108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_217
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2263ee963a1e9e2439ccd7667c9db7fb
+      internalID: -123339879
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_218
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1ea3669bb75c98743a06233dd513a055
+      internalID: -1291044668
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_219
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 4320
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c4ace80b8a9ab9d4ca62d498df1e1c47
+      internalID: -608738475
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_220
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07c76b42a39801f4aadfc70f3f43e59d
+      internalID: -313919621
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_221
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70ca2f3ad3d68da4290492d4190f16cf
+      internalID: -1695849315
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_222
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3084511585994dc47824990f5ce93946
+      internalID: 5439137
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_223
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6d588dbb03d13994f82466bfa3d9b8c1
+      internalID: 1490556031
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_224
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a6f6e2c57c823764c9cbe99d0411f617
+      internalID: -1075161447
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_225
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9d935a65c8813d141a19a4e33dded89f
+      internalID: -748031849
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_226
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 01c4ea13ad2f17c4cb9885b916bcbe6d
+      internalID: 2012999495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_227
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa583ac7851c39745b0bfc7ade8fd650
+      internalID: 1806752175
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_228
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cca994e4aa1c2664a8a1a9e820c81fa6
+      internalID: -293945242
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_229
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 3780
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4eeddce6a90ae4e4cbbab30d7490e1ef
+      internalID: 1595418565
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_230
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5cdf3e76dc2a48e4b9189e2d99190213
+      internalID: 1486269314
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_231
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8aa9a6370b057fe46acfe4c8c9c2f2f2
+      internalID: 30447610
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_232
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cf6d5b200ed946545bebf68409acc897
+      internalID: -1287522843
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_233
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 08478bbf43b92b6429db55c845cff801
+      internalID: 1744491370
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_234
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9ce6476a3a557bf41ae108fbc3bdd8a6
+      internalID: 1452656399
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_235
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 956f95d152e7a6c4babbe0bf02b8aa49
+      internalID: 1280646703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_236
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 206af957382def147bfe4aee010bc6d5
+      internalID: 346105434
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_237
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7ac084fb9a96adf4d963efee4442c967
+      internalID: -443382897
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_238
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b22b6f499a1aad34b8425a76f3596180
+      internalID: 305396414
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_239
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 3240
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 234f139c6f2ffe74da08e7f08a9e8f1a
+      internalID: -1376043451
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_240
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9299701778448184cbe9349f897dfd71
+      internalID: -507358778
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_241
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 185c8cc5738778145994df79590bfad3
+      internalID: -211353042
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_242
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73310468bee4e20489fa6042aa238c37
+      internalID: 1930593522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_243
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19221a56f65ee0743b477ce44492255d
+      internalID: 136731809
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_244
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5787469677bd7147914d6311dd058fe
+      internalID: -594180213
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_245
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 0f54089c6eb76024b983fb420810bd62
+      internalID: -46280319
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_246
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 551955d614066434bbb7b7c026bafb3a
+      internalID: 1588423437
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_247
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33ce67a31bbf01e4b914fa0c501c42a4
+      internalID: -1015502092
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_248
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ca2aab222bd52de4f8e0a4f64f56b22f
+      internalID: 1389001105
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_249
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 2700
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6737ad4440ad51f4db35d67a96ee1e57
+      internalID: 1549655594
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_250
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9047af9172fd1244eb034b6ca535e4ff
+      internalID: -1371595426
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_251
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d36d2a07e7f633e4fa31bc37c36d529f
+      internalID: 428559800
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_252
+      rect:
+        serializedVersion: 2
+        x: 2048
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1cdca29321cbbce4887ab2ffbb1162ee
+      internalID: -93925852
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_253
+      rect:
+        serializedVersion: 2
+        x: 3072
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: dfa714ae299e6d64cb5e49d17279aacf
+      internalID: -1143004816
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_254
+      rect:
+        serializedVersion: 2
+        x: 4096
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a3a0763ef26514c4a9d6958f47549ecc
+      internalID: 1695606067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_255
+      rect:
+        serializedVersion: 2
+        x: 5120
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5b6dd9258cb8c7c48bf6a1bd46b83fe3
+      internalID: -1368530787
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_256
+      rect:
+        serializedVersion: 2
+        x: 6144
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d009de34520d10f42956dfe840cbf830
+      internalID: -397250382
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_257
+      rect:
+        serializedVersion: 2
+        x: 7168
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 580357f47d9f61b4cac8a736be0942d2
+      internalID: 893648993
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_258
+      rect:
+        serializedVersion: 2
+        x: 8192
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 33e374febae1d564ead44fb576f1d98f
+      internalID: -2002937635
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: explode_Cloud_259
+      rect:
+        serializedVersion: 2
+        x: 9216
+        y: 2160
+        width: 1024
+        height: 540
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 00bb666c53ff0f542a69c6712bc8efce
+      internalID: 595417925
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+    nameFileIdTable:
+      explode_Cloud_0: -565075274
+      explode_Cloud_1: -449700161
+      explode_Cloud_10: 356389217
+      explode_Cloud_100: -942401999
+      explode_Cloud_101: -546002855
+      explode_Cloud_102: -2071190799
+      explode_Cloud_103: 1393708014
+      explode_Cloud_104: 1467722773
+      explode_Cloud_105: 734471282
+      explode_Cloud_106: -1803832222
+      explode_Cloud_107: 1918334013
+      explode_Cloud_108: -1608248399
+      explode_Cloud_109: 496317411
+      explode_Cloud_11: -444351850
+      explode_Cloud_110: -1159368171
+      explode_Cloud_111: 73457463
+      explode_Cloud_112: 1182424227
+      explode_Cloud_113: 2114961501
+      explode_Cloud_114: 986926821
+      explode_Cloud_115: 1527766787
+      explode_Cloud_116: -575919526
+      explode_Cloud_117: -269255289
+      explode_Cloud_118: -507165333
+      explode_Cloud_119: 298213295
+      explode_Cloud_12: 1551252619
+      explode_Cloud_120: 2037186229
+      explode_Cloud_121: 291032292
+      explode_Cloud_122: 999627495
+      explode_Cloud_123: -25159132
+      explode_Cloud_124: -1865705202
+      explode_Cloud_125: 160848064
+      explode_Cloud_126: -1007224537
+      explode_Cloud_127: -333215612
+      explode_Cloud_128: -1827873703
+      explode_Cloud_129: -1363563802
+      explode_Cloud_13: -1591904370
+      explode_Cloud_130: 1176911848
+      explode_Cloud_131: -1946225784
+      explode_Cloud_132: 1053455203
+      explode_Cloud_133: -610153721
+      explode_Cloud_134: 1441383691
+      explode_Cloud_135: 283591050
+      explode_Cloud_136: -1297104258
+      explode_Cloud_137: 75664476
+      explode_Cloud_138: -1053164676
+      explode_Cloud_139: 2016846768
+      explode_Cloud_14: -454073373
+      explode_Cloud_140: 38744687
+      explode_Cloud_141: 2037297877
+      explode_Cloud_142: -1883375103
+      explode_Cloud_143: 192605183
+      explode_Cloud_144: -812337423
+      explode_Cloud_145: -1955546344
+      explode_Cloud_146: 1962745523
+      explode_Cloud_147: -1979418050
+      explode_Cloud_148: 1589346774
+      explode_Cloud_149: 1126432963
+      explode_Cloud_15: -1350366101
+      explode_Cloud_150: -656820822
+      explode_Cloud_151: -891539379
+      explode_Cloud_152: 1660129004
+      explode_Cloud_153: 892525238
+      explode_Cloud_154: -1340354553
+      explode_Cloud_155: 19040223
+      explode_Cloud_156: 842474106
+      explode_Cloud_157: 1074583819
+      explode_Cloud_158: -1884236225
+      explode_Cloud_159: -92911232
+      explode_Cloud_16: 1406279667
+      explode_Cloud_160: -307302300
+      explode_Cloud_161: 407099227
+      explode_Cloud_162: 831858217
+      explode_Cloud_163: 708893031
+      explode_Cloud_164: 675156286
+      explode_Cloud_165: 1834321771
+      explode_Cloud_166: 2006740856
+      explode_Cloud_167: 656004648
+      explode_Cloud_168: -147034555
+      explode_Cloud_169: 440882353
+      explode_Cloud_17: -1109022826
+      explode_Cloud_170: 775850961
+      explode_Cloud_171: 69218954
+      explode_Cloud_172: 752260696
+      explode_Cloud_173: 967704891
+      explode_Cloud_174: 248492615
+      explode_Cloud_175: -311328837
+      explode_Cloud_176: -1883322441
+      explode_Cloud_177: -2059262514
+      explode_Cloud_178: -636259564
+      explode_Cloud_179: 448264698
+      explode_Cloud_18: 1736547695
+      explode_Cloud_180: -1621025900
+      explode_Cloud_181: -1889929949
+      explode_Cloud_182: 2135988874
+      explode_Cloud_183: 1316007111
+      explode_Cloud_184: -32910432
+      explode_Cloud_185: 497583965
+      explode_Cloud_186: 1036001091
+      explode_Cloud_187: -1156601561
+      explode_Cloud_188: 1759151341
+      explode_Cloud_189: 1502838259
+      explode_Cloud_19: -1914327275
+      explode_Cloud_190: -1030968165
+      explode_Cloud_191: -1713000592
+      explode_Cloud_192: 2097331599
+      explode_Cloud_193: 1844865843
+      explode_Cloud_194: -1557844617
+      explode_Cloud_195: 2072406709
+      explode_Cloud_196: -473333381
+      explode_Cloud_197: -1986839208
+      explode_Cloud_198: 331510018
+      explode_Cloud_199: 929059380
+      explode_Cloud_2: 1610712691
+      explode_Cloud_20: -718454626
+      explode_Cloud_200: -1560557781
+      explode_Cloud_201: 1193273241
+      explode_Cloud_202: 464389634
+      explode_Cloud_203: -1188947173
+      explode_Cloud_204: 1552236795
+      explode_Cloud_205: 2068962826
+      explode_Cloud_206: -1004358603
+      explode_Cloud_207: -524553058
+      explode_Cloud_208: -1274402185
+      explode_Cloud_209: -1240926821
+      explode_Cloud_21: 1341674382
+      explode_Cloud_210: -238353382
+      explode_Cloud_211: 1031625431
+      explode_Cloud_212: -1417351450
+      explode_Cloud_213: -48659973
+      explode_Cloud_214: -1253617961
+      explode_Cloud_215: 1451216826
+      explode_Cloud_216: -514165108
+      explode_Cloud_217: -123339879
+      explode_Cloud_218: -1291044668
+      explode_Cloud_219: -608738475
+      explode_Cloud_22: 1060059146
+      explode_Cloud_220: -313919621
+      explode_Cloud_221: -1695849315
+      explode_Cloud_222: 5439137
+      explode_Cloud_223: 1490556031
+      explode_Cloud_224: -1075161447
+      explode_Cloud_225: -748031849
+      explode_Cloud_226: 2012999495
+      explode_Cloud_227: 1806752175
+      explode_Cloud_228: -293945242
+      explode_Cloud_229: 1595418565
+      explode_Cloud_23: -954951296
+      explode_Cloud_230: 1486269314
+      explode_Cloud_231: 30447610
+      explode_Cloud_232: -1287522843
+      explode_Cloud_233: 1744491370
+      explode_Cloud_234: 1452656399
+      explode_Cloud_235: 1280646703
+      explode_Cloud_236: 346105434
+      explode_Cloud_237: -443382897
+      explode_Cloud_238: 305396414
+      explode_Cloud_239: -1376043451
+      explode_Cloud_24: 1092788674
+      explode_Cloud_240: -507358778
+      explode_Cloud_241: -211353042
+      explode_Cloud_242: 1930593522
+      explode_Cloud_243: 136731809
+      explode_Cloud_244: -594180213
+      explode_Cloud_245: -46280319
+      explode_Cloud_246: 1588423437
+      explode_Cloud_247: -1015502092
+      explode_Cloud_248: 1389001105
+      explode_Cloud_249: 1549655594
+      explode_Cloud_25: -184205205
+      explode_Cloud_250: -1371595426
+      explode_Cloud_251: 428559800
+      explode_Cloud_252: -93925852
+      explode_Cloud_253: -1143004816
+      explode_Cloud_254: 1695606067
+      explode_Cloud_255: -1368530787
+      explode_Cloud_256: -397250382
+      explode_Cloud_257: 893648993
+      explode_Cloud_258: -2002937635
+      explode_Cloud_259: 595417925
+      explode_Cloud_26: 1215281170
+      explode_Cloud_260: 1705229882
+      explode_Cloud_261: -754231304
+      explode_Cloud_262: -271818975
+      explode_Cloud_263: -427733610
+      explode_Cloud_264: -42238523
+      explode_Cloud_265: -1244902445
+      explode_Cloud_266: -1961598730
+      explode_Cloud_267: -101250896
+      explode_Cloud_268: 1883033092
+      explode_Cloud_269: 737197568
+      explode_Cloud_27: -533962639
+      explode_Cloud_270: 1235353445
+      explode_Cloud_271: -405983595
+      explode_Cloud_272: -639632435
+      explode_Cloud_273: 1460111314
+      explode_Cloud_274: 977403016
+      explode_Cloud_275: 1045885656
+      explode_Cloud_276: -1735386822
+      explode_Cloud_277: 247863198
+      explode_Cloud_278: -1921601066
+      explode_Cloud_279: 1184134442
+      explode_Cloud_28: 2069537007
+      explode_Cloud_280: -1272387199
+      explode_Cloud_281: 609502592
+      explode_Cloud_282: -1601045595
+      explode_Cloud_283: -1539965504
+      explode_Cloud_284: -2126061015
+      explode_Cloud_285: -534713686
+      explode_Cloud_286: 292710445
+      explode_Cloud_287: -579495601
+      explode_Cloud_288: 1021549180
+      explode_Cloud_289: 2109006913
+      explode_Cloud_29: 1372521406
+      explode_Cloud_290: -2103537882
+      explode_Cloud_291: -1216865549
+      explode_Cloud_292: 722075679
+      explode_Cloud_293: 1308724855
+      explode_Cloud_294: -1303873847
+      explode_Cloud_295: 1611519479
+      explode_Cloud_296: 1200729677
+      explode_Cloud_297: -1195185988
+      explode_Cloud_298: 36517261
+      explode_Cloud_299: 2023262574
+      explode_Cloud_3: -508454115
+      explode_Cloud_30: -852562632
+      explode_Cloud_31: 1050595734
+      explode_Cloud_32: 901459483
+      explode_Cloud_33: -1763455947
+      explode_Cloud_34: 1305594661
+      explode_Cloud_35: -1416763133
+      explode_Cloud_36: 139100440
+      explode_Cloud_37: -582285673
+      explode_Cloud_38: 1651345151
+      explode_Cloud_39: 1341849390
+      explode_Cloud_4: -1518026476
+      explode_Cloud_40: -1107210333
+      explode_Cloud_41: -2087764742
+      explode_Cloud_42: -583684760
+      explode_Cloud_43: 665172283
+      explode_Cloud_44: -1149940322
+      explode_Cloud_45: 30295318
+      explode_Cloud_46: -1601132129
+      explode_Cloud_47: 905231252
+      explode_Cloud_48: -247481780
+      explode_Cloud_49: 1356995027
+      explode_Cloud_5: -989423007
+      explode_Cloud_50: -740340475
+      explode_Cloud_51: -120889208
+      explode_Cloud_52: -769629423
+      explode_Cloud_53: 2034168571
+      explode_Cloud_54: 49812888
+      explode_Cloud_55: -1798926853
+      explode_Cloud_56: -84743686
+      explode_Cloud_57: -1079365619
+      explode_Cloud_58: -1452141644
+      explode_Cloud_59: -118302166
+      explode_Cloud_6: 1967016215
+      explode_Cloud_60: 92149807
+      explode_Cloud_61: 405910682
+      explode_Cloud_62: -346605919
+      explode_Cloud_63: 1012104095
+      explode_Cloud_64: -2009824953
+      explode_Cloud_65: 2039809364
+      explode_Cloud_66: 1195459749
+      explode_Cloud_67: 1740107937
+      explode_Cloud_68: -607179431
+      explode_Cloud_69: -542941865
+      explode_Cloud_7: -1844073724
+      explode_Cloud_70: -1779876753
+      explode_Cloud_71: 36532593
+      explode_Cloud_72: -976375992
+      explode_Cloud_73: -1847701207
+      explode_Cloud_74: -788295947
+      explode_Cloud_75: -680009702
+      explode_Cloud_76: 1406045426
+      explode_Cloud_77: 1084674570
+      explode_Cloud_78: -1681161420
+      explode_Cloud_79: 1925910423
+      explode_Cloud_8: -1310220269
+      explode_Cloud_80: -843705158
+      explode_Cloud_81: 822442574
+      explode_Cloud_82: -861737543
+      explode_Cloud_83: -60910179
+      explode_Cloud_84: 454060641
+      explode_Cloud_85: -1920035834
+      explode_Cloud_86: -1511184646
+      explode_Cloud_87: 1122722711
+      explode_Cloud_88: 515049454
+      explode_Cloud_89: 203011109
+      explode_Cloud_9: -156579152
+      explode_Cloud_90: 846140545
+      explode_Cloud_91: 1788520894
+      explode_Cloud_92: 259084316
+      explode_Cloud_93: -1655316084
+      explode_Cloud_94: 2031658225
+      explode_Cloud_95: 362736790
+      explode_Cloud_96: -544974548
+      explode_Cloud_97: 232910278
+      explode_Cloud_98: 1255651696
+      explode_Cloud_99: 2073315501
+  mipmapLimitGroupName: 
+  pSDRemoveMatte: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

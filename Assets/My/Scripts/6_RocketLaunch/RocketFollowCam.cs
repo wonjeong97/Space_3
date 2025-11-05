@@ -1,115 +1,153 @@
 using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
-public class RocketFollowCam : MonoBehaviour
+/// <summary>
+/// 로켓(또는 지정한 타겟)이 Y축으로 올라갈 때 카메라가 일정 거리(offset)를 유지하며 따라가는 카메라 컨트롤러.
+/// - 타겟의 위치 + 초기 offset을 기준으로 위치를 갱신.
+/// - followX/Y/Z 플래그로 어떤 축을 따라갈지 선택 가능.
+/// </summary>
+public sealed class RocketFollowCam : MonoBehaviour
 {
-    public enum RotationMode
+    [Header("Target")]
+    [SerializeField] private Transform target;              // 따라갈 로켓
+
+    [Header("Offset")]
+    [Tooltip("시작 시 타겟과의 현재 거리를 자동으로 offset으로 사용할지 여부")]
+    [SerializeField] private bool useInitialOffset = true;
+
+    [Tooltip("타겟 기준 카메라 위치 오프셋(직접 지정하고 싶을 때 사용)")]
+    [SerializeField] private Vector3 offset = new Vector3(0f, 10f, -20f);
+
+    [Header("Follow Axes")]
+    [Tooltip("X축 이동을 타겟에 맞출지 여부")]
+    [SerializeField] private bool followX = false;
+
+    [Tooltip("Y축 이동을 타겟에 맞출지 여부 (로켓 상승을 따라감)")]
+    [SerializeField] private bool followY = true;
+
+    [Tooltip("Z축 이동을 타겟에 맞출지 여부")]
+    [SerializeField] private bool followZ = false;
+
+    [Header("Smoothing")]
+    [Tooltip("위치 보정에 사용할 SmoothDamp 시간. 0이면 즉시 위치로 스냅")]
+    [Range(0f, 1f)]
+    [SerializeField] private float smoothTime = 0.15f;
+
+    [Header("Look At")]
+    [Tooltip("항상 타겟을 바라볼지 여부")]
+    [SerializeField] private bool lookAtTarget = true;
+
+    [Tooltip("타겟을 볼 때 추가로 줄 오프셋 (예: 로켓의 조금 위를 보고 싶을 때)")]
+    [SerializeField] private Vector3 lookAtOffset = Vector3.zero;
+
+    private Vector3 _velocity;  // SmoothDamp 내부용
+
+    // ============================
+    // Unity lifecycle
+    // ============================
+    private void Reset()
     {
-        LookAtWithTargetUp,   // 타겟을 바라보되 up=target.up으로 롤을 따라감
-        CopyTargetWithOffset  // 타겟 회전을 기준으로 초기 상대 회전 오프셋 유지
+        // 에디터에서 컴포넌트 추가 시 기본값 설정
+        if (target == null)
+        {
+            // 같은 오브젝트에 로켓이 붙어있을 일은 거의 없으니 기본은 null 유지
+        }
+
+        offset = new Vector3(0f, 10f, -20f);
+        followX = false;
+        followY = true;
+        followZ = false;
     }
 
-    [Header("Follow target")]
-    [SerializeField] private Transform target;           // 따라갈 단일 오브젝트
-    [SerializeField, Tooltip("카메라가 target을 따라갈 때 위치 스무딩(초)")]
-    private float positionSmoothTime = 0.2f;
-    [SerializeField, Tooltip("카메라가 target 회전을 따라갈 때 회전 스무딩(초). 0이면 즉시 회전")]
-    private float rotationSmoothTime = 0.12f;
+    private void Awake()
+    {
+        if (target == null)
+        {
+            LogWarn(nameof(Awake), "target이 지정되지 않았습니다. 인스펙터에서 로켓 Transform을 연결해 주세요.");
+        }
+    }
 
-    [Header("Rotation mode")]
-    [SerializeField] private RotationMode rotationMode = RotationMode.LookAtWithTargetUp;
-    [SerializeField, Tooltip("LookAtWithTargetUp 모드일 때, 타겟을 바라볼 지점의 오프셋(타겟 로컬 좌표)")]
-    private Vector3 lookAtLocalOffset = Vector3.zero;
-
-    [Header("Distance/offset")]
-    [SerializeField, Tooltip("타겟 로컬 좌표계에서의 초기 위치 오프셋. Start에서 자동 계산됨")]
-    private Vector3 initialLocalOffset; // 디자이너가 고정값을 직접 넣어도 됨
-    [SerializeField, Tooltip("초기 상대 회전 오프셋(타겟 기준). CopyTargetWithOffset에서 사용")]
-    private Quaternion initialRotOffset = Quaternion.identity;
-    
-    [SerializeField] private bool bFollowTarget = false;
-
-    private Camera _cam;
-    private Vector3 _posVelocity;   // SmoothDamp 내부 속도
-
-    // -> 초기화: 카메라 참조 확보 및 오프셋 계산
     private void Start()
     {
-        _cam = GetComponent<Camera>();
-        if (_cam == null || target == null) return;
+        if (target == null) return;
 
-        // 초기 위치 오프셋(타겟 로컬) 계산
-        initialLocalOffset = target.InverseTransformPoint(transform.position);
-
-        // 초기 회전 오프셋(타겟 기준) 계산
-        initialRotOffset = Quaternion.Inverse(target.rotation) * transform.rotation;
+        // 시작 시 현재 거리로 offset 설정
+        if (useInitialOffset)
+        {
+            offset = transform.position - target.position;
+            Log(nameof(Start), $"초기 offset 설정: {offset}");
+        }
     }
 
-    // -> LateUpdate: 타겟 로컬 오프셋을 기준으로 위치 추종 -> 선택한 회전 모드로 회전 추종
     private void LateUpdate()
     {
-        if (!_cam || !target || !bFollowTarget) return;
+        if (target == null) return;
 
-        // 1) 위치 추종: 타겟 로컬 오프셋을 월드로 변환하여 스무딩 이동
-        Vector3 desiredPos = target.TransformPoint(initialLocalOffset);
-        transform.position = Vector3.SmoothDamp(transform.position, desiredPos, ref _posVelocity, positionSmoothTime);
+        Vector3 currentPos = transform.position;
+        Vector3 desiredPos = target.position + offset;
 
-        // 2) 회전 추종: 모드에 따라 목표 회전 계산
-        Quaternion targetRot = transform.rotation;
+        // 축별로 따라갈지 말지 선택
+        if (!followX) desiredPos.x = currentPos.x;
+        if (!followY) desiredPos.y = currentPos.y;
+        if (!followZ) desiredPos.z = currentPos.z;
 
-        if (rotationMode == RotationMode.CopyTargetWithOffset)
+        if (smoothTime <= 0f)
         {
-            // 타겟 회전 * 초기 상대 회전 오프셋
-            targetRot = target.rotation * initialRotOffset;
+            transform.position = desiredPos;
         }
-        else // RotationMode.LookAtWithTargetUp
+        else
         {
-            // 타겟을 바라보되, up 벡터로 target.up을 사용해 롤을 따라감
-            Vector3 lookPoint = target.TransformPoint(lookAtLocalOffset);
-            Vector3 fwd = (lookPoint - transform.position);
-            if (fwd.sqrMagnitude > 1e-6f)
-            {
-                targetRot = Quaternion.LookRotation(fwd, target.up);
-            }
+            transform.position = Vector3.SmoothDamp(currentPos, desiredPos, ref _velocity, smoothTime);
         }
 
-        ApplyRotation(targetRot);
+        if (lookAtTarget)
+        {
+            Vector3 lookTarget = target.position + lookAtOffset;
+            transform.LookAt(lookTarget);
+        }
     }
 
-    // -> 회전 적용(스무딩 또는 즉시)
-    private void ApplyRotation(Quaternion targetRot)
+    // ============================
+    // Public API
+    // ============================
+    /// <summary>
+    /// 런타임에 타겟을 바꾸고 싶을 때 사용.
+    /// </summary>
+    public void SetTarget(Transform newTarget, bool recalcOffset = true)
     {
-        if (rotationSmoothTime <= 0f)
+        target = newTarget;
+
+        if (target == null)
         {
-            transform.rotation = targetRot;
+            LogWarn(nameof(SetTarget), "새 타겟이 null 입니다.");
             return;
         }
 
-        float t = 1f - Mathf.Exp(-Time.deltaTime / Mathf.Max(0.0001f, rotationSmoothTime));
-        transform.rotation = Quaternion.Slerp(transform.rotation, targetRot, t);
+        if (recalcOffset)
+        {
+            offset = transform.position - target.position;
+            Log(nameof(SetTarget), $"타겟 변경 및 offset 재계산: {offset}");
+        }
+        else
+        {
+            Log(nameof(SetTarget), "타겟 변경 (offset 유지)");
+        }
     }
 
-    // -> 현재 배치에서 오프셋을 다시 캡처(에디터 우클릭 메뉴)
-    [ContextMenu("Re-capture Offsets From Current Pose")]
-    private void ReCaptureOffsets()
+    // ============================
+    // Logging helpers
+    // ============================
+    private static void Log(string method, string msg)
     {
-        if (target == null) return;
-        initialLocalOffset = target.InverseTransformPoint(transform.position);
-        initialRotOffset   = Quaternion.Inverse(target.rotation) * transform.rotation;
+        Debug.Log($"[RocketFollowCam] {method}-> {msg}");
     }
 
-    // -> 타겟 기준으로 한 발짝 뒤로/앞으로 이동하는 유틸(디자인 편의)
-    [ContextMenu("Nudge Backward (Local Z +1)")]
-    private void NudgeBackward()
+    private static void LogWarn(string method, string msg)
     {
-        if (target == null) return;
-        initialLocalOffset += new Vector3(0f, 0f, 1f);
+        Debug.LogWarning($"[RocketFollowCam] {method}-> {msg}");
     }
 
-    [ContextMenu("Nudge Forward (Local Z -1)")]
-    private void NudgeForward()
+    private static void LogError(string method, string msg)
     {
-        if (target == null) return;
-        initialLocalOffset += new Vector3(0f, 0f, -1f);
+        Debug.LogError($"[RocketFollowCam] {method}-> {msg}");
     }
 }

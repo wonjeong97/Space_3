@@ -1,5 +1,6 @@
 using UnityEngine;
 
+/// <summary> 거치대가 완전히 올라오면 오브젝트에서 로켓 분리 하고 로켓 레디 신호 줌 </summary>
 public class LauncherAnimEvent : MonoBehaviour
 {
     [Header("Detach Settings")]
@@ -10,13 +11,10 @@ public class LauncherAnimEvent : MonoBehaviour
     [SerializeField] private Transform reparentTo;
 
     [Tooltip("부모 변경 시 월드 좌표/회전/스케일 유지")]
-    [SerializeField] private bool keepWorldPosition = true;
+    [SerializeField] private bool keepWorldPosition = false;
     
     [SerializeField] private GameObject launcherObj;
-    [SerializeField] private ParticleSystem launcherSmoke01;
-    [SerializeField] private ParticleSystem launcherSmoke02;
-    [SerializeField] private ParticleSystem launcherSmoke03;
-    [SerializeField] private ParticleSystem launcherSmoke04;
+    
 
     // ======================
     // Public API
@@ -62,17 +60,6 @@ public class LauncherAnimEvent : MonoBehaviour
         if (LaunchManager.Instance)
         {
             LaunchManager.Instance.RocketReady = true;
-        }
-    }
-
-    public void StartLauncherSmoke()
-    {
-        if (launcherSmoke01 && launcherSmoke02 && launcherSmoke03 && launcherSmoke04)
-        {
-            launcherSmoke01.Play();
-            launcherSmoke02.Play();
-            launcherSmoke03.Play();
-            launcherSmoke04.Play();
         }
     }
 }

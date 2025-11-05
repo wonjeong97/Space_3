@@ -1,22 +1,17 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
 
-[Serializable]
-public struct JetEngine
-{
-    public GameObject rootObject;
-    public ParticleSystem flameA;
-    public ParticleSystem flameB;
-}
-
 public class NuriAnimEvent : MonoBehaviour
 {
-    [Header("Animator")] 
-    [SerializeField] private Animator separateAnimator;
-    
+    [Header("Animator")] [SerializeField] private Animator separateAnimator;
+
+    [Header("Bottom Smoke")]
+    [SerializeField] private ParticleSystem bottomSmoke;
+
     [Header("Fairing")]
     [SerializeField] private GameObject fairing1;
     [SerializeField] private GameObject fairing2;
@@ -25,63 +20,81 @@ public class NuriAnimEvent : MonoBehaviour
 
     [Header("Stage1")]
     [SerializeField] private GameObject stage1;
-    [SerializeField] private List<GameObject> stage1VfXs = new List<GameObject>();
+    [SerializeField] private GameObject stage1Flame;
     [SerializeField] private ParticleSystem stage1Smoke;
 
     [Header("Stage2")]
     [SerializeField] private GameObject stage2;
-    [SerializeField] private List<JetEngine> stage2VfXs = new List<JetEngine>();
+    [SerializeField] private GameObject stage2Flame;
     [SerializeField] private ParticleSystem stage2Smoke;
 
     [Header("Stage3")]
     [SerializeField] private GameObject stage3;
-    [SerializeField] private List<JetEngine> stage3VfXs = new List<JetEngine>();
+    [SerializeField] private GameObject stage3Flame;
 
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
-
-    [ContextMenu("test call")]
-    public void Test()
-    {
-        separateAnimator?.SetTrigger("Stage01");
-    }
     
+    private JetVFXAnim _jetVFXAnimStage1;
+    private JetVFXAnim _jetVFXAnimStage2;
+    private JetVFXAnim _jetVFXAnimStage3;
+
+    private void Awake()
+    {
+        _jetVFXAnimStage1 = stage1.GetComponent<JetVFXAnim>();
+        _jetVFXAnimStage2 = stage2.GetComponent<JetVFXAnim>();
+        _jetVFXAnimStage3 = stage3.GetComponent<JetVFXAnim>();
+    }
+
+    public void StartBottomSmoke()
+    {
+        if (bottomSmoke && !bottomSmoke.isPlaying)
+        {
+            bottomSmoke.Play();
+        }
+    }
+
+    public void StopBottomSmoke()
+    {
+        if (!bottomSmoke || !bottomSmoke.isPlaying)
+            return;
+
+        // 1) 루프 끄기 -> 자연스럽게 줄어들도록
+        var main = bottomSmoke.main;
+        main.loop = false;
+
+        // 2) 5초 뒤 완전 정지
+        StartCoroutine(StopAfterDelay(bottomSmoke, 5f));
+    }
+
+    private IEnumerator StopAfterDelay(ParticleSystem ps, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (ps)
+        {
+            ps.Stop();
+        }
+    }
+
     /// <summary> 1단 분리: 1단 제트 축소 → 연기 → 분리 → 2단 점화/확장 → 폐기 </summary>
     public async UniTask DropStage1()
     {
         var token = this.GetCancellationTokenOnDestroy();
         try
         {
-            if (!stage1 || !stage1Smoke) return;
+            if (!stage1 || !stage1Smoke || !stage1Flame) return;
             
-            foreach (GameObject vfx in stage1VfXs)
-            {
-                if (vfx && vfx.TryGetComponent(out JetVFXAnim anim))
-                {
-                    anim.Shrink();
-                }
-            }
-
             stage1Smoke?.Play();
-            await UniTask.Delay(3000, cancellationToken: token);
+            _jetVFXAnimStage1?.Shrink();
             
+            await UniTask.Delay(3000, cancellationToken: token);
+
             separateAnimator?.SetTrigger("Stage01");
-            
+
             await UniTask.Delay(3000, cancellationToken: token);
-
-            foreach (JetEngine vfx in stage2VfXs)
-            {
-                GameObject root = vfx.rootObject;
-                ParticleSystem flameA = vfx.flameA;
-                ParticleSystem flameB = vfx.flameB;
-
-                if (root && root.TryGetComponent(out JetVFXAnim anim) && flameA && flameB)
-                {
-                    flameA.Play();
-                    flameB.Play();
-                    anim.Expand();
-                }
-            }
+            
+            _jetVFXAnimStage2?.Expand();
 
             await UniTask.Delay(10000, cancellationToken: token);
 
@@ -105,9 +118,9 @@ public class NuriAnimEvent : MonoBehaviour
             fairingSmoke?.Play();
             fairingSmokeVertical?.Play();
             await UniTask.Delay(3000, cancellationToken: token);
-            
+
             separateAnimator?.SetTrigger("Fairing");
-           
+
             await UniTask.Delay(2000, cancellationToken: token);
             fairingSmoke?.Stop();
             fairingSmokeVertical?.Stop();
@@ -131,37 +144,19 @@ public class NuriAnimEvent : MonoBehaviour
         var token = this.GetCancellationTokenOnDestroy();
         try
         {
-            if (!stage2) return;
-            
-            foreach (JetEngine vfx in stage2VfXs)
-            {
-                GameObject root = vfx.rootObject;
-                if (root && root.TryGetComponent(out JetVFXAnim anim))
-                {
-                    anim.Shrink();
-                }
-            }
+            if (!stage2 || !stage2Smoke || !stage2Flame) return;
 
+            _jetVFXAnimStage2?.Shrink();
             stage2Smoke?.Play();
+            
             await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage02");
-            
-            await UniTask.Delay(3000, cancellationToken: token);
-            
-            foreach (JetEngine vfx in stage3VfXs)
-            {
-                GameObject root = vfx.rootObject;
-                ParticleSystem flameA = vfx.flameA;
-                ParticleSystem flameB = vfx.flameB;
 
-                if (root && root.TryGetComponent(out JetVFXAnim anim) && flameA && flameB)
-                {
-                    flameA.Play();
-                    flameB.Play();
-                    anim.Expand();
-                }
-            }
+            await UniTask.Delay(3000, cancellationToken: token);
+
+            _jetVFXAnimStage3.Expand();
+
             await UniTask.Delay(10000, cancellationToken: token);
             if (stage2) Destroy(stage2);
         }
@@ -177,33 +172,24 @@ public class NuriAnimEvent : MonoBehaviour
         CancellationToken token = this.GetCancellationTokenOnDestroy();
         try
         {
-            if (!stage3) return;
+            if (!stage3 || !stage3Flame) return;
             
-            foreach (JetEngine vfx in stage3VfXs)
-            {
-                var root = vfx.rootObject;
-                if (root && root.TryGetComponent(out JetVFXAnim anim))
-                {
-                    anim.Shrink();
-                }
-            }
+            _jetVFXAnimStage3?.Shrink();
             
-            await UniTask.Delay(5000, cancellationToken: token);
-            
-            foreach (JetEngine vfx in stage3VfXs)
-            {
-                GameObject root = vfx.rootObject;
-                if (root)
-                {
-                    Destroy(root);
-                }
-            }
+            await UniTask.Delay(7000, cancellationToken: token);
+           
+            separateAnimator?.SetTrigger("Stage03");
         }
         catch (OperationCanceledException) { }
         catch (Exception e)
         {
             Debug.LogError(e);
         }
+    }
+
+    public void FadeBackground()
+    {
+        LaunchManager.Instance?.CallEndRocket();
     }
 
     /// <summary> 다음 씬 호출 </summary>
@@ -216,10 +202,22 @@ public class NuriAnimEvent : MonoBehaviour
         {
             await LaunchManager.Instance.LoadNextSceneAsync().AttachExternalCancellation(token);
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
         }
+    }
+
+    public void PlaySeparateSound()
+    {
+        SoundManager.Instance?.PlayByKey("분리");
+    }
+
+    public void PlayRocketEngineSound(string soundKey)
+    {
+        SoundManager.Instance?.CrossFadeByKey(soundKey, loop: true);
     }
 }

@@ -1,26 +1,30 @@
 {
-  "portName": "COM6",
-  "baudRate": 9600,  
-  "buttonDelayTime": 1,
-  "inactivityTime": 1160.0,
-  "fadeTime": 0.5,
-  "closeSetting": {
-	"position": { "x": 1, "y": 0 },
-	"numToClose": 10,
-	"resetClickTime": 60,
-	"imageAlpha": 1.0
-  },
-  "fontMap": {
-	"font1": "Fonts/TMPro/Freesentation-4Regular SDF.asset",
-	"font2": "Fonts/TMPro/EliceDigitalBaeum_Bold SDF.asset"
-  },
-  "sounds": [
-	{ "key": "click1", "clipPath": "click1.wav", "volume": 1.0 },
-	{ "key": "click2", "clipPath": "click2.wav", "volume": 0.5 }
-  ],
-  "canvas1TargetMonitorIndex": 0,
-  "canvas2TargetMonitorIndex": 1,
-  "canvas3TargetMonitorIndex": 2,
-  "camera3TurnSpeed": 5.0,
-  "buttonSound": {	"key": "button",	"clipPath": "Sound/물리 버튼.mp3",	"volume": 1.0  }
+	"portName": "COM6",
+	"baudRate": 9600,
+	"buttonDelayTime": 1,
+	"inactivityTime": 1160.0,
+	"fadeTime": 0.5,
+	"closeSetting": {
+		"position": { "x": 1, "y": 0 },
+		"numToClose": 10,
+		"resetClickTime": 60,
+		"imageAlpha": 1.0
+	},
+	"fontMap": {
+		"font1": "Fonts/TMPro/Freesentation-4Regular SDF.asset",
+		"font2": "Fonts/TMPro/EliceDigitalBaeum_Bold SDF.asset"
+	},
+	"sounds": [
+		{ "key": "ButtonSound", "clipPath": "Sound/물리 버튼.mp3", "volume": 1.0 },
+		{ "key": "Countdown", "clipPath": "Sound/누리호 발사 카운트 다운.wav", "volume": 1.0 },
+		{ "key": "발사", "clipPath": "Sound/발사.mp3", "volume": 0.7 },
+		{ "key": "분리", "clipPath": "Sound/분리.wav", "volume": 0.5 },
+		{ "key": "1단 발사", "clipPath": "Sound/1단 발사중.wav", "volume": 1.0 },
+		{ "key": "2단 발사", "clipPath": "Sound/2단 발사중.wav", "volume": 1.0 },
+		{ "key": "3단 발사", "clipPath": "Sound/3단 발사중.wav", "volume": 1.0 }
+	],
+	"canvas1TargetMonitorIndex": 0,
+	"canvas2TargetMonitorIndex": 1,
+	"canvas3TargetMonitorIndex": 2,
+	"camera3TurnSpeed": 5.0
 }

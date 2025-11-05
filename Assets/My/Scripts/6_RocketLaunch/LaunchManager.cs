@@ -109,6 +109,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject launcherObj;
     [SerializeField] private Animator launcherAnimator;
     [SerializeField] private GameObject rocketVFX;
+    [SerializeField] private NuriAnimEvent nuriAnimEvent;
 
     protected override string JsonPath => "JSON/LaunchSetting.json";
 
@@ -305,6 +306,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             await UniTask.Yield();
         }
+
+        nuriAnimEvent?.StartBottomSmoke(); // 로켓 하단 연기 시작
         
         SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
         SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
@@ -323,6 +326,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
+                //SoundManager.Instance?.PlayByPath("Sound/누리호 발사 카운트 다운.wav");
+                SoundManager.Instance?.PlayByKey("Countdown");
 
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
 
@@ -335,7 +340,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             ArduinoInputManager.Instance?.FlushAll();
             await UniTask.Yield();
         }
-
+        
         // 로켓 런치 시작
         if (rocketVFX != null && rocketVFX.TryGetComponent(out _rocketLaunch))
         {
@@ -350,7 +355,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         // 카운트다운 시작
         RunCountdownAsync().Forget();
         CountController.Instance?.RunCountdownAsync().Forget();
-
+        
         // 무입력 복귀 일시 중지
         PauseInactivityTimer();
     }
@@ -360,7 +365,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     #region Countdown
 
     /// <summary>
-    /// 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 페이드
+    /// 숫자를 갱신하고, 각 숫자마다 알파를 1 -> 0으로 페이드,
+    /// 현재는 미사용하고 1초일 때 카메라 러프로 사용 중 
     /// </summary>
     private async UniTask RunCountdownAsync()
     {
@@ -387,6 +393,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             }
 
             SetAlpha(tmp, 0f);
+
+            if (n == 1)
+            {
+                LerpCamera3Fov(2, 70).Forget();
+            }
         }
     }
 
@@ -878,14 +889,39 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     #endregion
     
-    [ContextMenu("call")]
     public async UniTaskVoid CallEndRocket()
     {
-        float newFadeTime = fadeTime + 3;
+        float newFadeTime = fadeTime + 2;
         await FadeImageAsync(0f, 1f, newFadeTime, new[] { fadeImage3 });
         
         launcherObj?.SetActive(false);
         
         await FadeImageAsync(1f, 0f, newFadeTime, new[] { fadeImage3 });
+    }
+    
+    private async UniTask LerpCamera3Fov(float duration, float targetFov)
+    {
+        if (camera3 == null) return;
+
+        float d = Mathf.Max(0.01f, duration);
+        float startFov = camera3.fieldOfView;
+
+        float t = 0f;
+        CancellationToken token = DestroyToken;
+
+        while (t < d && !token.IsCancellationRequested)
+        {
+            t += Time.deltaTime;
+            float u = Mathf.Clamp01(t / d);
+            float fov = Mathf.Lerp(startFov, targetFov, u);
+            camera3.fieldOfView = fov;
+
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
+        }
+
+        if (!token.IsCancellationRequested)
+        {
+            camera3.fieldOfView = targetFov;
+        }
     }
 }

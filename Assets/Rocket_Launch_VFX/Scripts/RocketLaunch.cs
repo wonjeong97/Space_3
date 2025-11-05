@@ -4,13 +4,17 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 public class RocketLaunch : MonoBehaviour
-{
+{   
+    [Header("Rocket")]
+    [SerializeField] private NuriAnimEvent nuriAnimEvent;
+    
     [Header("VFX Roots")]
-    public List<GameObject> jetEngineVFX = new List<GameObject>();
+    public GameObject stage01Flame;
     public GameObject flamesLight;
     public GameObject launcher;
 
-    [Header("Particles")]
+    [Header("Particles")] 
+    public ParticleSystem engineSmokeParticles;
     public ParticleSystem turbulenceSmokeParticles;
     public ParticleSystem flamesAParticles;
     public ParticleSystem flamesBParticles;
@@ -18,29 +22,37 @@ public class RocketLaunch : MonoBehaviour
     public ParticleSystem takeOffSmokeParticles;
     public GameObject launchSmoke;
 
-    [Header("Timing (fallbacks)")]
-    [Tooltip("CountController가 없을 때 사용할 대기(초)")]
-    public int startDelay = 10;
-    public int engineWarmupTime = 6;
-    public int launchEndTimer = 8;
+    [Header("T- Trigger Times (seconds)")]
+    [Tooltip("T- 이 값 이하가 되면 사전 연기(takeOffSmoke)를 켬")]
+    [SerializeField] private float tMinusPreSmoke = 10f;
 
-    [Header("T- Gate")]
-    [Tooltip("이 값(초) 이하의 T- 가 되면 시퀀스 시작. 예: 2 -> T-00:00:02")]
-    [SerializeField] private float startAtTMinusSeconds = 2f;
+    [Tooltip("T- 이 값 이하가 되면 엔진 점화 VFX(flames, 스파크 등)를 켬")]
+    [SerializeField] private float tMinusEngineOn = 1f;
+
+    [Tooltip("T- 이 값 이하가 되면 이륙 연기 및 제트 배기 VFX를 켬 (보통 0)")]
+    [SerializeField] private float tMinusLaunchVfx = 0f;
+
+    [Header("T+ Stop Time (seconds)")]
+    [Tooltip("T+ 이 값 이상이 되면 모든 VFX를 정리하고 시퀀스를 종료")]
+    [SerializeField] private float tPlusStopVfx = 8f;
+
+    [Header("Stop Delay Settings")]
+    [Tooltip("루프를 끈 뒤 완전 Stop()까지 기다릴 시간(초)")]
+    [SerializeField] private float stopDelaySeconds = 5f;
 
     private ParticleSystem _launchSmokeParticle;
+    private JetVFXAnim _stage01JetEngineVFX;
 
     private void Awake()
     {
         _launchSmokeParticle = launchSmoke ? launchSmoke.GetComponent<ParticleSystem>() : null;
+        _stage01JetEngineVFX = stage01Flame ? stage01Flame.GetComponent<JetVFXAnim>() : null;
     }
 
     private void Start()
     {
+        // 시작 시 불빛 비활성
         SafeSetActive(flamesLight, false);
-
-        foreach (GameObject vfx in jetEngineVFX)
-            SafeSetActive(vfx, false);
     }
 
     public void Call()
@@ -50,76 +62,85 @@ public class RocketLaunch : MonoBehaviour
 
     private IEnumerator LaunchRocket()
     {
-        LogUtil.Log(nameof(RocketLaunch), nameof(LaunchRocket), "시퀀스 시작 요청");
-
-        // 0) 사전 연기
-        SafePlay(takeOffSmokeParticles);
-
-        // 1) CountController가 있으면 T- 게이트까지 대기, 없으면 기존 startDelay 사용
-        if (CountController.Instance)
+        if (!CountController.Instance)
         {
-            float gate = Mathf.Max(0f, startAtTMinusSeconds);
+            LogUtil.Log(nameof(RocketLaunch), nameof(LaunchRocket), "CountController 없음 -> 시퀀스 중단");
+            yield break;
+        }
 
-            // 이미 T+일 경우 즉시 진행
+        bool firedPreSmoke = false;
+        bool firedEngineOn = false;
+        bool firedLaunchVfx = false;
+        bool finished = false;
+
+        while (CountController.Instance && !finished)
+        {
             if (CountController.Instance.IsCountingDown)
             {
-                LogUtil.Log(nameof(RocketLaunch), nameof(LaunchRocket), $"T- 게이트 대기 시작 (<= {gate:0.00}s)");
-                while (CountController.Instance &&
-                       CountController.Instance.IsCountingDown &&
-                       CountController.Instance.TMinusSeconds > gate)
+                // T- 구간
+                float tMinus = CountController.Instance.TMinusSeconds;
+
+                // 1) 사전 연기 (T- 10)
+                if (!firedPreSmoke && tMinus <= tMinusPreSmoke)
                 {
-                    yield return null;
+                    firedPreSmoke = true;
+                    SafePlay(takeOffSmokeParticles);
                 }
-                LogUtil.Log(nameof(RocketLaunch), nameof(LaunchRocket), $"T- 게이트 통과 (현재 T- {CountController.Instance?.TMinusSeconds:0.00}s)");
+
+                // 2) 엔진 점화 VFX (T- 1)
+                if (!firedEngineOn && tMinus <= tMinusEngineOn)
+                {
+                    firedEngineOn = true;
+
+                    LaunchManager.Instance?.FadeInStagePublicAsync(1).Forget();
+
+                    SafeSetActive(flamesLight, true);
+                    SafePlay(engineSmokeParticles);
+                    SafePlay(turbulenceSmokeParticles);
+                    SafePlay(flamesAParticles);
+                    SafePlay(flamesBParticles);
+                    SafePlay(sparksParticles);
+                }
+
+                // 3) 이륙 VFX (T- 0)
+                if (!firedLaunchVfx && tMinus <= tMinusLaunchVfx)
+                {
+                    firedLaunchVfx = true;
+                    
+                    nuriAnimEvent?.StopBottomSmoke();
+                    SafePlay(_launchSmokeParticle);
+
+                    // 1단 제트 플레임 확장 애니메이션
+                    _stage01JetEngineVFX?.Expand();
+                }
             }
             else
             {
-                LogUtil.Log(nameof(RocketLaunch), nameof(LaunchRocket), "이미 T+ 상태, 즉시 진행");
+                // T+ 구간
+                float tPlus = CountController.Instance.TPlusSeconds;
+
+                if (tPlus >= tPlusStopVfx)
+                {
+                    finished = true;
+                }
             }
-        }
-        else
-        {
-            LogUtil.LogWarn(nameof(RocketLaunch), nameof(LaunchRocket), $"CountController 없음 -> startDelay {startDelay}s 폴백");
-            yield return new WaitForSeconds(Mathf.Max(0, startDelay));
+
+            yield return null;
         }
 
-        // 2) 1단계: 스테이지 페이드, 불빛/연기/스파크 점화
-        LaunchManager.Instance?.FadeInStagePublicAsync(1).Forget();
-
-        SafeSetActive(flamesLight, true);
-        SafePlay(turbulenceSmokeParticles);
-        SafePlay(flamesAParticles);
-        SafePlay(flamesBParticles);
-        SafePlay(sparksParticles);
-
-        // 3) 엔진 워밍업(선택) – CountController가 있든 없든 일관되게 대기
-        if (engineWarmupTime > 0)
-            yield return new WaitForSeconds(engineWarmupTime);
-
-        // 4) 이륙 연기 및 제트 배기 VFX 온
-        SafePlay(_launchSmokeParticle);
-
-        foreach (GameObject vfx in jetEngineVFX)
-            SafeSetActive(vfx, true);
-
-        // 5) 종료 타이머 후 정리
-        if (launchEndTimer > 0)
-            yield return new WaitForSeconds(launchEndTimer);
-
+        // 공통 정리: 바로 Stop()하지 말고 loop를 끄고 일정 시간 후 정지
         SafeSetActive(flamesLight, false);
-        SafeStop(turbulenceSmokeParticles);
-        SafeStop(flamesAParticles);
-        SafeStop(flamesBParticles);
-        SafeStop(sparksParticles);
 
-        SafeDestroy(flamesLight);
-        SafeDestroy(turbulenceSmokeParticles);
-        SafeDestroy(flamesAParticles);
-        SafeDestroy(flamesBParticles);
-        SafeDestroy(sparksParticles);
-        //SafeDestroy(launcher);
+        SafeStop(engineSmokeParticles,       stopDelaySeconds);
+        SafeStop(turbulenceSmokeParticles,   stopDelaySeconds);
+        SafeStop(flamesAParticles,           stopDelaySeconds);
+        SafeStop(flamesBParticles,           stopDelaySeconds);
+        SafeStop(sparksParticles,            stopDelaySeconds);
+        SafeStop(_launchSmokeParticle,       stopDelaySeconds);
+        SafeStop(takeOffSmokeParticles,      stopDelaySeconds);
 
-        LogUtil.Log(nameof(RocketLaunch), nameof(LaunchRocket), "시퀀스 종료");
+        // 필요하다면 파티클 정지 후 Destroy까지 하고 싶을 때는
+        // StopAfterDelay 안에서 Destroy까지 같이 처리하도록 확장할 수 있음.
     }
 
     // -------------------------
@@ -133,12 +154,31 @@ public class RocketLaunch : MonoBehaviour
 
     private static void SafePlay(ParticleSystem ps)
     {
-        if (ps) ps.Play();
+        if (ps)
+        {
+            ps.Play();
+        }
     }
 
-    private static void SafeStop(ParticleSystem ps)
+    /// <summary> 루프를 끄고 일정 시간(delay) 후 완전 Stop(). </summary>
+    private void SafeStop(ParticleSystem ps, float delay)
     {
-        if (ps) ps.Stop();
+        if (!ps || !ps.isPlaying) return;
+
+        ParticleSystem.MainModule main = ps.main;
+        main.loop = false;
+
+        StartCoroutine(StopAfterDelay(ps, delay));
+    }
+
+    private IEnumerator StopAfterDelay(ParticleSystem ps, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+
+        if (ps != null)
+        {
+            ps.Stop();
+        }
     }
 
     private static void SafeDestroy(Object obj)

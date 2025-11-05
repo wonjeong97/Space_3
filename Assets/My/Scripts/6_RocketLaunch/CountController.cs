@@ -103,7 +103,7 @@ public class CountController : MonoBehaviour
     /// </summary>
     public async UniTask RunCountdownAsync()
     {
-        float time = 10f; // 카운트다운 시작값
+        float time = 11f; // 카운트다운 시작값
         IsCountingDown = true;
 
         TPlusSeconds = 0f;
