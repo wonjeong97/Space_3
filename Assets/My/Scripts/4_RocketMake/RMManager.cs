@@ -138,7 +138,7 @@ public class RMManager : SceneManager_Base<RMSetting>
     private CancellationTokenSource _velBarCts, _maxBarCts, _altBarCts, _slopeBarCts, _remainBarCts;
 
     // 현재 표시값을 기억해 중복 파싱 없이 애니메이션 시작점으로 사용
-    private float _curVelocity, _curMaxVelocity, _curAltitude, _curSlope, _curRemainDistance;
+    private float _curVelocity/*, _curMaxVelocity, _curAltitude, _curSlope, _curRemainDistance*/;
     
     private TextMeshProUGUI _lblTime, _lblAltitude, _lblVelocity, _lblDistance;
     private TextMeshProUGUI _valTime, _valAltitude, _valVelocity, _valDistance;
@@ -368,10 +368,10 @@ public class RMManager : SceneManager_Base<RMSetting>
         if (!float.IsNaN(_curVelocity) && string.IsNullOrEmpty(_valVelocity?.text) && _curVelocity == 0f)
         {
             _curVelocity = float.NaN;
-            _curMaxVelocity = float.NaN;
-            _curAltitude = float.NaN;
-            _curSlope = float.NaN;
-            _curRemainDistance = float.NaN;
+            // _curMaxVelocity = float.NaN;
+            // _curAltitude = float.NaN;
+            // _curSlope = float.NaN;
+            // _curRemainDistance = float.NaN;
         }
 
         RocketSetting src = arr[index];

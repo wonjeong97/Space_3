@@ -34,15 +34,10 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     {
         inputReceived = false;
 
-        // 1) UI 세팅 (예외 로그는 한글로 기록)
-        try { SettingImageObject(backgroundImage, setting.background); }
-        catch (Exception e) { Debug.LogWarning($"[TitleManager] Init-> 배경 이미지 세팅 중 예외: {e.Message}"); }
-
-        try { SettingImageObject(titleImage, setting.titleImage); }
-        catch (Exception e) { Debug.LogWarning($"[TitleManager] Init-> 타이틀 이미지 세팅 중 예외: {e.Message}"); }
-
-        try { SettingImageObject(infoImage, setting.infoImage); }
-        catch (Exception e) { Debug.LogWarning($"[TitleManager] Init-> 안내 이미지 세팅 중 예외: {e.Message}"); }
+        // 1) UI 세팅
+        SettingImageObject(backgroundImage, setting.background); 
+        SettingImageObject(titleImage, setting.titleImage);
+        SettingImageObject(infoImage, setting.infoImage);
 
         await UniTask.Yield();
 
@@ -69,7 +64,6 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
         }
         else
         {
-            Debug.Log("[TitleManager] Init-> 아두이노 준비 완료");
             try
             {
                 await UniTask.Delay(1000, cancellationToken: ct); // 1초 지연
@@ -91,6 +85,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
 
         // 3) 카메라/페이드 인
         TurnCamera3Async(ct).Forget();
+        SoundManager.Instance?.PlayBGMByKey("BGM");
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
         if (ct.IsCancellationRequested || !this || !isActiveAndEnabled) return;
 
@@ -104,7 +99,6 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
         }
 
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 1;
-        Debug.Log($"[TitleManager] Init-> 다음 씬으로 전환 시도 (buildIndex={target})");
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
     }
 

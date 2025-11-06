@@ -53,6 +53,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     // ===== private =====
     private readonly Dictionary<GameObject, CancellationTokenSource> _anchoredYAnimCts = new Dictionary<GameObject, CancellationTokenSource>(); // Y좌표 애니메이션 관리
     private readonly Dictionary<string, Sprite> _spriteCache = new Dictionary<string, Sprite>(); // 버튼 이미지 캐싱
+    private readonly Dictionary<GameObject, CancellationTokenSource> _blinkCtsDict = new(); // 조작 방식 버튼 이미지 on/off 깜빡임 관리
 
     private CancellationToken _destroyToken; // 객체 파괴 감지용 토큰
     private CancellationTokenSource _ledCts; // LED 제어용 토큰
@@ -733,6 +734,68 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         for (int i = 0; i < buttons.Length; i++) SetButtonOff(buttons[i]);
     }
 
+    /// <summary> 지정한 버튼을 깜빡이게 한다. </summary>
+    protected void StartButtonBlink(GameObject buttonObject, float interval = 0.3f)
+    {
+        if (buttonObject == null)
+        {
+            Debug.LogWarning("[SceneManager_Base] StartButtonBlink-> buttonObject가 null입니다");
+            return;
+        }
+
+        // 기존에 깜빡이는 중이면 중단
+        StopButtonBlink(buttonObject);
+
+        CancellationTokenSource cts = new();
+        _blinkCtsDict[buttonObject] = cts;
+        BlinkRoutineAsync(buttonObject, interval, cts.Token).Forget();
+    }
+
+    /// <summary> 버튼 깜빡임 중단 </summary>
+    protected void StopButtonBlink(GameObject buttonObject)
+    {
+        if (buttonObject == null) return;
+
+        if (_blinkCtsDict.TryGetValue(buttonObject, out CancellationTokenSource cts))
+        {
+            cts.Cancel();
+            cts.Dispose();
+            _blinkCtsDict.Remove(buttonObject);
+        }
+
+        // 중단 시 Off 상태로 복귀
+        SetButtonOff(buttonObject);
+    }
+
+    /// <summary> 모든 버튼의 깜빡임 중단 </summary>
+    protected void StopAllButtonBlinks()
+    {
+        foreach (var kvp in _blinkCtsDict)
+        {
+            kvp.Value.Cancel();
+            kvp.Value.Dispose();
+            if (kvp.Key != null)
+                SetButtonOff(kvp.Key);
+        }
+        _blinkCtsDict.Clear();
+    }
+
+    /// <summary> 내부 비동기 루프: On/Off 반복 </summary>
+    private async UniTask BlinkRoutineAsync(GameObject buttonObject, float interval, CancellationToken token)
+    {
+        bool isOn = false;
+        while (!token.IsCancellationRequested)
+        {
+            if (isOn)
+                SetButtonOff(buttonObject);
+            else
+                SetButtonOn(buttonObject);
+
+            isOn = !isOn;
+            await UniTask.Delay(TimeSpan.FromSeconds(interval), cancellationToken: token);
+        }
+    }
+    
     #endregion
 
     #region Anchored Y Animation (쓰로틀 바 등)
@@ -874,6 +937,40 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     #endregion
 
     #region LED Effects
+    
+    /// <summary> 버튼 LED 블링크 </summary>
+    protected async UniTask BlinkLedAsync(int ledIndex, int onMs, int offMs, CancellationToken token)
+    {
+        ArduinoInputManager mgr = ArduinoInputManager.Instance;
+        if (mgr == null) return;
+
+        try
+        {
+            while (!token.IsCancellationRequested)
+            {
+                mgr.SetLed(ledIndex, true);
+                try { await UniTask.Delay(onMs, cancellationToken: token); }
+                catch (OperationCanceledException) { }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[SceneManager_Base] BlinkLedAsync-> 대기 중 예외(켜짐 구간): {e.Message}");
+                }
+
+                mgr.SetLed(ledIndex, false);
+                try { await UniTask.Delay(offMs, cancellationToken: token); }
+                catch (OperationCanceledException) { }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[SceneManager_Base] BlinkLedAsync-> 대기 중 예외(꺼짐 구간): {e.Message}");
+                }
+            }
+        }
+        finally
+        {
+            try { mgr.SetLed(ledIndex, false); }
+            catch (Exception e) { Debug.LogWarning($"[SceneManager_Base] BlinkLedAsync-> LED 종료 처리 중 예외: {e.Message}"); }
+        }
+    }
 
     /// <summary> 외부 공개: 초록 깜빡임 시작 </summary>
     public void PublicStartBlinkGreen(int periodMsHalf, int onBrightness)

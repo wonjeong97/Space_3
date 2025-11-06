@@ -326,7 +326,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
-                //SoundManager.Instance?.PlayByPath("Sound/누리호 발사 카운트 다운.wav");
                 SoundManager.Instance?.PlayByKey("Countdown");
 
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
@@ -699,18 +698,30 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     #region Button helpers (Left/Middle/Right)
 
-    public void SetButtonOn(string whichButton)
+    public void SetButtonOn(string whichButton, CancellationToken blinkCts)
     {
         switch (whichButton)
         {
             case "Left":
-                SetButtonOn(buttonLeft);
+                StopAllButtonBlinks();
+                ArduinoInputManager.Instance?.SetLedAll(false);
+                
+                StartButtonBlink(buttonLeft);
+                BlinkLedAsync(1, 300, 300, blinkCts).Forget();
                 break;
             case "Middle":
-                SetButtonOn(buttonMiddle);
+                StopAllButtonBlinks();
+                ArduinoInputManager.Instance?.SetLedAll(false);
+                
+                StartButtonBlink(buttonMiddle);
+                BlinkLedAsync(2, 300, 300, blinkCts).Forget();
                 break;
             case "Right":
-                SetButtonOn(buttonRight);
+                StopAllButtonBlinks();
+                ArduinoInputManager.Instance?.SetLedAll(false);
+                
+                StartButtonBlink(buttonRight);
+                BlinkLedAsync(3, 300, 300, blinkCts).Forget();
                 break;
             default:
                 LogUtil.LogWarn(nameof(LaunchManager),nameof(SetButtonOn), "Unknown button name: " + whichButton);
@@ -723,13 +734,13 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         switch (whichButton)
         {
             case "Left":
-                SetButtonOff(buttonLeft);
+                StopButtonBlink(buttonLeft);
                 break;
             case "Middle":
-                SetButtonOff(buttonMiddle);
+                StopButtonBlink(buttonMiddle);
                 break;
             case "Right":
-                SetButtonOff(buttonRight);
+                StopButtonBlink(buttonRight);
                 break;
             default:
                 LogUtil.LogWarn(nameof(LaunchManager),nameof(SetButtonOff), "Unknown button name: " + whichButton);
@@ -891,7 +902,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     
     public async UniTask CallEndRocket()
     {
-        float newFadeTime = fadeTime + 2;
+        float newFadeTime = fadeTime + 1;
         await FadeImageAsync(0f, 1f, newFadeTime, new[] { fadeImage3 });
         
         launcherObj?.SetActive(false);

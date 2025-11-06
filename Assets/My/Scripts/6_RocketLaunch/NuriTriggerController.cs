@@ -5,24 +5,24 @@ using UnityEngine;
 
 /// <summary>
 /// CountController의 PlusSeconds를 감시해 NuriAnimEvent 이벤트를 자동 호출.
-/// T+ 2:05 → DropStage1()
-/// T+ 3:56 → SeparateFairing()
-/// T+ 4:30 → DropStage2()
-/// T+ 12:14 → Stage3Off()
+/// T+ 2:05 -> DropStage1()
+/// T+ 3:56 -> SeparateFairing()
+/// T+ 4:30 -> DropStage2()
+/// T+ 12:14 -> Stage3Off()
 /// </summary>
 public class NuriTriggerController : MonoBehaviour
 {
-    [Header("Refs")] [SerializeField] private CountController count;
+    [Header("Refs")]
+    [SerializeField] private CountController count;
     [SerializeField] private NuriAnimEvent nuri;
 
     [Header("Trigger Times (T+ in seconds)")]
-    [SerializeField] private float tDropStage1 = 2f * 60f + 5f; // 2:05
-    [SerializeField] private float tSeparateFairing = 3f * 60f + 56f; // 3:56
-    [SerializeField] private float tDropStage2 = 4f * 60f + 30f; // 4:30
-    [SerializeField] private float tFadeBackground = 3f * 60f + 40f; // 5:50
-    [SerializeField] private float tStage3Off = 12f * 60f + 14f; // 12:14
-    [SerializeField] private float tSeparateSatellite = 13f * 60f + 5f; // 13:05
-    [SerializeField] private float tCallNextScene = 15f * 60f; // 15:00
+    [SerializeField] private float tDropStage1 = 2f * 60f + 5f;           // 2:05
+    [SerializeField] private float tSeparateFairing = 3f * 60f + 56f;     // 3:56
+    [SerializeField] private float tDropStage2 = 4f * 60f + 30f;          // 4:30
+    [SerializeField] private float tStage3Off = 12f * 60f + 14f;          // 12:14
+    [SerializeField] private float tSeparateSatellite = 13f * 60f + 5f;   // 13:05
+    [SerializeField] private float tCallNextScene = 15f * 60f;            // 15:00
 
     [Header("Polling Interval (sec)")]
     [SerializeField] private float pollInterval = 0.05f;
@@ -30,7 +30,6 @@ public class NuriTriggerController : MonoBehaviour
     private bool _firedDrop1;
     private bool _firedFairing;
     private bool _firedDrop2;
-    private bool _firedFade;
     private bool _firedStage3Off;
     private bool _firedSatellite;
     private bool _firedNextScene;
@@ -64,6 +63,7 @@ public class NuriTriggerController : MonoBehaviour
         }
 
         _firedDrop1 = _firedFairing = _firedDrop2 = _firedStage3Off = false;
+        _firedSatellite = _firedNextScene = false;
         bool firedLaunchSound = false;
 
         while (!token.IsCancellationRequested)
@@ -76,9 +76,15 @@ public class NuriTriggerController : MonoBehaviour
                 {
                     firedLaunchSound = true;
                     SoundManager.Instance?.PlayByKey("발사");
-                    Debug.Log("[NuriTriggerController] RunTriggerLoop-> 발사 사운드 재생");
-
-                    await UniTask.Delay(6000, cancellationToken: token);
+                    
+                    try
+                    {
+                        await UniTask.Delay(6000, cancellationToken: token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        return;
+                    }
 
                     SoundManager.Instance?.CrossFadeByKey("1단 발사", loop: true);
                 }
@@ -86,59 +92,86 @@ public class NuriTriggerController : MonoBehaviour
                 // T+ 2:05 DropStage1
                 if (!_firedDrop1 && t >= tDropStage1 && LaunchManager.Instance != null)
                 {
-                    // ===== 왼쪽 버튼 대기 =====
-                    LaunchManager.Instance.SetButtonOn("Left");
-                    count.BeginExternalHold(); // T+ 시간 멈춤
-                    LaunchManager.Instance.SetGuideText("1단 분리 버튼을 누르세요.");
-                    ArduinoInputManager.Instance?.SetLed(1, true);
-                    LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
-                    LaunchManager.Instance.ResumeInactivityTimer();
+                    CancellationTokenSource blinkCts = new CancellationTokenSource();
+                    try
+                    {
+                        // ===== 왼쪽 버튼 대기 =====
+                        LaunchManager.Instance.SetButtonOn("Left", blinkCts.Token);
+                        count.BeginExternalHold(); // T+ 시간 멈춤
+                        LaunchManager.Instance.SetGuideText("1단 분리 버튼을 누르세요.");
+                        LaunchManager.Instance.ResumeInactivityTimer();
+                        LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
 
-                    await LaunchManager.Instance.WaitForLeftButtonAsync(token);
+                        try
+                        {
+                            await LaunchManager.Instance.WaitForLeftButtonAsync(token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
 
-                    LaunchManager.Instance.SetGuideText("");
-                    count.EndExternalHold();
-                    LaunchManager.Instance.SetButtonOff("Left");
-                    LaunchManager.Instance.PauseInactivityTimer();
+                        LaunchManager.Instance.SetGuideText("");
+                        count.EndExternalHold();
+                        LaunchManager.Instance.PauseInactivityTimer();
 
-                    ArduinoInputManager.Instance?.SetLed(1, false);
-                    LaunchManager.Instance.PublicStopLedEffects();
-                    LedStrip.Range(0, 9, 255, 0, 0);
-                    // ========================
+                        LaunchManager.Instance.PublicStopLedEffects();
+                        LedStrip.Range(0, 9, 255, 0, 0);
+                        // ========================
+                    }
+                    finally
+                    {
+                        blinkCts.Cancel();
+                        blinkCts.Dispose();
+                        LaunchManager.Instance.SetButtonOff("Left");
+                    }
 
                     _firedDrop1 = true;
                     FocusObject.Pose pose = new FocusObject.Pose(new Vector3(0f, 3100f, 0f), Quaternion.identity);
                     //focus.FocusTo(pose, 2f);
                     nuri.DropStage1().Forget();
 
-                    LaunchManager.Instance.FocusImage3ThenPingPong4(); // 시퀀스 이미지 핑퐁
-                    LaunchManager.Instance.FadeInStagePublicAsync(3).Forget(); // 스테이지 이미지 페이드 인
+                    LaunchManager.Instance.FocusImage3ThenPingPong4();          // 시퀀스 이미지 핑퐁
+                    LaunchManager.Instance.FadeInStagePublicAsync(3).Forget();   // 스테이지 이미지 페이드 인
                     LaunchManager.Instance.FadeOutSubRocketStage1Async().Forget(); // 서브모니터 stage1 이미지 페이드 아웃
                 }
 
                 // T+ 3:56 SeparateFairing
                 if (!_firedFairing && t >= tSeparateFairing && LaunchManager.Instance != null)
                 {
-                    // ===== 오른쪽 버튼 대기 =====
-                    LaunchManager.Instance.SetButtonOn("Right");
-                    count.BeginExternalHold();
-                    LaunchManager.Instance.SetGuideText("페어링 분리 버튼을 누르세요.");
-                    LaunchManager.Instance.ResumeInactivityTimer();
+                    CancellationTokenSource blinkCts = new CancellationTokenSource();
+                    try
+                    {
+                        // ===== 오른쪽 버튼 대기 =====
+                        LaunchManager.Instance.SetButtonOn("Right", blinkCts.Token);
+                        count.BeginExternalHold();
+                        LaunchManager.Instance.SetGuideText("페어링 분리 버튼을 누르세요.");
+                        LaunchManager.Instance.ResumeInactivityTimer();
+                        LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
 
-                    ArduinoInputManager.Instance?.SetLed(3, true);
-                    LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
+                        try
+                        {
+                            await LaunchManager.Instance.WaitForRightButtonAsync(token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
 
-                    await LaunchManager.Instance.WaitForRightButtonAsync(token);
+                        LaunchManager.Instance.SetGuideText("");
+                        count.EndExternalHold();
+                        LaunchManager.Instance.PauseInactivityTimer();
 
-                    LaunchManager.Instance.SetGuideText("");
-                    count.EndExternalHold();
-                    LaunchManager.Instance.SetButtonOff("Right");
-                    LaunchManager.Instance.PauseInactivityTimer();
-
-                    ArduinoInputManager.Instance?.SetLed(3, false);
-                    LaunchManager.Instance.PublicStopLedEffects();
-                    LedStrip.Range(0, 9, 255, 0, 0);
-                    // =========================
+                        LaunchManager.Instance.PublicStopLedEffects();
+                        LedStrip.Range(0, 9, 255, 0, 0);
+                        // =========================
+                    }
+                    finally
+                    {
+                        blinkCts.Cancel();
+                        blinkCts.Dispose();
+                        LaunchManager.Instance.SetButtonOff("Right");
+                    }
 
                     _firedFairing = true;
                     nuri.SeparateFairing().Forget();
@@ -150,26 +183,39 @@ public class NuriTriggerController : MonoBehaviour
                 // T+ 4:30 DropStage2
                 if (!_firedDrop2 && t >= tDropStage2 && LaunchManager.Instance != null)
                 {
-                    // ===== 가운데 버튼 대기 =====
-                    LaunchManager.Instance.SetButtonOn("Middle");
-                    count.BeginExternalHold();
-                    LaunchManager.Instance.SetGuideText("2단 분리 버튼을 누르세요");
-                    LaunchManager.Instance.ResumeInactivityTimer();
+                    CancellationTokenSource blinkCts = new CancellationTokenSource();
+                    try
+                    {
+                        // ===== 가운데 버튼 대기 =====
+                        LaunchManager.Instance.SetButtonOn("Middle", blinkCts.Token);
+                        count.BeginExternalHold();
+                        LaunchManager.Instance.SetGuideText("2단 분리 버튼을 누르세요");
+                        LaunchManager.Instance.ResumeInactivityTimer();
+                        LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
 
-                    ArduinoInputManager.Instance?.SetLed(2, true);
-                    LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
+                        try
+                        {
+                            await LaunchManager.Instance.WaitForMiddleButtonAsync(token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            return;
+                        }
 
-                    await LaunchManager.Instance.WaitForMiddleButtonAsync(token);
+                        LaunchManager.Instance.SetGuideText("");
+                        count.EndExternalHold();
+                        LaunchManager.Instance.PauseInactivityTimer();
 
-                    LaunchManager.Instance.SetGuideText("");
-                    count.EndExternalHold();
-                    LaunchManager.Instance.SetButtonOff("Middle");
-                    LaunchManager.Instance.PauseInactivityTimer();
-
-                    ArduinoInputManager.Instance?.SetLed(2, false);
-                    LaunchManager.Instance.PublicStopLedEffects();
-                    LedStrip.Range(0, 9, 255, 0, 0);
-                    // =========================
+                        LaunchManager.Instance.PublicStopLedEffects();
+                        LedStrip.Range(0, 9, 255, 0, 0);
+                        // =========================
+                    }
+                    finally
+                    {
+                        blinkCts.Cancel();
+                        blinkCts.Dispose();
+                        LaunchManager.Instance.SetButtonOff("Middle");
+                    }
 
                     _firedDrop2 = true;
                     FocusObject.Pose pose = new(new Vector3(0f, 3800f, 0f), Quaternion.identity);
@@ -178,13 +224,6 @@ public class NuriTriggerController : MonoBehaviour
 
                     LaunchManager.Instance.FadeInStagePublicAsync(5).Forget();
                     LaunchManager.Instance.FadeOutSubRocketStage2Async().Forget();
-                }
-                
-                // T+ 5:50
-                if (!_firedFade && t >= tFadeBackground && LaunchManager.Instance != null)
-                {
-                    _firedFade = true;
-                    await LaunchManager.Instance.CallEndRocket();
                 }
 
                 // T+ 12:14 Stage3Off
@@ -210,6 +249,7 @@ public class NuriTriggerController : MonoBehaviour
                 // T+ 15:00 Call Next Scene
                 if (!_firedNextScene && t >= tCallNextScene)
                 {
+                    _firedNextScene = true;
                     nuri.CallNextScene().Forget();
                 }
             }

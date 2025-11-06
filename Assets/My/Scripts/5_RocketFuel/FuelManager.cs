@@ -251,13 +251,13 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                     // LED1 블링크 종료
                     CancelAndDispose(ref _blinkCts);
                     try { ArduinoInputManager.Instance?.SetLed(1, false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED1 끄기 중 예외: {e.Message}"); }
-                    SetButtonOff(buttonLeft);
+                    StopButtonBlink(buttonLeft);
 
                     // LED2 블링크 시작
                     _blinkCts = new CancellationTokenSource();
                     SettingTextObject(textGuide, setting.guideText, "가운데 버튼을 누르세요").Forget();
                     BlinkLedAsync(2, 300, 300, _blinkCts.Token).Forget();
-                    SetButtonOn(buttonMiddle);
+                    StartButtonBlink(buttonMiddle);
                     
                     _phase = Phase.FuelInjection2;
                     break;
@@ -283,13 +283,13 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                     // LED2 블링크 종료
                     CancelAndDispose(ref _blinkCts);
                     try { ArduinoInputManager.Instance?.SetLed(2, false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED2 끄기 중 예외: {e.Message}"); }
-                    SetButtonOff(buttonMiddle);
+                    StopButtonBlink(buttonMiddle);
 
                     // LED3 블링크 시작
                     _blinkCts = new CancellationTokenSource();
                     SettingTextObject(textGuide, setting.guideText, "오른쪽 버튼을 누르세요").Forget();
                     BlinkLedAsync(3, 300, 300, _blinkCts.Token).Forget();
-                    SetButtonOn(buttonRight);
+                    StartButtonBlink(buttonRight);
                     
                     _phase = Phase.FuelInjection3;
                 }
@@ -314,7 +314,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                     // LED3 블링크 종료
                     CancelAndDispose(ref _blinkCts);
                     try { ArduinoInputManager.Instance?.SetLed(3, false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED3 끄기 중 예외: {e.Message}"); }
-                    SetButtonOff(buttonRight);
+                    StopButtonBlink(buttonRight);
                     
                     _phase = Phase.Done;
                     break;
@@ -406,7 +406,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
         // 팝업이 사라진 뒤 첫 단계 안내
         SettingTextObject(textGuide, setting.guideText, "왼쪽 버튼을 누르세요").Forget();
-        SetButtonOn(buttonLeft);
+        StartButtonBlink(buttonLeft);
         if (_blinkCts == null) _blinkCts = new CancellationTokenSource();
         BlinkLedAsync(ledIndex: 1, onMs: 300, offMs: 300, token: _blinkCts.Token).Forget();
     }
@@ -420,39 +420,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         return (before < 1f && img.fillAmount >= 1f);
     }
     
-    /// <summary> LED 블링크 </summary>
-    private async UniTask BlinkLedAsync(int ledIndex, int onMs, int offMs, CancellationToken token)
-    {
-        ArduinoInputManager mgr = ArduinoInputManager.Instance;
-        if (mgr == null) return;
 
-        try
-        {
-            while (!token.IsCancellationRequested)
-            {
-                mgr.SetLed(ledIndex, true);
-                try { await UniTask.Delay(onMs, cancellationToken: token); }
-                catch (OperationCanceledException) { }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"[FuelManager] BlinkLedAsync-> 대기 중 예외(켜짐 구간): {e.Message}");
-                }
-
-                mgr.SetLed(ledIndex, false);
-                try { await UniTask.Delay(offMs, cancellationToken: token); }
-                catch (OperationCanceledException) { }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"[FuelManager] BlinkLedAsync-> 대기 중 예외(꺼짐 구간): {e.Message}");
-                }
-            }
-        }
-        finally
-        {
-            try { mgr.SetLed(ledIndex, false); }
-            catch (Exception e) { Debug.LogWarning($"[FuelManager] BlinkLedAsync-> LED 종료 처리 중 예외: {e.Message}"); }
-        }
-    }
     
     /// <summary> 디버그 스킵: 모든 주입 과정을 중단하고 즉시 다음 씬으로 이동 </summary>
     protected override void OnDebugSkip()

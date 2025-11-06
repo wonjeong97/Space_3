@@ -14,7 +14,8 @@ public sealed class SoundManager : MonoBehaviour
     [Header("Audio Sources")]
     [SerializeField] private AudioSource buttonSource; // 버튼용
     [SerializeField] private AudioSource rocketSource; // 로켓/배경용
-    [SerializeField] private AudioSource crossSource; // 크로스페이드용 내부 소스
+    [SerializeField] private AudioSource crossSource;  // 크로스페이드용 내부 소스
+    [SerializeField] private AudioSource bgmSource;    // BGM 전용
 
     private readonly Dictionary<string, AudioClip> _clipCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, SoundSetting> _soundMap = new(StringComparer.OrdinalIgnoreCase);
@@ -41,6 +42,13 @@ public sealed class SoundManager : MonoBehaviour
             rocketSource.playOnAwake = false;
             rocketSource.loop = false;
             rocketSource.spatialBlend = 0f;
+        }
+        if (bgmSource == null)
+        {
+            bgmSource = gameObject.AddComponent<AudioSource>();
+            bgmSource.playOnAwake = false;
+            bgmSource.loop = true;      // 기본적으로 루프
+            bgmSource.spatialBlend = 0f;
         }
         crossSource = gameObject.AddComponent<AudioSource>();
         crossSource.playOnAwake = false;
@@ -81,30 +89,6 @@ public sealed class SoundManager : MonoBehaviour
     // ==============================================================
     // 퍼블릭 API
     // ==============================================================
-
-    /// <summary> 버튼 효과음 재생 </summary>
-    public async UniTaskVoid PlayButton(bool loop = false)
-    {
-        await UniTask.SwitchToMainThread();
-
-        Settings s = JsonLoader.Instance?.settings;
-        if (s?.buttonSound == null)
-        {
-            Debug.LogWarning("[SoundManager] PlayButton-> Settings.buttonSound 미설정");
-            return;
-        }
-
-        string relPath = s.buttonSound.clipPath;
-        float volume = Mathf.Clamp01(s.buttonSound.volume <= 0f ? 1f : s.buttonSound.volume);
-
-        AudioClip clip = await GetOrLoadClipAsync(relPath, this.GetCancellationTokenOnDestroy());
-        if (clip == null) return;
-
-        buttonSource.loop = loop;
-        buttonSource.clip = clip;
-        buttonSource.volume = volume;
-        buttonSource.Play();
-    }
 
     /// <summary> 사운드 키로 재생 (Settings.sounds 기준) </summary>
     public async UniTaskVoid PlayByKey(string key, bool loop = false)
@@ -202,7 +186,68 @@ public sealed class SoundManager : MonoBehaviour
         crossSource.clip = null;
         crossSource.volume = 0f;
     }
+    
+    /// <summary> 사운드 키로 BGM 재생 (Settings.sounds 기준) - bgmSource를 사용하므로 씬 전환과 무관하게 유지됨 </summary>
+    public async UniTaskVoid PlayBGMByKey(string key, bool loop = true, float volumeScale = 1f)
+    {
+        await UniTask.SwitchToMainThread();
 
+        if (string.IsNullOrEmpty(key)) return;
+
+        if (bgmSource != null && bgmSource.isPlaying) return; // 이미 BGM이 재생 중이면 무시
+
+        if (!_soundMap.TryGetValue(key, out SoundSetting ss))
+        {
+            Debug.LogWarning($"[SoundManager] PlayBGMByKey-> 미등록 키: {key}");
+            return;
+        }
+
+        AudioClip clip = await GetOrLoadClipAsync(ss.clipPath, this.GetCancellationTokenOnDestroy());
+        if (clip == null) return;
+
+        float baseVolume = ss.volume <= 0f ? 1f : ss.volume;
+        float finalVolume = Mathf.Clamp01(baseVolume * Mathf.Max(0f, volumeScale));
+
+        bgmSource.loop = loop;
+        bgmSource.clip = clip;
+        bgmSource.volume = finalVolume;
+        bgmSource.Play();
+    }
+
+    /// <summary> 현재 재생 중인 BGM 정지 </summary>
+    public void StopBGM()
+    {
+        if (bgmSource == null) return;
+
+        if (bgmSource.isPlaying)
+            bgmSource.Stop();
+
+        bgmSource.clip = null;
+    }
+    
+    /// <summary> 현재 재생 중인 BGM 일시정지 </summary>
+    public void PauseBGM()
+    {
+        if (bgmSource == null) return;
+
+        if (bgmSource.isPlaying)
+        {
+            bgmSource.Pause();
+        }
+    }
+
+    /// <summary> 일시정지된 BGM 다시 재생 </summary>
+    public void ResumeBGM()
+    {
+        if (bgmSource == null) return;
+
+        // clip이 있고 일시정지된 상태일 때만 재개
+        if (bgmSource.clip != null && !bgmSource.isPlaying)
+        {
+            bgmSource.UnPause();
+        }
+    }
+    
     // ==============================================================
     // 내부 유틸
     // ==============================================================

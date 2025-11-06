@@ -117,6 +117,8 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
         LedStrip.Range(0, 9, 255, 0, 0);
 
         // 인트로 준비/재생
+        
+        SoundManager.Instance?.PauseBGM();
         await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
 
         _vp.loopPointReached -= OnVideoEnded;
@@ -144,6 +146,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
             {
                 _phase = Phase.RuleSeq;
                 _ruleIndex = 0;
+                SoundManager.Instance.ResumeBGM();
 
                 if (_ruleSeq == null || _ruleSeq.Length == 0)
                 {

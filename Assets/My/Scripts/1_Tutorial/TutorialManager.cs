@@ -8,13 +8,10 @@ using UnityEngine.UI;
 [Serializable]
 public class TutorialSetting
 {
-    public ImageSetting background;
-
-    public ImageSetting infoImage1;
-    public ImageSetting infoImage2;
-    public ImageSetting infoImage3;
-
-    public TextSetting infoText;
+    public ImageSetting tutorialPage1;
+    public ImageSetting tutorialPage2;
+    public ImageSetting tutorialPage3;
+    
     public ImageSetting[] tutorialImages;
 }
 
@@ -27,11 +24,14 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
     #region Serialized Refs
 
     [Header("UI")]
-    [SerializeField] private GameObject backgroundImage; // 배경 팝업 이미지
-    [SerializeField] private GameObject infoImage1; // "조작 안내"
-    [SerializeField] private GameObject infoImage2; // "모니터에 출력되는 내용을 보고 따라해주세요!"
-    [SerializeField] private GameObject infoImage3; // "컨트롤러의 아무 버튼을 누르면 다음 화면으로 진행됩니다."
     [SerializeField] private List<GameObject> tutorialImageObjs; // 튜토리얼 이미지 목록
+
+    [SerializeField] private GameObject tutorialPage1; // 이용안내 일체형 이미지
+    [SerializeField] private GameObject tutorialPage2; // 모니터에 출력되는 내용을 보고 따라해주세요 배경 이미지
+    [SerializeField] private GameObject tutorialPage3; // 각 상황에 맞게 버튼을 조정해주세요 배경 이미지
+
+    [SerializeField] private GameObject tutorialPage2Image; // 페이지2 내용 이미지
+    [SerializeField] private GameObject tutorialPage3Image; // 페이지3 내용 이미지
 
     #endregion
 
@@ -52,69 +52,24 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
         try
         {
             _step = 0;
-
-            // 1) 튜토리얼 이미지 배치 및 초기 가시성 설정
+            
+            SettingImageObject(tutorialPage1, setting.tutorialPage1);
+            SettingImageObject(tutorialPage2, setting.tutorialPage2);
+            SettingImageObject(tutorialPage3, setting.tutorialPage3);
+            
             int count = (tutorialImageObjs != null && setting.tutorialImages != null) ? Mathf.Min(tutorialImageObjs.Count, setting.tutorialImages.Length) : 0;
 
             for (int i = 0; i < count; i++)
             {
-                try
+                if (tutorialImageObjs != null && setting.tutorialImages != null)
                 {
-                    if (tutorialImageObjs != null && setting.tutorialImages != null)
-                    {
-                        SettingImageObject(tutorialImageObjs[i], setting.tutorialImages[i]);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogWarning($"[TutorialManager] Init-> 튜토리얼 이미지 세팅 중 예외(i={i}): {e.Message}");
+                    SettingImageObject(tutorialImageObjs[i], setting.tutorialImages[i]);
                 }
             }
-
-            if (tutorialImageObjs != null)
-            {
-                for (int i = 0; i < tutorialImageObjs.Count; i++)
-                {
-                    SetActiveWithAlpha(tutorialImageObjs[i], i == 0, i == 0 ? 1f : 0f);
-                }
-            }
-
-            // 2) 고정 UI 이미지 배치
-            try
-            {
-                SettingImageObject(backgroundImage, setting.background);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[TutorialManager] Init-> 배경 이미지 세팅 중 예외: {e.Message}");
-            }
-
-            try
-            {
-                SettingImageObject(infoImage1, setting.infoImage1);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[TutorialManager] Init-> infoImage1 세팅 중 예외: {e.Message}");
-            }
-
-            try
-            {
-                SettingImageObject(infoImage2, setting.infoImage2);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[TutorialManager] Init-> infoImage2 세팅 중 예외: {e.Message}");
-            }
-
-            try
-            {
-                SettingImageObject(infoImage3, setting.infoImage3);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[TutorialManager] Init-> infoImage3 세팅 중 예외: {e.Message}");
-            }
+            
+            tutorialPage1.SetActive(true);
+            tutorialPage2.SetActive(false);
+            tutorialPage3.SetActive(false);
 
             await UniTask.Yield();
 
@@ -142,28 +97,22 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
 
                 if (ShouldAbort()) break;
 
-                // 다음 이미지로 전환
-                if (_step < count - 1)
+                // ===== 페이지 전환 로직 =====
+                if (_step == 0)
                 {
-                    if (ShouldAbort()) break;
-                    try
-                    {
-                        if (tutorialImageObjs != null)
-                        {
-                            await AdvanceStepAsync(tutorialImageObjs[_step], tutorialImageObjs[_step + 1], CrossFadeTime);
-                        }
-
-                        _step++;
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError($"[TutorialManager] Init-> 단계 전환 중 예외: {e}");
-                        break;
-                    }
+                    tutorialPage1.SetActive(false);
+                    tutorialPage2.SetActive(true);
+                    _step = 1;
+                }
+                else if (_step == 1)
+                {
+                    tutorialPage2.SetActive(false);
+                    tutorialPage3.SetActive(true);
+                    _step = 2;
                 }
                 else
                 {
-                    // 마지막 단계 → 다음 씬으로 전환
+                    // 마지막 단계 -> 다음 씬
                     canInput = false;
                     if (ArduinoInputManager.Instance) ArduinoInputManager.Instance.FlushAll();
                     inputReceived = false;
@@ -171,10 +120,10 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
                     if (ShouldAbort()) break;
 
                     int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 2;
-                    Debug.Log($"[TutorialManager] Init-> 다음 씬으로 전환 시도 (buildIndex={target})");
                     await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
                     break;
                 }
+                inputReceived = false;
             }
         }
         catch (Exception e)
@@ -186,29 +135,6 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
     #endregion
 
     #region Helpers
-
-    /// <summary> 게임 오브젝트 활성화 및 Image 알파 적용 </summary>
-    private void SetActiveWithAlpha(GameObject go, bool active, float alpha)
-    {
-        if (!go)
-        {
-            Debug.LogWarning("[TutorialManager] SetActiveWithAlpha-> 대상 오브젝트가 null입니다");
-            return;
-        }
-
-        go.SetActive(active);
-
-        if (go.TryGetComponent(out Image img))
-        {
-            Color c = img.color;
-            c.a = alpha;
-            img.color = c;
-        }
-        else
-        {
-            Debug.LogWarning("[TutorialManager] SetActiveWithAlpha-> Image 컴포넌트를 찾을 수 없습니다");
-        }
-    }
 
     /// <summary> 취소/비활성/전환 중 여부 확인 </summary>
     private bool ShouldAbort()

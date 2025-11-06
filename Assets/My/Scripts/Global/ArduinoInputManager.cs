@@ -240,13 +240,13 @@ public class ArduinoInputManager : MonoBehaviour
                 if (string.IsNullOrWhiteSpace(line)) continue;
 
                 string s = line.Trim();
-                Debug.Log("[Arduino]>> "+ s);
-
+                
                 // 먼저 원문 한 줄을 브로드캐스트
                 try { LineReceived?.Invoke(s); } catch { /* 구독자 예외 방지 */ }
                 
                 if (s.StartsWith("THROTTLE", StringComparison.OrdinalIgnoreCase))
-                {
+                {   
+                    Debug.Log("[Arduino]>> "+ s);
                     string[] parts = s.Split(' ');
                     if (parts.Length >= 2 && int.TryParse(parts[1], out int throttle))
                     {
@@ -259,17 +259,17 @@ public class ArduinoInputManager : MonoBehaviour
 
                 if (s.IndexOf("BTN 1", StringComparison.OrdinalIgnoreCase) >= 0)
                 {   
-                    SoundManager.Instance?.PlayButton();
+                    SoundManager.Instance?.PlayByKey("ButtonSound");
                     SetPressedBit(BIT_B1);
                 }
                 else if (s.IndexOf("BTN 2", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    SoundManager.Instance?.PlayButton();
+                    SoundManager.Instance?.PlayByKey("ButtonSound");
                     SetPressedBit(BIT_B2);
                 }
                 else if (s.IndexOf("BTN 3", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    SoundManager.Instance?.PlayButton();
+                    SoundManager.Instance?.PlayByKey("ButtonSound");
                     SetPressedBit(BIT_B3);
                 }
             }
