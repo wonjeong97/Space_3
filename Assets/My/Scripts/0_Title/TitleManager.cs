@@ -98,6 +98,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
             await UniTask.Yield();
         }
 
+        SoundManager.Instance?.PlayByKey("Title_Confirm");
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 1;
         await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
     }

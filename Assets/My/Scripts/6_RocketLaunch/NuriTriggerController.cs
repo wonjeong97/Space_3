@@ -75,7 +75,7 @@ public class NuriTriggerController : MonoBehaviour
                 if (!firedLaunchSound && t >= 0f)
                 {
                     firedLaunchSound = true;
-                    SoundManager.Instance?.PlayByKey("발사");
+                    SoundManager.Instance?.PlayByKey("Launch");
                     
                     try
                     {
@@ -86,7 +86,7 @@ public class NuriTriggerController : MonoBehaviour
                         return;
                     }
 
-                    SoundManager.Instance?.CrossFadeByKey("1단 발사", loop: true);
+                    SoundManager.Instance?.CrossFadeByKey("Launch_Stage01", loop: true);
                 }
 
                 // T+ 2:05 DropStage1

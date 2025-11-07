@@ -16,16 +16,19 @@
 	},
 	"sounds": [
 		{ "key": "BGM", "clipPath": "Sound/03-Ethereal_Light.wav", "volume": 0.5 },
-		{ "key": "ButtonSound", "clipPath": "Sound/물리 버튼.mp3", "volume": 1.0 },
-		{ "key": "Countdown", "clipPath": "Sound/누리호 발사 카운트 다운.wav", "volume": 1.0 },
-		{ "key": "발사", "clipPath": "Sound/발사.mp3", "volume": 0.7 },
-		{ "key": "분리", "clipPath": "Sound/분리.wav", "volume": 0.5 },
-		{ "key": "1단 발사", "clipPath": "Sound/1단 발사중.wav", "volume": 1.0 },
-		{ "key": "2단 발사", "clipPath": "Sound/2단 발사중.wav", "volume": 1.0 },
-		{ "key": "3단 발사", "clipPath": "Sound/3단 발사중.wav", "volume": 1.0 }
+		{ "key": "ButtonSound", "clipPath": "Sound/Button.wav", "volume": 1.0 },
+		{ "key": "Countdown", "clipPath": "Sound/Countdown.wav", "volume": 1.0 },
+		{ "key": "Launch", "clipPath": "Sound/Launch.mp3", "volume": 0.7 },
+		{ "key": "Separate", "clipPath": "Sound/Separate.wav", "volume": 0.5 },
+		{ "key": "Launch_Stage01", "clipPath": "Sound/Launch_Stage01.wav", "volume": 1.0 },
+		{ "key": "Launch_Stage02", "clipPath": "Sound/Launch_Stage02.wav", "volume": 1.0 },
+		{ "key": "Launch_Stage03", "clipPath": "Sound/Launch_Stage03.wav", "volume": 1.0 },
+		{ "key": "Title_Confirm", "clipPath": "Sound/Title_Confirm.wav", "volume": 1.0 },
+		{ "key": "Popup_Close", "clipPath": "Sound/Popup_Close.wav", "volume": 1.0 }
 	],
 	"canvas1TargetMonitorIndex": 0,
 	"canvas2TargetMonitorIndex": 1,
 	"canvas3TargetMonitorIndex": 2,
-	"camera3TurnSpeed": 5.0
+	"camera3TurnSpeed": 5.0,
+	"uiBlinkTime": 5.0
 }

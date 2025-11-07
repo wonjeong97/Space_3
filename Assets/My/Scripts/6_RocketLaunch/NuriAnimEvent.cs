@@ -208,7 +208,7 @@ public class NuriAnimEvent : MonoBehaviour
 
     public void PlaySeparateSound()
     {
-        SoundManager.Instance?.PlayByKey("분리");
+        SoundManager.Instance?.PlayByKey("Separate");
     }
 
     public void PlayRocketEngineSound(string soundKey)

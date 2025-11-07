@@ -231,6 +231,7 @@ public class Settings
 
     public float camera3TurnSpeed;
     public SoundSetting buttonSound;
+    public float uiBlinkTime;
 }
 
 #endregion

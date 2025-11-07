@@ -22,7 +22,9 @@ public class LaunchSetting
     public ImageSetting[] stages;
     public ImageSetting[] sequence;
     public ImageSetting[] oxidizers;
+    public ImageSetting[] oxidizerTextImages;
     public ImageSetting[] fuels;
+    public ImageSetting[] fuelTextImages;
 
     public TextSetting objectiveText;
 
@@ -73,11 +75,19 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject stage1Oxidizer;
     [SerializeField] private GameObject stage2Oxidizer;
     [SerializeField] private GameObject stage3Oxidizer;
+    
+    [SerializeField] private GameObject stage1OxidizerTextImage;
+    [SerializeField] private GameObject stage2OxidizerTextImage;
+    [SerializeField] private GameObject stage3OxidizerTextImage;
 
     [Header("Fuels")]
     [SerializeField] private GameObject stage1Fuel;
     [SerializeField] private GameObject stage2Fuel;
     [SerializeField] private GameObject stage3Fuel;
+    
+    [SerializeField] private GameObject stage1FuelTextImage;
+    [SerializeField] private GameObject stage2FuelTextImage;
+    [SerializeField] private GameObject stage3FuelTextImage;
 
     [Header("MainImage1")]
     [SerializeField] private Image[] stages;
@@ -192,28 +202,25 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(subRocketStage3Image, setting.rocketStage3);
         SettingImageObject(subRocketPairingImage, setting.rocketPairing);
 
-        // 산화제/연료 배열 길이 가드
-        if (setting.oxidizers != null && setting.oxidizers.Length >= 3)
-        {
-            SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
-            SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
-            SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
-        }
-        else
-        {
-            LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "oxidizers length < 3. Skipped stage oxidizer setup.");
-        }
+        // 산화제 이미지 세팅
+        SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
+        SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
+        SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
+        
+        // "산화제" 글자 이미지 세팅
+        SettingImageObject(stage1OxidizerTextImage, setting.oxidizerTextImages[0]);
+        SettingImageObject(stage2OxidizerTextImage, setting.oxidizerTextImages[1]);
+        SettingImageObject(stage3OxidizerTextImage, setting.oxidizerTextImages[2]);
 
-        if (setting.fuels != null && setting.fuels.Length >= 3)
-        {
-            SettingImageObject(stage1Fuel, setting.fuels[0]);
-            SettingImageObject(stage2Fuel, setting.fuels[1]);
-            SettingImageObject(stage3Fuel, setting.fuels[2]);
-        }
-        else
-        {
-            LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "fuels length < 3. Skipped stage fuel setup.");
-        }
+        // 연료 이미지 세팅
+        SettingImageObject(stage1Fuel, setting.fuels[0]);
+        SettingImageObject(stage2Fuel, setting.fuels[1]);
+        SettingImageObject(stage3Fuel, setting.fuels[2]);
+        
+        // "연료" 글자 이미지 세팅
+        SettingImageObject(stage1FuelTextImage, setting.fuelTextImages[0]);
+        SettingImageObject(stage2FuelTextImage, setting.fuelTextImages[1]);
+        SettingImageObject(stage3FuelTextImage, setting.fuelTextImages[2]);
 
         // mainImage1: 단계/시퀀스 세팅
         if (setting.stages != null && stages != null)

@@ -4,13 +4,14 @@ using UnityEngine.UI;
 
 public class UIBlink : MonoBehaviour
 {
-    [SerializeField] private float _periodSeconds = 4f; // 한 사이클(밝아졌다 어두워짐) 시간
+    private float _periodSeconds; 
 
     private readonly int _minAlpha255 = 0;
     private readonly int _maxAlpha255 = 255;
 
     private Image _image;
     private Coroutine _routine;
+    private Settings _setting;
 
     private void Awake()
     {
@@ -28,6 +29,8 @@ public class UIBlink : MonoBehaviour
         }
 
         _routine = StartCoroutine(BlinkRoutine());
+        _setting = JsonLoader.Instance?.settings;
+        _periodSeconds = _setting?.uiBlinkTime ?? 4f;
     }
 
     private void OnDisable()

@@ -1,34 +1,27 @@
 {
-  "tutorialPage1": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"sourceImage": "Image/Tutorial/3_이용안내.png",
-	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },
-	"tutorialPage2": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"sourceImage": "Image/Tutorial/3_체험방법-1.png",
-	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },
-	"tutorialPage3": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"sourceImage": "Image/Tutorial/3_체험방법-2.png",
-	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },  
-  "tutorialImages": [	
-	{
-	  "position": { "x": 960, "y": 635 },
-	  "size": { "x": 1100, "y": 575 },
-	  "sourceImage": "Image/Tutorial/2_Tutorial.png",
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	"tutorialPage1": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/Tutorial/3_이용안내.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
 	},
-	{
-	  "position": { "x": 960, "y": 635 },
-	  "size": { "x": 1100, "y": 575 },
-	  "sourceImage": "Image/Tutorial/3_Tutorial.png",
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	"tutorialPage2": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/Tutorial/3_체험방법-2.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	},
+	"tutorialPage3": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/Tutorial/3_체험방법-1.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	},
+	"imageInfo": {
+		"position": { "x": 960, "y": 985 },
+		"size": { "x": 1942, "y": 183 },
+		"scale":{ "x": 0.7, "y": 0.7, "z": 0.7 },
+		"sourceImage": "Image/Tutorial/3_체험방법_txt.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
 	}
-  ]
 }

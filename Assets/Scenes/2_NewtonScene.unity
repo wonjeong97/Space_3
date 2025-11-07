@@ -203,7 +203,7 @@ Canvas:
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 1
-  m_TargetDisplay: 0
+  m_TargetDisplay: 1
 --- !u!224 &265556548
 RectTransform:
   m_ObjectHideFlags: 0
@@ -887,7 +887,6 @@ MonoBehaviour:
   fadeImage3: {fileID: 638666639}
   nextSceneBuildIndex: 3
   useInactivityTimeout: 1
-  sIsLoading: 0
   videoPlayerObject: {fileID: 337159217}
 --- !u!4 &776960349
 Transform:

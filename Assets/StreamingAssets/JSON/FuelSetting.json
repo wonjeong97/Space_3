@@ -71,42 +71,82 @@
 	],
 	"oxidizers": [
 		{
-			"position": { "x": "-285", "y": 8 },
+			"position": { "x": -285, "y": 8 },
 			"size": { "x": 415, "y": 145 },
 			"sourceImage": "Image/ForSub/1_ox.png",
 			"type": 3
 		},
 		{
-			"position": { "x": "370", "y": 8 },
+			"position": { "x": 370, "y": 8 },
 			"size": { "x": 280, "y": 110 },
 			"sourceImage": "Image/ForSub/2_ox.png",
 			"type": 3
 		},
 		{
-			"position": { "x": "690", "y": 8 },
-			"size": { "x": 50, "y": 105 },
+			"position": { "x": 685, "y": 8 },
+			"size": { "x": 60, "y": 125 },
 			"sourceImage": "Image/ForSub/3_ox.png",
 			"type": 3
 		}
 	],
+	"oxidizerTextImages": [
+		{
+			"position": { "x": -280, "y": -150 },
+			"size": { "x": 170, "y": 180 },
+			"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
+			"sourceImage": "Image/ForSub/3_산화제-txt-1.png"
+		},
+		{
+			"position": { "x": 380, "y": -150 },
+			"size": { "x": 170, "y": 180 },
+			"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
+			"sourceImage": "Image/ForSub/3_산화제-txt-1.png"
+		},
+		{
+			"position": { "x": 750, "y": -150 },
+			"size": { "x": 187, "y": 180 },
+			"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
+			"sourceImage": "Image/ForSub/3_산화제-txt-2.png"
+		}
+	],
 	"fuels": [
 		{
-			"position": { "x": "-630", "y": 8 },
-			"size": { "x": 245, "y": 145 },
+			"position": { "x": -630, "y": 8 },
+			"size": { "x": 300, "y": 190 },
 			"sourceImage": "Image/ForSub/1_fuel.png",
 			"type": 3
 		},
 		{
-			"position": { "x": "160", "y": 8 },
-			"size": { "x": 130, "y": 110 },
+			"position": { "x": 160, "y": 8 },
+			"size": { "x": 160, "y": 155 },
 			"sourceImage": "Image/ForSub/2_fuel.png",
 			"type": 3
 		},
 		{
-			"position": { "x": "620", "y": 8 },
-			"size": { "x": 55, "y": 50 },
+			"position": { "x": 620, "y": 8 },
+			"size": { "x": 75, "y": 70 },
 			"sourceImage": "Image/ForSub/3_fuel.png",
 			"type": 3
+		}
+	],
+	"fuelTextImages": [
+		{
+			"position": { "x": -630, "y": -150 },
+			"size": { "x": 170, "y": 180 },
+			"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
+			"sourceImage": "Image/ForSub/3_연료제-txt.png"
+		},
+		{
+			"position": { "x": 160, "y": -150 },
+			"size": { "x": 170, "y": 180 },
+			"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
+			"sourceImage": "Image/ForSub/3_연료제-txt.png"
+		},
+		{
+			"position": { "x": 620, "y": -150 },
+			"size": { "x": 170, "y": 180 },
+			"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
+			"sourceImage": "Image/ForSub/3_연료제-txt.png"
 		}
 	],
 	"stageBgImage": {

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Imaging;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
@@ -11,8 +12,8 @@ public class TutorialSetting
     public ImageSetting tutorialPage1;
     public ImageSetting tutorialPage2;
     public ImageSetting tutorialPage3;
-    
-    public ImageSetting[] tutorialImages;
+
+    public ImageSetting imageInfo;
 }
 
 /// <summary> 튜토리얼 씬 관리 매니저 </summary>
@@ -30,9 +31,8 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
     [SerializeField] private GameObject tutorialPage2; // 모니터에 출력되는 내용을 보고 따라해주세요 배경 이미지
     [SerializeField] private GameObject tutorialPage3; // 각 상황에 맞게 버튼을 조정해주세요 배경 이미지
 
-    [SerializeField] private GameObject tutorialPage2Image; // 페이지2 내용 이미지
-    [SerializeField] private GameObject tutorialPage3Image; // 페이지3 내용 이미지
-
+    [SerializeField] private GameObject infoImage;
+    
     #endregion
 
     #region Settings / State
@@ -57,15 +57,7 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
             SettingImageObject(tutorialPage2, setting.tutorialPage2);
             SettingImageObject(tutorialPage3, setting.tutorialPage3);
             
-            int count = (tutorialImageObjs != null && setting.tutorialImages != null) ? Mathf.Min(tutorialImageObjs.Count, setting.tutorialImages.Length) : 0;
-
-            for (int i = 0; i < count; i++)
-            {
-                if (tutorialImageObjs != null && setting.tutorialImages != null)
-                {
-                    SettingImageObject(tutorialImageObjs[i], setting.tutorialImages[i]);
-                }
-            }
+            SettingImageObject(infoImage, setting.imageInfo);
             
             tutorialPage1.SetActive(true);
             tutorialPage2.SetActive(false);
@@ -123,7 +115,9 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
                     await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
                     break;
                 }
+                
                 inputReceived = false;
+                await UniTask.Yield();
             }
         }
         catch (Exception e)

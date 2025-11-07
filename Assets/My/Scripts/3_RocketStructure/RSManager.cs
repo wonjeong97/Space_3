@@ -45,13 +45,13 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
     {
         // (참고) 이미지 크로스페이드는 현재 미사용. 필요 시 _crossTime 및 explainImageObjs 로직 활성화
         _crossTime = Mathf.Max(0f, setting.transitionTime);
-
+        
         if (!videoPlayerObject)
         {
             Debug.LogError("[RSManager] Init-> 비디오 플레이어 오브젝트가 지정되지 않았습니다");
             return;
         }
-
+        
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
         _audio = videoPlayerObject.GetComponent<AudioSource>();

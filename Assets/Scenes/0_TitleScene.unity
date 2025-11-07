@@ -278,7 +278,7 @@ Canvas:
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
   m_SortingOrder: 1
-  m_TargetDisplay: 0
+  m_TargetDisplay: 1
 --- !u!224 &265556548
 RectTransform:
   m_ObjectHideFlags: 0
@@ -526,8 +526,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67efc62f9ae891842835fb2e7408affa, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  buttonSource: {fileID: 0}
-  rocketSource: {fileID: 0}
+  sfxSource: {fileID: 0}
   crossSource: {fileID: 0}
   bgmSource: {fileID: 0}
 --- !u!4 &602045419
@@ -2029,7 +2028,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e9dac7029e3c2d14fba90917fe2f057c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _periodSeconds: 4
 --- !u!1 &1979848744
 GameObject:
   m_ObjectHideFlags: 0

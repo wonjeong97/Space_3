@@ -470,7 +470,7 @@ AnimationClip:
     messageOptions: 0
   - time: 1.5
     functionName: PlayRocketEngineSound
-    data: "2\uB2E8 \uBC1C\uC0AC"
+    data: Launch_Stage02
     objectReferenceParameter: {fileID: 0}
     floatParameter: 0
     intParameter: 0

@@ -13,27 +13,30 @@ public class FuelSetting
     public ImageSetting main1;
     public ImageSetting main2;
     public ImageSetting main3;
-    
+
     public ImageSetting[] main1Children;
-    
+
     public ImageSetting fuelPopup;
     public ImageSetting subBg;
     public ImageSetting subRocket;
     public ImageSetting[] oxidizers;
+    public ImageSetting[] oxidizerTextImages;
+    
     public ImageSetting[] fuels;
+    public ImageSetting[] fuelTextImages;
     
     public ImageSetting stageBgImage;
     public TextSetting objectiveText;
-    
+
     public ImageSetting controllerBackground;
     public ImageSetting buttonLeft;
     public ImageSetting buttonMiddle;
     public ImageSetting buttonRight;
     public ImageSetting throttleBackground;
     public ImageSetting throttleButton;
-    
+
     public TextSetting guideText;
-    
+
     public TextSetting timeText;
     public TextSetting altitudeText;
     public TextSetting velocityText;
@@ -52,7 +55,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
     #region Serialized Refs
 
-    [Header("UI")] 
+    [Header("UI")]
     [SerializeField] private GameObject backgroundImage;
     [SerializeField] private GameObject mainImage1;
     [SerializeField] private GameObject mainImage2;
@@ -60,22 +63,30 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject popupImage;
     [SerializeField] private GameObject subBgImage;
     [SerializeField] private GameObject subRocketImage;
-    
-    [Header("Oxidizers")]
+
+    [Header("Oxidizers")] 
     [SerializeField] private GameObject stage1Oxidizer;
     [SerializeField] private GameObject stage2Oxidizer;
     [SerializeField] private GameObject stage3Oxidizer;
-    
-    [Header("Fuels")]
+
+    [SerializeField] private GameObject stage1OxidizerTextImage;
+    [SerializeField] private GameObject stage2OxidizerTextImage;
+    [SerializeField] private GameObject stage3OxidizerTextImage;
+
+    [Header("Fuels")] 
     [SerializeField] private GameObject stage1Fuel;
     [SerializeField] private GameObject stage2Fuel;
     [SerializeField] private GameObject stage3Fuel;
-    
-    [Header("mainImage1")]
+
+    [SerializeField] private GameObject stage1FuelTextImage;
+    [SerializeField] private GameObject stage2FuelTextImage;
+    [SerializeField] private GameObject stage3FuelTextImage;
+
+    [Header("mainImage1")] 
     [SerializeField] private GameObject imageStageBg;
-    [SerializeField] private Image[] sequences;              // 메인1 하위 단계별 강조 이미지들
-    [SerializeField] private GameObject textObjective;       // 목표 텍스트
-    
+    [SerializeField] private Image[] sequences; // 메인1 하위 단계별 강조 이미지들
+    [SerializeField] private GameObject textObjective; // 목표 텍스트
+
     [Header("mainImage2")]
     [SerializeField] private GameObject controllerBackground;
     [SerializeField] private GameObject buttonLeft;
@@ -84,7 +95,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject throttleBackground;
     [SerializeField] private GameObject throttleButton;
     [SerializeField] private GameObject textGuide;
-    
+
     [Header("mainImage3")]
     [SerializeField] private GameObject textTime;
     [SerializeField] private GameObject textAltitude;
@@ -95,24 +106,24 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject textVelocityValue;
     [SerializeField] private GameObject textDistanceValue;
 
-
     #endregion
 
     #region Settings / State
 
     // private
-    private CancellationTokenSource _blinkCts;   // LED 블링크 토큰
+    private CancellationTokenSource _blinkCts; // LED 블링크 토큰
     private CancellationTokenSource _main1AlphaCts; // 메인1 강조 이미지 알파 핑퐁 토큰
-    private CancellationTokenSource _popupFadeCts;  // 팝업 페이드 토큰
+    private CancellationTokenSource _popupFadeCts; // 팝업 페이드 토큰
 
-    private float _fuelFillSpeed;  // 연료 증가 속도 (fillAmount/sec)
-    private float _popupFadeTime;  // 팝업 사라지는 시간
+    private float _fuelFillSpeed; // 연료 증가 속도 (fillAmount/sec)
+    private float _popupFadeTime; // 팝업 사라지는 시간
 
-    private Image _fuel1Image;     // 1단계 연료 이미지 (Filled)
-    private Image _fuel2Image;     // 2단계 연료 이미지 (Filled)
-    private Image _fuel3Image;     // 3단계 연료 이미지 (Filled)
+    private Image _fuel1Image; // 1단계 연료 이미지 (Filled)
+    private Image _fuel2Image; // 2단계 연료 이미지 (Filled)
+    private Image _fuel3Image; // 3단계 연료 이미지 (Filled)
 
     private enum Phase { RocketMove, FuelInjection1, FuelInjection2, FuelInjection3, Done }
+
     private Phase _phase = Phase.RocketMove; // 현재 단계
 
     #endregion
@@ -123,11 +134,11 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     protected override void OnDisable()
     {
         try
-        {   
+        {
             CancelAndDispose(ref _blinkCts);
             CancelAndDispose(ref _main1AlphaCts);
             CancelAndDispose(ref _popupFadeCts);
-            
+
             ArduinoInputManager.Instance?.SetLedAll(false);
         }
         catch (Exception e)
@@ -149,12 +160,12 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         // 고정 이미지 세팅
         SettingImageObject(backgroundImage, setting.main1);
         SettingImageObject(mainImage1, setting.main1);
-        SettingImageObject(mainImage2, setting.main2); 
+        SettingImageObject(mainImage2, setting.main2);
         SettingImageObject(mainImage3, setting.main3);
         SettingImageObject(popupImage, setting.fuelPopup);
         SettingImageObject(subBgImage, setting.subBg);
         SettingImageObject(subRocketImage, setting.subRocket);
-        
+
         // ===== mainImage1 =====
         if (setting.main1Children != null && sequences != null)
         {
@@ -162,17 +173,25 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             for (int i = 0; i < count; i++)
             {
                 if (sequences[i] == null) continue;
-                try { SettingImageObject(sequences[i].gameObject, setting.main1Children[i]); }
-                catch (Exception e) { Debug.LogWarning($"[FuelManager] Init-> sequences[{i}] 세팅 중 예외: {e.Message}"); }
+                try
+                {
+                    SettingImageObject(sequences[i].gameObject, setting.main1Children[i]);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogWarning($"[FuelManager] Init-> sequences[{i}] 세팅 중 예외: {e.Message}");
+                }
             }
         }
+
         if (sequences != null && sequences.Length > 1 && sequences[1] != null)
         {
             StartAlphaPingPong(sequences[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
+
         SettingImageObject(imageStageBg, setting.stageBgImage);
         SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요").Forget();
-        
+
         // ===== mainImage2 =====
         SettingImageObject(controllerBackground, setting.controllerBackground);
         SettingImageObject(buttonLeft, setting.buttonLeft);
@@ -181,7 +200,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
         SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
-        
+
         // ===== mainImage2 =====
         SettingTextObject(textTime, setting.timeText).Forget();
         SettingTextObject(textAltitude, setting.altitudeText).Forget();
@@ -191,17 +210,27 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
         SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
         SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
-        
+
         // 산화제 이미지 세팅
         SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);
         SettingImageObject(stage2Oxidizer, setting.oxidizers[1]);
         SettingImageObject(stage3Oxidizer, setting.oxidizers[2]);
         
+        // "산화제" 글자 이미지 세팅
+        SettingImageObject(stage1OxidizerTextImage, setting.oxidizerTextImages[0]);
+        SettingImageObject(stage2OxidizerTextImage, setting.oxidizerTextImages[1]);
+        SettingImageObject(stage3OxidizerTextImage, setting.oxidizerTextImages[2]);
+
         // 연료 이미지 세팅
         SettingImageObject(stage1Fuel, setting.fuels[0]);
         SettingImageObject(stage2Fuel, setting.fuels[1]);
         SettingImageObject(stage3Fuel, setting.fuels[2]);
         
+        // "연료" 글자 이미지 세팅
+        SettingImageObject(stage1FuelTextImage, setting.fuelTextImages[0]);
+        SettingImageObject(stage2FuelTextImage, setting.fuelTextImages[1]);
+        SettingImageObject(stage3FuelTextImage, setting.fuelTextImages[2]);
+
         InitFuelImage(); // fillAmount 0으로 초기화
 
         ArduinoInputManager.Instance?.SetLedAll(true);
@@ -209,7 +238,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
         StartBlinkGreenAsync(500, 160);
-        
+
         _phase = Phase.FuelInjection1;
         _blinkCts = new CancellationTokenSource();
 
@@ -238,7 +267,16 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 if (_popupFadeCts == null)
                 {
                     _popupFadeCts = new CancellationTokenSource();
-                    try { ArduinoInputManager.Instance?.SetLedAll(false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED 전체 끄기 중 예외: {e.Message}"); }
+                    try
+                    {
+                        ArduinoInputManager.Instance?.SetLedAll(false);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED 전체 끄기 중 예외: {e.Message}");
+                    }
+
+                    SoundManager.Instance?.PlayByKey("Popup_Close");
                     SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
                     PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token).Forget();
                 }
@@ -250,7 +288,15 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 {
                     // LED1 블링크 종료
                     CancelAndDispose(ref _blinkCts);
-                    try { ArduinoInputManager.Instance?.SetLed(1, false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED1 끄기 중 예외: {e.Message}"); }
+                    try
+                    {
+                        ArduinoInputManager.Instance?.SetLed(1, false);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED1 끄기 중 예외: {e.Message}");
+                    }
+
                     StopButtonBlink(buttonLeft);
 
                     // LED2 블링크 시작
@@ -258,7 +304,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                     SettingTextObject(textGuide, setting.guideText, "가운데 버튼을 누르세요").Forget();
                     BlinkLedAsync(2, 300, 300, _blinkCts.Token).Forget();
                     StartButtonBlink(buttonMiddle);
-                    
+
                     _phase = Phase.FuelInjection2;
                     break;
                 }
@@ -282,7 +328,15 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 {
                     // LED2 블링크 종료
                     CancelAndDispose(ref _blinkCts);
-                    try { ArduinoInputManager.Instance?.SetLed(2, false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED2 끄기 중 예외: {e.Message}"); }
+                    try
+                    {
+                        ArduinoInputManager.Instance?.SetLed(2, false);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED2 끄기 중 예외: {e.Message}");
+                    }
+
                     StopButtonBlink(buttonMiddle);
 
                     // LED3 블링크 시작
@@ -290,7 +344,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                     SettingTextObject(textGuide, setting.guideText, "오른쪽 버튼을 누르세요").Forget();
                     BlinkLedAsync(3, 300, 300, _blinkCts.Token).Forget();
                     StartButtonBlink(buttonRight);
-                    
+
                     _phase = Phase.FuelInjection3;
                 }
             }
@@ -310,12 +364,20 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             if (btn == ArduinoInputManager.ButtonId.Button3 || Input.GetKey(KeyCode.RightArrow))
             {
                 if (IncreaseFill(_fuel3Image, _fuelFillSpeed * Time.deltaTime))
-                {   
+                {
                     // LED3 블링크 종료
                     CancelAndDispose(ref _blinkCts);
-                    try { ArduinoInputManager.Instance?.SetLed(3, false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED3 끄기 중 예외: {e.Message}"); }
+                    try
+                    {
+                        ArduinoInputManager.Instance?.SetLed(3, false);
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED3 끄기 중 예외: {e.Message}");
+                    }
+
                     StopButtonBlink(buttonRight);
-                    
+
                     _phase = Phase.Done;
                     break;
                 }
@@ -337,8 +399,10 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 Debug.LogError($"[FuelManager] FuelFillAsync-> 토큰 취소 중 예외: {e}");
             }
 
-            _popupFadeCts?.Dispose(); _popupFadeCts = null;
-            _blinkCts?.Dispose(); _blinkCts = null;
+            _popupFadeCts?.Dispose();
+            _popupFadeCts = null;
+            _blinkCts?.Dispose();
+            _blinkCts = null;
 
             if (nextSceneBuildIndex >= 0)
             {
@@ -419,9 +483,8 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         img.fillAmount = Mathf.Clamp01(before + delta);
         return (before < 1f && img.fillAmount >= 1f);
     }
-    
 
-    
+
     /// <summary> 디버그 스킵: 모든 주입 과정을 중단하고 즉시 다음 씬으로 이동 </summary>
     protected override void OnDebugSkip()
     {
@@ -431,7 +494,15 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             CancelAndDispose(ref _blinkCts);
             CancelAndDispose(ref _main1AlphaCts);
 
-            try { ArduinoInputManager.Instance?.SetLedAll(false); } catch (Exception e) { Debug.LogWarning($"[FuelManager] OnDebugSkip-> LED 전체 끄기 중 예외: {e.Message}"); }
+            try
+            {
+                ArduinoInputManager.Instance?.SetLedAll(false);
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[FuelManager] OnDebugSkip-> LED 전체 끄기 중 예외: {e.Message}");
+            }
+
             StopLedEffects();
 
             _phase = Phase.Done;
