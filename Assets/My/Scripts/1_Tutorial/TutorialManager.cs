@@ -14,6 +14,8 @@ public class TutorialSetting
     public ImageSetting tutorialPage3;
 
     public ImageSetting imageInfo;
+
+    public ImageSetting subImage;
 }
 
 /// <summary> 튜토리얼 씬 관리 매니저 </summary>
@@ -26,12 +28,11 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
 
     [Header("UI")]
     [SerializeField] private List<GameObject> tutorialImageObjs; // 튜토리얼 이미지 목록
-
     [SerializeField] private GameObject tutorialPage1; // 이용안내 일체형 이미지
     [SerializeField] private GameObject tutorialPage2; // 모니터에 출력되는 내용을 보고 따라해주세요 배경 이미지
     [SerializeField] private GameObject tutorialPage3; // 각 상황에 맞게 버튼을 조정해주세요 배경 이미지
-
     [SerializeField] private GameObject infoImage;
+    [SerializeField] private GameObject subImage;
     
     #endregion
 
@@ -58,6 +59,7 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
             SettingImageObject(tutorialPage3, setting.tutorialPage3);
             
             SettingImageObject(infoImage, setting.imageInfo);
+            SettingImageObject(subImage, setting.subImage);
             
             tutorialPage1.SetActive(true);
             tutorialPage2.SetActive(false);
@@ -70,7 +72,7 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
             TurnCamera3Async(DestroyToken).Forget();
 
             // 4) 페이드 인
-            await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
+            await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
             // 5) 입력 루프: 버튼 입력마다 다음 단계로 넘어감
             while (true)
@@ -112,7 +114,7 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
                     if (ShouldAbort()) break;
 
                     int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 2;
-                    await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
+                    await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
                     break;
                 }
                 

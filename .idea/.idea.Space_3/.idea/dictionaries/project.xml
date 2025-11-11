@@ -2,6 +2,7 @@
   <dictionary name="project">
     <words>
       <w>addressables</w>
+      <w>cysharp</w>
     </words>
   </dictionary>
 </component>

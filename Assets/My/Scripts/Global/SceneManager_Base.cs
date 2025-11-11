@@ -13,14 +13,14 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     #region Serialized Refs
 
     [Header("Camera")]
-    [SerializeField] protected Camera mainCamera; // Display1
-    [SerializeField] protected Camera camera2; // Display2
-    [SerializeField] protected Camera camera3; // Display3
+    [SerializeField] protected Camera mainCamera;       // Display1
+    [SerializeField] protected Camera subCamera;        // Display2
+    [SerializeField] protected Camera verticalCamera;   // Display3
 
     [Header("Canvas")]
-    [SerializeField] protected Canvas mainCanvas;
-    [SerializeField] protected Canvas subCanvas;
-    [SerializeField] protected Canvas verticalCanvas;
+    [SerializeField] protected Canvas mainCanvas;     // 1920 x 1080 캔버스
+    [SerializeField] protected Canvas subCanvas;      // 1920 x 540 캔버스
+    [SerializeField] protected Canvas verticalCanvas; // 1080 x 3840 캔버스
 
     [Header("Fade Images")] 
     [SerializeField] protected Image fadeImage1; // Display1 Fade
@@ -41,36 +41,36 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     private static volatile bool _sTransitionInProgress; // 전역 씬 전환 중 여부
     protected static bool TransitionInProgress => _sTransitionInProgress;
 
-    [NonSerialized] protected T setting; // JSON 설정 데이터 참조
-    private Settings _mainSettings; // 공통 설정 참조
+    [NonSerialized] protected T setting;    // JSON 설정 데이터 참조
+    private Settings _mainSettings;         // 공통 설정 참조
 
     // ===== protected =====
-    protected bool canInput; // 입력 가능 여부 (페이드 중 방지)
-    protected int buttonDelayTime; // 버튼 클릭 간 딜레이 시간 (ms)
-    protected bool inputReceived; // 입력 한 번만 허용할 때 사용
-    protected float fadeTime; // 페이드 시간 설정
+    protected bool canInput;        // 입력 가능 여부 (페이드 중 방지)
+    protected int buttonDelayTime;  // 버튼 클릭 간 딜레이 시간 (ms)
+    protected bool inputReceived;   // 입력 한 번만 허용할 때 사용
+    protected float fadeTime;       // 페이드 시간 설정
 
     // ===== private =====
     private readonly Dictionary<GameObject, CancellationTokenSource> _anchoredYAnimCts = new Dictionary<GameObject, CancellationTokenSource>(); // Y좌표 애니메이션 관리
     private readonly Dictionary<string, Sprite> _spriteCache = new Dictionary<string, Sprite>(); // 버튼 이미지 캐싱
-    private readonly Dictionary<GameObject, CancellationTokenSource> _blinkCtsDict = new(); // 조작 방식 버튼 이미지 on/off 깜빡임 관리
+    private readonly Dictionary<GameObject, CancellationTokenSource> _blinkCtsDict = new Dictionary<GameObject, CancellationTokenSource>(); // 조작 방식 버튼 이미지 on/off 깜빡임 관리
 
-    private CancellationToken _destroyToken; // 객체 파괴 감지용 토큰
-    private CancellationTokenSource _ledCts; // LED 제어용 토큰
+    private CancellationToken _destroyToken;        // 객체 파괴 감지용 토큰
+    private CancellationTokenSource _ledCts;        // LED 제어용 토큰
 
-    private const float DebugSkipCooldown = 0.25f; // 디버그 스킵 쿨다운 시간
+    private const float DebugSkipCooldown = 0.25f;  // 디버그 스킵 쿨다운 시간
 
-    private bool _destroyTokenInitialized; // Destroy 토큰 초기화 여부
-    private bool _isLoading; // 현재 씬 로드 중 여부
+    private bool _destroyTokenInitialized;          // Destroy 토큰 초기화 여부
+    private bool _isLoading;                        // 현재 씬 로드 중 여부
 
-    private float _camera3TurnSpeed; // 세 번째 카메라 회전 속도
-    private float _inactivityThreshold; // 비활성 상태에서 홈으로 복귀 시간 기준
-    private float _inactivityTimer; // 현재 비활성 누적 시간
-    private float _lastDebugSkipTime; // 마지막 디버그 스킵 입력 시간
+    private float _camera3TurnSpeed;                // 세 번째 카메라 회전 속도
+    private float _inactivityThreshold;             // 비활성 상태에서 홈으로 복귀 시간 기준
+    private float _inactivityTimer;                 // 현재 비활성 누적 시간
+    private float _lastDebugSkipTime;               // 마지막 디버그 스킵 입력 시간
 
-    private int _arduinoTouchedFlag; // 아두이노 입력 감지 플래그
-    private int _blinkHalfPeriodMs = 300; // LED 초록색 깜빡임 주기 절반 시간
-    private int _inactivityPauseCount; // 비활성 타이머 일시정지 중첩 카운트
+    private int _arduinoTouchedFlag;                // 아두이노 입력 감지 플래그
+    private int _blinkHalfPeriodMs = 300;           // LED 초록색 깜빡임 주기 절반 시간
+    private int _inactivityPauseCount;              // 비활성 타이머 일시정지 중첩 카운트
     
     private bool IsInactivityPaused => _inactivityPauseCount > 0; // 일시정지 상태 여부
     
@@ -89,7 +89,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 의존성 확인 및 아두이노 이벤트 구독 </summary>
     protected virtual void Awake()
     {
-        if (!mainCamera || !camera2 || !camera3) Debug.LogWarning("[SceneManager_Base] Awake-> 카메라가 지정되지 않았습니다");
+        if (!mainCamera || !subCamera || !verticalCamera) Debug.LogWarning("[SceneManager_Base] Awake-> 카메라가 지정되지 않았습니다");
         if (!mainCanvas || !subCanvas || !verticalCanvas) Debug.LogWarning("[SceneManager_Base] Awake-> 캔버스가 지정되지 않았습니다");
         if (!fadeImage1 || !fadeImage2 || !fadeImage3) Debug.LogWarning("[SceneManager_Base] Awake-> 페이드 이미지가 지정되지 않았습니다");
 
@@ -125,9 +125,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
             // 윈도우 디스플레이 순서가 바뀌어도 JSON으로 지정 가능
             mainCamera.targetDisplay = _mainSettings.canvas1TargetMonitorIndex;
             mainCanvas.targetDisplay = _mainSettings.canvas1TargetMonitorIndex;
-            camera2.targetDisplay = _mainSettings.canvas2TargetMonitorIndex;
+            subCamera.targetDisplay = _mainSettings.canvas2TargetMonitorIndex;
             subCanvas.targetDisplay = _mainSettings.canvas2TargetMonitorIndex;
-            camera3.targetDisplay = _mainSettings.canvas3TargetMonitorIndex;
+            verticalCamera.targetDisplay = _mainSettings.canvas3TargetMonitorIndex;
             verticalCanvas.targetDisplay = _mainSettings.canvas3TargetMonitorIndex;
 
             await InitSafe();
@@ -239,7 +239,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> Display3 카메라를 일정 속도로 계속 회전시킴 </summary>
     protected async UniTaskVoid TurnCamera3Async(CancellationToken token)
     {
-        if (!camera3)
+        if (!verticalCamera)
         {
             Debug.LogError("[SceneManager_Base] TurnCamera3Async-> camera3가 지정되지 않았습니다");
             return;
@@ -249,7 +249,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         {
             while (!token.IsCancellationRequested)
             {
-                camera3.transform.Rotate(Vector3.up, _camera3TurnSpeed * Time.deltaTime, Space.World);
+                verticalCamera.transform.Rotate(Vector3.up, _camera3TurnSpeed * Time.deltaTime, Space.World);
                 await UniTask.Yield(PlayerLoopTiming.Update, token);
             }
         }
@@ -746,7 +746,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         // 기존에 깜빡이는 중이면 중단
         StopButtonBlink(buttonObject);
 
-        CancellationTokenSource cts = new();
+        CancellationTokenSource cts = new CancellationTokenSource();
         _blinkCtsDict[buttonObject] = cts;
         BlinkRoutineAsync(buttonObject, interval, cts.Token).Forget();
     }

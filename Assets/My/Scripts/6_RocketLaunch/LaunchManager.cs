@@ -920,10 +920,10 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     
     private async UniTask LerpCamera3Fov(float duration, float targetFov)
     {
-        if (camera3 == null) return;
+        if (verticalCamera == null) return;
 
         float d = Mathf.Max(0.01f, duration);
-        float startFov = camera3.fieldOfView;
+        float startFov = verticalCamera.fieldOfView;
 
         float t = 0f;
         CancellationToken token = DestroyToken;
@@ -933,14 +933,38 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             t += Time.deltaTime;
             float u = Mathf.Clamp01(t / d);
             float fov = Mathf.Lerp(startFov, targetFov, u);
-            camera3.fieldOfView = fov;
+            verticalCamera.fieldOfView = fov;
 
             await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
 
         if (!token.IsCancellationRequested)
         {
-            camera3.fieldOfView = targetFov;
+            verticalCamera.fieldOfView = targetFov;
         }
     }
+
+    /*private void FixedUpdate()
+    {
+        if (Input.GetKeyUp(KeyCode.Alpha2))
+        {
+            try
+            {
+                ArduinoInputManager.Instance?.Send("THROTTLE ON");
+            }
+            catch
+            {
+            }
+        }
+        else if (Input.GetKeyUp(KeyCode.Alpha3))
+        {
+            try
+            {
+                ArduinoInputManager.Instance?.Send("THROTTLE OFF");
+            }
+            catch
+            {
+            }
+        }
+    }*/
 }

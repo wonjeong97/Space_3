@@ -10,6 +10,8 @@ public class TitleSetting
     public ImageSetting background;
     public ImageSetting infoImage;
     public ImageSetting titleImage;
+
+    public ImageSetting subImage;
 }
 
 /// <summary> 타이틀 씬 관리 클래스 </summary>
@@ -24,6 +26,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     [SerializeField] private GameObject backgroundImage; // 배경 이미지
     [SerializeField] private GameObject infoImage;       // "시작하려면 아무 버튼이나 누르세요"
     [SerializeField] private GameObject titleImage;      // 우주발사체 타이틀 이미지
+    [SerializeField] private GameObject subImage;        // "누리호 발사 임무" 이미지
 
     #endregion
 
@@ -38,6 +41,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
         SettingImageObject(backgroundImage, setting.background); 
         SettingImageObject(titleImage, setting.titleImage);
         SettingImageObject(infoImage, setting.infoImage);
+        SettingImageObject(subImage, setting.subImage);
 
         await UniTask.Yield();
 
@@ -86,7 +90,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
         // 3) 카메라/페이드 인
         TurnCamera3Async(ct).Forget();
         SoundManager.Instance?.PlayBGMByKey("BGM");
-        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
         if (ct.IsCancellationRequested || !this || !isActiveAndEnabled) return;
 
         // 4) 입력 대기 → 다음 씬
@@ -100,7 +104,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
 
         SoundManager.Instance?.PlayByKey("Title_Confirm");
         int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 1;
-        await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
+        await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
     }
 
     #endregion

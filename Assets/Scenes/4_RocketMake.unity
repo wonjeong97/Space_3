@@ -1796,8 +1796,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
-  camera2: {fileID: 1034087464}
-  camera3: {fileID: 1519031297}
+  subCamera: {fileID: 1034087464}
+  verticalCamera: {fileID: 1519031297}
   mainCanvas: {fileID: 1143324484}
   subCanvas: {fileID: 1861275197}
   verticalCanvas: {fileID: 650116682}
@@ -2294,7 +2294,7 @@ GameObject:
   - component: {fileID: 1034087465}
   - component: {fileID: 1034087464}
   m_Layer: 0
-  m_Name: Camera2
+  m_Name: Sub Camera
   m_TagString: Camera2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3115,7 +3115,7 @@ GameObject:
   - component: {fileID: 1519031298}
   - component: {fileID: 1519031297}
   m_Layer: 0
-  m_Name: Camera3
+  m_Name: Vertical Camera
   m_TagString: Camera3
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

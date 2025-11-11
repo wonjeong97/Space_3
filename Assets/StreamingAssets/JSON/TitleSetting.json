@@ -14,5 +14,10 @@
 		"size": { "x": 3930, "y": 425 },
 		"scale": { "x": 0.5, "y": 0.5, "z": 0.5 },
 		"sourceImage": "Image/Title/1_Start.png"
+	},
+	"subImage": {
+		"position": { "x": 960, "y": 270 },
+		"size": { "x": 1920, "y": 540 },
+		"sourceImage": "Image/ForSub/3_assi-idle.png"
 	}
 }

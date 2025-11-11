@@ -7,7 +7,8 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
-public class UICreator : MonoBehaviour
+public class 
+    UICreator : MonoBehaviour
 {
     public static UICreator Instance { get; private set; }
 

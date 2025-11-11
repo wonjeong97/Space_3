@@ -11761,8 +11761,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mainCamera: {fileID: 963194227}
-  camera2: {fileID: 1034087464}
-  camera3: {fileID: 904505306}
+  subCamera: {fileID: 1034087464}
+  verticalCamera: {fileID: 904505306}
   mainCanvas: {fileID: 1143324484}
   subCanvas: {fileID: 1861275197}
   verticalCanvas: {fileID: 650116682}
@@ -12014,7 +12014,7 @@ GameObject:
   - component: {fileID: 904505305}
   - component: {fileID: 904505308}
   m_Layer: 7
-  m_Name: Camera3
+  m_Name: Vertical Camera
   m_TagString: Camera3
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -17493,7 +17493,7 @@ GameObject:
   - component: {fileID: 1034087465}
   - component: {fileID: 1034087464}
   m_Layer: 0
-  m_Name: Camera2
+  m_Name: Sub Camera
   m_TagString: Camera2
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -39935,7 +39935,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7529808073714240912, guid: c435e358ca7afdc4391ffe5d1ff21231, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7704060234724310110, guid: c435e358ca7afdc4391ffe5d1ff21231, type: 3}
       propertyPath: m_IsActive

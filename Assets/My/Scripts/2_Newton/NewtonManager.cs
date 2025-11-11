@@ -12,6 +12,7 @@ public class NewtonSetting
     public ImageSetting background;
     public ImageSetting infoImage1;
     public ImageSetting infoImage2;
+    public ImageSetting subImage;
 
     public VideoSetting introVideo;
     public VideoSetting[] newtonsRuleVideos;
@@ -27,7 +28,8 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
 
     [Header("UI")]
     [SerializeField] private GameObject videoPlayerObject; // 비디오를 표시할 GameObject (VideoPlayer + RawImage + AudioSource)
-
+    [SerializeField] private GameObject subImage;
+    
     #endregion
 
     #region Settings / State
@@ -101,6 +103,8 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
             return;
         }
 
+        SettingImageObject(subImage, setting.subImage);
+        
         // 컴포넌트 캐시
         _vp   = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw  = videoPlayerObject.GetComponent<RawImage>();
@@ -128,7 +132,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
 
         // 3번 모니터 카메라 회전 및 페이드 인
         TurnCamera3Async(DestroyToken).Forget();
-        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
     }
 
     #endregion
@@ -151,7 +155,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
                 if (_ruleSeq == null || _ruleSeq.Length == 0)
                 {
                     _phase = Phase.Done;
-                    await LoadSceneAsync(3, new[] { fadeImage1, fadeImage3 });
+                    await LoadSceneAsync(3, new[] { fadeImage1, fadeImage2, fadeImage3 });
                     return;
                 }
 
@@ -162,7 +166,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
                 if (_ruleSeq == null || _ruleSeq.Length == 0 || _ruleIndex < 0 || _ruleIndex >= _ruleSeq.Length)
                 {
                     _phase = Phase.Done;
-                    await LoadSceneAsync(3, new[] { fadeImage1, fadeImage3 });
+                    await LoadSceneAsync(3, new[] { fadeImage1, fadeImage2, fadeImage3 });
                     return;
                 }
 
@@ -183,7 +187,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
                 else
                 {
                     _phase = Phase.Done;
-                    await LoadSceneAsync(3, new[] { fadeImage1, fadeImage3 });
+                    await LoadSceneAsync(3, new[] { fadeImage1, fadeImage2, fadeImage3 });
                 }
             }
         }
@@ -333,7 +337,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
         else
         {
             _phase = Phase.Done;
-            await LoadSceneAsync(3, new[] { fadeImage1, fadeImage3 });
+            await LoadSceneAsync(3, new[] { fadeImage1, fadeImage2, fadeImage3 });
         }
     }
 
@@ -379,7 +383,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
             _isSwitching = false;
             _phase = Phase.Done;
 
-            LoadSceneAsync(3, new[] { fadeImage1, fadeImage3 }).Forget();
+            LoadSceneAsync(3, new[] { fadeImage1, fadeImage2, fadeImage3 }).Forget();
         }
         catch (Exception e)
         {

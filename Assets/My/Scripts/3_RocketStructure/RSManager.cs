@@ -10,6 +10,7 @@ using UnityEngine.Video;
 public class RSSetting
 {
     public float transitionTime;
+    public ImageSetting subImage;
     public ImageSetting[] explainImages;
     public VideoSetting structureVideo;
 }
@@ -25,7 +26,8 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
     [Header("UI")]
     [SerializeField] private GameObject videoPlayerObject;   // 비디오 플레이어 + RawImage + AudioSource가 붙은 오브젝트
     [SerializeField] private List<GameObject> explainImageObjs; // (비활성화됨) 이미지 시퀀스 오브젝트 목록
-
+    [SerializeField] private GameObject subImage;
+    
     #endregion
 
     #region Settings / State
@@ -51,6 +53,8 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
             Debug.LogError("[RSManager] Init-> 비디오 플레이어 오브젝트가 지정되지 않았습니다");
             return;
         }
+        
+        SettingImageObject(subImage, setting.subImage);
         
         _vp = videoPlayerObject.GetComponent<VideoPlayer>();
         _raw = videoPlayerObject.GetComponent<RawImage>();
@@ -97,7 +101,7 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
         }
 
         // 페이드 인
-        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
     }
 
     #endregion
@@ -112,7 +116,7 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
             if (_vp) _vp.loopPointReached -= OnVideoEnded;
 
             int target = (nextSceneBuildIndex >= 0) ? nextSceneBuildIndex : 4;
-            await LoadSceneAsync(target, new[] { fadeImage1, fadeImage3 });
+            await LoadSceneAsync(target, new[] { fadeImage1, fadeImage2, fadeImage3 });
         }
         catch (Exception e)
         {
