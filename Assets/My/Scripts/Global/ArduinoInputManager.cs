@@ -98,6 +98,12 @@ public class ArduinoInputManager : MonoBehaviour
     private Thread _readThread;
     private volatile bool _running;
 
+    public SerialPort SerialPort
+    {
+        get => _serialPort;
+        private set => _serialPort = value;
+    }
+
     // 버튼 눌림을 한 번만 전달하기 위한 비트마스크 플래그
     // bit0: Button1, bit1: Button2, bit2: Button3
     private volatile int _pressedBits; // 멀티스레드 환경에서 사용

@@ -136,6 +136,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     public bool RocketReady { get; set; }
 
+    public Camera VerticalCamera
+    {
+        get => verticalCamera;
+        private set =>  verticalCamera = value;
+    }
+
     #region Unity lifecycle
 
     protected override void Awake()
@@ -967,4 +973,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             }
         }
     }*/
+
+    public async UniTask FadeVerticalAsync(float start, float end)
+    {
+        await FadeImageAsync(start, end, fadeTime, new[] { fadeImage3 });
+    }
 }

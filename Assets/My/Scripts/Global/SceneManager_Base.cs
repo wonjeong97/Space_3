@@ -73,7 +73,10 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     private int _inactivityPauseCount;              // 비활성 타이머 일시정지 중첩 카운트
     
     private bool IsInactivityPaused => _inactivityPauseCount > 0; // 일시정지 상태 여부
-    
+
+    public bool CanInput { get; set; }
+    public bool InputReceived { get; set; }
+
     public float InactivityTimer // 현재 비활성 누적 시간 접근자
     {
         get => _inactivityTimer;

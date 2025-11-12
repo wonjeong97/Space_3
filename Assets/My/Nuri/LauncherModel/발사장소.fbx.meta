@@ -18,7 +18,17 @@ ModelImporter:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: Frame
+    second: {fileID: 2100000, guid: 7b73b60fc86077b4082a5eb7353dbbef, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: base
     second: {fileID: 2100000, guid: 9d2d66eb7ddf27b4f8163a78993d4b3a, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: fence
+    second: {fileID: 2100000, guid: f7b10eb02d770fc4aa89d1b55ace4b69, type: 2}
   - first:
       type: UnityEngine:Texture2D
       assembly: UnityEngine.CoreModule
