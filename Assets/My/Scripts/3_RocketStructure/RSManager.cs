@@ -130,7 +130,9 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
 
     /// <summary> 비활성화: 이벤트 해제 및 비디오 정지 </summary>
     protected override void OnDisable()
-    {
+    {   
+        base.OnDisable();
+        
         if (_vp)
         {
             try { _vp.loopPointReached -= OnVideoEnded; }

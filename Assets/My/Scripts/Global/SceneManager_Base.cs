@@ -184,8 +184,19 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> LED/이벤트 해제 </summary>
     protected virtual void OnDisable()
     {
-        StopLedEffects();
-        UnhookArduino();
+        try
+        {
+            StopLedEffects();
+            ArduinoInputManager.Instance?.SetLedAll(false);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[{SceneManager.GetActiveScene().name}] OnDisable Exception: {e}");
+        }
+        finally
+        {
+            UnhookArduino();    
+        }
     }
 
     #endregion
@@ -569,9 +580,13 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     /// <summary> VideoObject 설정: RT 바인딩, URL 해석, Prepare & Play </summary>
     protected async UniTask SettingVideoObject(GameObject vpObject, VideoSetting vs, VideoPlayer vp, RawImage raw, AudioSource audioSource)
-    {
-        if (!vpObject || vs == null || !vp || !raw) return;
-
+    {   
+        if (!vpObject || vs == null || !vp || !raw)
+        {   
+            Debug.LogWarning($"vpObject: {vpObject?.name}, vs: {vs?.name}, vp: {vp?.name}, raw: {raw?.name}");
+            return;
+        }
+        
         if (vpObject.TryGetComponent(out RectTransform rt))
         {
             UIUtility.ApplyRect(

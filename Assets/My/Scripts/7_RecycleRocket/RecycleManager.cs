@@ -3,21 +3,19 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 [Serializable]
 public class RecycleSetting
 {
     public float popupFadeTime;
     public float gameCloseTime;
-    public ImageSetting main1;
-    public ImageSetting main2;
-    public ImageSetting main3;
-    public ImageSetting popup1;
-    public ImageSetting endBackground;
-    public ImageSetting endImage1;
-    public ImageSetting endImage2;
 
-    public ImageSetting[] main1Children;
+    public ImageSetting recyclePopup;
+    public VideoSetting recycleVideo;
+
+    public ImageSetting successImage;
+    public ImageSetting messageImage;
 }
 
 /// <summary>
@@ -27,71 +25,47 @@ public class RecycleSetting
 public class RecycleManager : SceneManager_Base<RecycleSetting>
 {
     [Header("UI")]
-    [SerializeField] private GameObject mainImage1;
-    [SerializeField] private GameObject mainImage2;
-    [SerializeField] private GameObject mainImage3;
-    [SerializeField] private GameObject popupImage1;
-    [SerializeField] private GameObject endBackgroundImage;
-    [SerializeField] private GameObject endImage1;
-    [SerializeField] private GameObject endImage2;
-
-    [Header("mainImage1")]
-    [SerializeField] private Image[] main1ChildrenImages;
+    [SerializeField] private GameObject recyclePopup;
+    [SerializeField] private GameObject recycleVideo;
+    [SerializeField] private GameObject successImage;
+    [SerializeField] private GameObject messageImage;
 
     protected override string JsonPath => "JSON/RecycleSetting.json";
 
     private float _popupFadeTime;
     private float _gameCloseTime;
+    
+    private AudioSource _audio;
+    private RawImage _raw;
+    private VideoPlayer _video;
 
     #region Unity lifecycle
-
-    /// <summary> 파괴/비활성화 시 LED 이펙트 등 외부 리소스 정리 </summary>
-    protected override void OnDisable()
-    {
-        base.OnDisable();
-        try
-        {
-            StopLedEffects();
-            ArduinoInputManager.Instance?.SetLedAll(false);
-        }
-        catch (Exception e)
-        {
-            LogUtil.LogError(nameof(RecycleManager), nameof(OnDisable), e.ToString());
-        }
-    }
 
     /// <summary> 초기 세팅 및 입력 대기 -> 크로스페이드 -> 종료 타이머 -> 타이틀 복귀 </summary>
     protected override async UniTask Init()
     {
         CancellationToken token = DestroyToken;
+        
+        _video = recycleVideo.GetComponent<VideoPlayer>();
+        _audio = recycleVideo.GetComponent<AudioSource>();
+        _raw = recycleVideo.GetComponent<RawImage>();
+
+        if (_video) _video.isLooping = true;
 
         // 시간 파라미터 보정
         _popupFadeTime = Mathf.Max(0f, setting.popupFadeTime);
         _gameCloseTime = Mathf.Max(0f, setting.gameCloseTime);
 
-        // 고정 이미지 세팅
-        SettingImageObject(mainImage1, setting.main1);
-        SettingImageObject(mainImage2, setting.main2);
-        SettingImageObject(mainImage3, setting.main3);
-        SettingImageObject(popupImage1, setting.popup1);
-        SettingImageObject(endBackgroundImage, setting.endBackground);
-        SettingImageObject(endImage1, setting.endImage1);
-        SettingImageObject(endImage2, setting.endImage2);
-
-        // mainImage1 자식 이미지들 세팅
-        if (setting.main1Children != null && main1ChildrenImages != null)
-        {
-            int count = Mathf.Min(setting.main1Children.Length, main1ChildrenImages.Length);
-            for (int i = 0; i < count; i++)
-            {
-                if (main1ChildrenImages[i] == null) continue;
-                SettingImageObject(main1ChildrenImages[i].gameObject, setting.main1Children[i]);
-            }
-        }
+        // 이미지 & 비디오 세팅
+        SettingImageObject(recyclePopup, setting.recyclePopup);
+        SettingImageObject(successImage, setting.successImage);
+        SettingImageObject(messageImage, setting.messageImage);
+        await SettingVideoObject(recycleVideo, setting.recycleVideo, _video, _raw, _audio);
 
         // 엔딩 백그라운드는 시작 시 비활성
-        if (endBackgroundImage != null) endBackgroundImage.gameObject.SetActive(false);
-
+        if (successImage != null) successImage.gameObject.SetActive(false);
+        if (messageImage != null) messageImage.gameObject.SetActive(false);
+        
         // LED 안내 시작
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
@@ -102,10 +76,7 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
         // 입력 대기 루프 (아두이노 버튼 or 키보드)
         while (!token.IsCancellationRequested)
         {
-            bool pressed =
-                (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))
-                || TryConsumeSingleInput();
-
+            bool pressed = (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))|| TryConsumeSingleInput();
             if (pressed)
             {
                 StopLedEffects();
@@ -121,8 +92,11 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
 
         // 팝업(앞) -> 엔딩(뒤) 크로스페이드
         try
-        {
-            CrossFadeAsync(popupImage1, endBackgroundImage, _popupFadeTime).Forget();
+        {   
+            recycleVideo.SetActive(false);
+            
+            await CrossFadeAsync(recyclePopup, successImage, _popupFadeTime);
+            messageImage.SetActive(true);
         }
         catch (Exception e)
         {

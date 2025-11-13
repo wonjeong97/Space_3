@@ -133,13 +133,12 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     /// <summary> 비활성화 시 토큰/LED 정리 </summary>
     protected override void OnDisable()
     {
+        base.OnDisable();
         try
         {
             CancelAndDispose(ref _blinkCts);
             CancelAndDispose(ref _main1AlphaCts);
             CancelAndDispose(ref _popupFadeCts);
-
-            ArduinoInputManager.Instance?.SetLedAll(false);
         }
         catch (Exception e)
         {

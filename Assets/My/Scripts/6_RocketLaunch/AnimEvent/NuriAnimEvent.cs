@@ -10,7 +10,7 @@ public class NuriAnimEvent : MonoBehaviour
     [Header("Animator")] 
     [SerializeField] private Animator separateAnimator;
 
-    [Header("Bottom Smoke")]
+    [Header("Bottom Smoke")] 
     [SerializeField] private ParticleSystem bottomSmoke;
 
     [Header("Fairing")]
@@ -36,20 +36,22 @@ public class NuriAnimEvent : MonoBehaviour
 
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
-    
+
     private JetVFXAnim _jetVFXAnimStage1;
     private JetVFXAnim _jetVFXAnimStage2;
     private JetVFXAnim _jetVFXAnimStage3;
 
     private Camera _verticalCameraInst;
+    private CameraShaker _verticalCameraShake;
 
     private void Awake()
     {
         _jetVFXAnimStage1 = stage1Flame.GetComponent<JetVFXAnim>();
         _jetVFXAnimStage2 = stage2Flame.GetComponent<JetVFXAnim>();
         _jetVFXAnimStage3 = stage3Flame.GetComponent<JetVFXAnim>();
-        
+
         _verticalCameraInst = LaunchManager.Instance.VerticalCamera;
+        _verticalCameraShake = CameraShaker.Instance;
     }
 
     public void StartBottomSmoke()
@@ -90,23 +92,25 @@ public class NuriAnimEvent : MonoBehaviour
         try
         {
             if (!stage1 || !stage1Smoke || !stage1Flame) return;
-            
+
             stage1Smoke?.Play();
             _jetVFXAnimStage1?.Shrink();
-            
+
             await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage01");
 
             await UniTask.Delay(3000, cancellationToken: token);
-            
+
             _jetVFXAnimStage2?.Expand();
 
             await UniTask.Delay(10000, cancellationToken: token);
 
             if (stage1) Destroy(stage1);
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -137,7 +141,9 @@ public class NuriAnimEvent : MonoBehaviour
             if (fairing1) Destroy(fairing1);
             if (fairing2) Destroy(fairing2);
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -154,7 +160,7 @@ public class NuriAnimEvent : MonoBehaviour
 
             _jetVFXAnimStage2?.Shrink();
             stage2Smoke?.Play();
-            
+
             await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage02");
@@ -166,7 +172,9 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(10000, cancellationToken: token);
             if (stage2) Destroy(stage2);
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -179,14 +187,16 @@ public class NuriAnimEvent : MonoBehaviour
         try
         {
             if (!stage3 || !stage3Flame) return;
-            
+
             _jetVFXAnimStage3?.Shrink();
-            
+
             await UniTask.Delay(7000, cancellationToken: token);
-           
+
             separateAnimator?.SetTrigger("Stage03");
         }
-        catch (OperationCanceledException) { }
+        catch (OperationCanceledException)
+        {
+        }
         catch (Exception e)
         {
             Debug.LogError(e);
@@ -224,27 +234,56 @@ public class NuriAnimEvent : MonoBehaviour
 
     public async void SetVerticalCameraToSocket()
     {
-        if (!_verticalCameraInst)
+        try
         {
-            Debug.LogError("[NuriAnimEvent] SetVerticalCameraToSocket => verticalCameraInstance is null.");
+            if (!_verticalCameraInst)
+            {
+                Debug.LogError("[NuriAnimEvent] SetVerticalCameraToSocket => verticalCameraInstance is null.");
+                return;
+            }
+
+            if (!verticalCameraSocket)
+            {
+                Debug.LogError("[NuriAnimEvent] SetVerticalCameraToSocket => verticalCameraSocket is null.");
+                return;
+            }
+
+            await LaunchManager.Instance.FadeVerticalAsync(0f, 1f);
+
+            RocketFollowCam rfc = _verticalCameraInst.GetComponent<RocketFollowCam>();
+            rfc.enabled = false;
+            _verticalCameraInst.transform.SetParent(verticalCameraSocket.transform);
+            _verticalCameraInst.transform.localPosition = Vector3.zero;
+            _verticalCameraInst.transform.localRotation = Quaternion.identity;
+            _verticalCameraInst.fieldOfView = 120f;
+
+            await LaunchManager.Instance.FadeVerticalAsync(1f, 0f);
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[NuriAnimEvent] SetVerticalCameraToSocket => Exception: {e}");
+        }
+    }
+
+    public void PlayVCamShake()
+    {
+        if (_verticalCameraShake == null)
+        {
+            Debug.LogError("[NuriAnimEvent] PlayVCamShake => _verticalCameraShake is null.");
             return;
         }
+        
+        _verticalCameraShake.PlayShake();
+    }
 
-        if (!verticalCameraSocket)
+    public void StopVCamShake()
+    {
+        if (_verticalCameraShake == null)
         {
-            Debug.LogError("[NuriAnimEvent] SetVerticalCameraToSocket => verticalCameraSocket is null.");
+            Debug.LogError("[NuriAnimEvent] StopVCamShake => _verticalCameraShake is null.");
             return;
         }
-
-        await LaunchManager.Instance.FadeVerticalAsync(0f, 1f);
         
-        RocketFollowCam rfc = _verticalCameraInst.GetComponent<RocketFollowCam>();
-        rfc.enabled = false;
-        _verticalCameraInst.transform.SetParent(verticalCameraSocket.transform);
-        _verticalCameraInst.transform.localPosition = Vector3.zero;
-        _verticalCameraInst.transform.localRotation = Quaternion.identity;
-        _verticalCameraInst.fieldOfView = 120f;
-        
-        await LaunchManager.Instance.FadeVerticalAsync(1f, 0f);
+        _verticalCameraShake.StopShake();
     }
 }

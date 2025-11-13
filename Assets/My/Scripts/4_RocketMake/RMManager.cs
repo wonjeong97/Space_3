@@ -147,7 +147,8 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     /// <summary> 리소스/이벤트/토큰 정리 </summary>
     protected override void OnDisable()
-    {
+    {   
+        base.OnDisable();
         try
         {
             if (_vp != null)

@@ -1,0 +1,129 @@
+{
+	"__background": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/Newton/0_BG.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	},
+	"__infoImage1": {
+		"position": { "x": 960, "y": 100 },
+		"size": { "x": 750, "y": 80 },
+		"sourceImage": "Image/Newton/1_Info.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	},
+	"__infoImage2": {
+		"position": { "x": 960, "y": 970 },
+		"size": { "x": 1000, "y": 120 },
+		"sourceImage": "Image/Newton/2_Info.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	},
+	"subImage": {
+		"position": { "x": 960, "y": 270 },
+		"size": { "x": 1920, "y": 540 },
+		"sourceImage": "Image/ForSub/3_assi-idle.png"
+	},
+	"introVideo": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"fileName": "Video/Newton/Intro.mp4",
+		"volume": 1.0
+	},
+	"newtonsRuleVideos": [
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-1-1_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-1-1_2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-1-2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-1-3_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-1-3_2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-2-1_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-2-1_2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-2-2_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-2-2_2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-2-3-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-3-1_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-3-1_2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-3-2_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-3-2_2-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-3-3_1.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/Newton/3-3-3_2-Loop.webm",
+			"volume": 1.0
+		}
+	]
+}

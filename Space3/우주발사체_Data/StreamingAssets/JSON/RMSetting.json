@@ -1,0 +1,344 @@
+{
+	"videoFadeTime": 1,
+	"background": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/RocketMake/0_BG.png",
+		"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	},
+	"main1": {
+		"position": { "x": 340, "y": 540 },
+		"size": { "x": 600, "y": 800 },
+		"sourceImage": "Image/MainDisplay/1_Guide.png"
+	},
+	"main2": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 600, "y": 800 },
+		"sourceImage": "Image/MainDisplay/2_Guide.png"
+	},
+	"main3": {
+		"position": { "x": 1580, "y": 540 },
+		"size": { "x": 600, "y": 800 },
+		"sourceImage": "Image/MainDisplay/3_Guide.png"
+	},
+	"subBg": {
+		"position": { "x": 960, "y": 270 },
+		"size": { "x": 1920, "y": 540 },
+		"sourceImage": "Image/ForSub/Background.png"
+	},
+	"subRocket": {
+		"position": { "x": 940, "y": 270 },
+		"size": { "x": 2150, "y": 700 },
+		"sourceImage": "Image/ForSub/Rocket_All.png"
+	},
+	"main1Children": [
+		{
+			"position": { "x": 61.5, "y": 532 },
+			"size": { "x": 77, "y": 53 },
+			"sourceImage": "Image/RocketMake/1_거치.png",
+			"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+		},
+		{
+			"position": { "x": 143, "y": 532 },
+			"size": { "x": 107, "y": 53 },
+			"sourceImage": "Image/RocketMake/2_연료주입.png",
+			"color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+		},
+		{
+			"position": { "x": 225, "y": 532 },
+			"size": { "x": 77, "y": 53 },
+			"sourceImage": "Image/RocketMake/3_대기.png",
+			"color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+		},
+		{
+			"position": { "x": 291.5, "y": 532 },
+			"size": { "x": 77, "y": 53 },
+			"sourceImage": "Image/RocketMake/4_발사.png",
+			"color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+		},
+		{
+			"position": { "x": 373, "y": 532 },
+			"size": { "x": 107, "y": 53 },
+			"sourceImage": "Image/RocketMake/5_엔진분리.png",
+			"color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+		},
+		{
+			"position": { "x": 471, "y": 532 },
+			"size": { "x": 107, "y": 53 },
+			"sourceImage": "Image/RocketMake/6_위성안착.png",
+			"color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+		}
+	],
+	"rockets": [
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/rocket1.png"
+			},
+			"velocity": 7.5,
+			"maxVelocity": 7.5,
+			"altitude": 1336,
+			"slope": 98,
+			"remainDistance": 100
+		}
+	],
+	"satellites": [
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/satellite1.png"
+			},
+			"velocity": 7.1,
+			"maxVelocity": 7.1,
+			"altitude": 1336,
+			"slope": 66.04,
+			"remainDistance": 112.5
+		},
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/satellite2.png"
+			},
+			"velocity": 7.7,
+			"maxVelocity": 7.7,
+			"altitude": 600,
+			"slope": 97.8,
+			"remainDistance": 96.7
+		},
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/satellite3.png"
+			},
+			"velocity": 7.6,
+			"maxVelocity": 7.6,
+			"altitude": 700,
+			"slope": 97.8,
+			"remainDistance": 98
+		},
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/satellite4.png"
+			},
+			"velocity": 7.7,
+			"maxVelocity": 7.7,
+			"altitude": 500,
+			"slope": 97.5,
+			"remainDistance": 95
+		},
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/satellite5.png"
+			},
+			"velocity": 7.5,
+			"maxVelocity": 7.5,
+			"altitude": 1500,
+			"slope": 53,
+			"remainDistance": 110
+		},
+		{
+			"rocketImage": {
+				"position": { "x": 275, "y": 700 },
+				"size": { "x": 425, "y": 350 },
+				"sourceImage": "Image/RocketMake/satellite6.png"
+			},
+			"velocity": 3.1,
+			"maxVelocity": 3.1,
+			"altitude": 36000,
+			"slope": 0,
+			"remainDistance": 1436
+		}
+	],
+	"progressBars": [
+		{
+			"name": "velocityBar",
+			"position": { "x": 50, "y": 113 },
+			"size": { "x": 180, "y": 20 },
+			"sourceImage": "Image/RocketMake/Bar.png"
+		},
+		{
+			"name": "maxVelocityBar",
+			"position": { "x": 50, "y": 167 },
+			"size": { "x": 180, "y": 20 },
+			"sourceImage": "Image/RocketMake/Bar.png"
+		},
+		{
+			"name": "altitudeBar",
+			"position": { "x": 50, "y": 221 },
+			"size": { "x": 180, "y": 20 },
+			"sourceImage": "Image/RocketMake/Bar.png"
+		},
+		{
+			"name": "slopeBar",
+			"position": { "x": 50, "y": 275 },
+			"size": { "x": 180, "y": 20 },
+			"sourceImage": "Image/RocketMake/Bar.png"
+		},
+		{
+			"name": "remainDistanceBar",
+			"position": { "x": 50, "y": 329 },
+			"size": { "x": 180, "y": 20 },
+			"sourceImage": "Image/RocketMake/Bar.png"
+		}
+	],
+	"locationVideo": [
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/RocketMake/1_Location.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/RocketMake/1_Location-Loop.webm",
+			"volume": 1.0
+		}
+	],
+	"rocketMakeVideo": [
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/RocketMake/1-1_Make.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/RocketMake/1-2_Make-Loop.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/RocketMake/2_Make.webm",
+			"volume": 1.0
+		},
+		{
+			"position": { "x": 960, "y": 540 },
+			"size": { "x": 1920, "y": 1080 },
+			"fileName": "Video/RocketMake/3_Make.webm",
+			"volume": 1.0
+		}
+	],
+	"stageBgImage": {
+		"position": { "x": 300, "y": 320 },
+		"size": { "x": 1860, "y": 1300 },
+		"scale": { "x": 0.25, "y": 0.25, "z": 0.25 },
+		"sourceImage": "Image/RocketLaunch/Nuri_BG.png"
+	},
+	"objectiveText": {
+		"position": { "x": 300, "y": 700 },
+		"fontName": "font1",
+		"fontSize": 48,
+		"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 }
+	},
+	"controllerBackground": {
+		"position": { "x": 300, "y": 370 },
+		"size": { "x": 400, "y": 200 },
+		"sourceImage": "Image/MainDisplay/ControllerPanel.png"
+	},
+	"buttonLeft": {
+		"position": { "x": 80, "y": 105 },
+		"size": { "x": 80, "y": 80 },
+		"sourceImage": "Image/MainDisplay/ButtonOff.png"
+	},
+	"buttonMiddle": {
+		"position": { "x": 165, "y": 105 },
+		"size": { "x": 80, "y": 80 },
+		"sourceImage": "Image/MainDisplay/ButtonOff.png"
+	},
+	"buttonRight": {
+		"position": { "x": 250, "y": 105 },
+		"size": { "x": 80, "y": 80 },
+		"sourceImage": "Image/MainDisplay/ButtonOff.png"
+	},
+	"throttleBackground": {
+		"position": { "x": 340, "y": 105 },
+		"size": { "x": 15, "y": 120 },
+		"sourceImage": "Image/MainDisplay/ThrottleBG.png"
+	},
+	"throttleButton": {
+		"position": { "x": 6.5, "y": 70 },
+		"size": { "x": 50, "y": 30 },
+		"sourceImage": "Image/MainDisplay/ThrottleButton.png"
+	},
+	"guideText": {
+		"position": { "x": 300, "y": 700 },
+		"fontName": "font1",
+		"fontSize": 48,
+		"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 }
+	},
+	"timeText": {
+		"position": { "x": 100, "y": 170 },
+		"fontName": "font2",
+		"text": "시간 (TIME)",
+		"fontSize": 20,
+		"fontColor": { "r": 0.05098039, "g": 0.05098039, "b": 0.05098039, "a": 255 },
+		"alignment": 516
+	},
+	"altitudeText": {
+		"position": { "x": 100, "y": 260 },
+		"text": "고도 (ALTITUDE)",
+		"fontName": "font2",
+		"fontSize": 20,
+		"fontColor": { "r": 0.05098039, "g": 0.05098039, "b": 0.05098039, "a": 255 },
+		"alignment": 516
+	},
+	"velocityText": {
+		"position": { "x": 100, "y": 350 },
+		"text": "속도 (VELOCITY)",
+		"fontName": "font2",
+		"fontSize": 20,
+		"fontColor": { "r": 0.05098039, "g": 0.05098039, "b": 0.05098039, "a": 255 },
+		"alignment": 516
+	},
+	"distanceText": {
+		"position": { "x": 100, "y": 445 },
+		"text": "목표 궤도까지 남은 거리\n(DISTANCE)",
+		"fontName": "font2",
+		"fontSize": 20,
+		"fontColor": { "r": 0.05098039, "g": 0.05098039, "b": 0.05098039, "a": 255 },
+		"alignment": 516
+	},
+	"timeValueText": {
+		"position": { "x": 430, "y": 170 },
+		"text": "T + 00:00:00",
+		"fontName": "font2",
+		"fontSize": 30,
+		"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 },
+		"alignment": 516
+	},
+	"altitudeValueText": {
+		"position": { "x": 430, "y": 260 },
+		"fontName": "font2",
+		"text": "0 KM",
+		"fontSize": 30,
+		"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 },
+		"alignment": 516
+	},
+	"velocityValueText": {
+		"position": { "x": 430, "y": 350 },
+		"text": "0 KM/H",
+		"fontName": "font2",
+		"fontSize": 30,
+		"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 },
+		"alignment": 516
+	},
+	"distanceValueText": {
+		"position": { "x": 430, "y": 440 },
+		"text": "550.0 KM",
+		"fontName": "font2",
+		"fontSize": 30,
+		"fontColor": { "r": 1, "g": 0.8980392, "b": 0.7137255, "a": 255 },
+		"alignment": 516
+	}
+}

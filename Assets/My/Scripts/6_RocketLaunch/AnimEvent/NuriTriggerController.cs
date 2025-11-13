@@ -78,8 +78,10 @@ public class NuriTriggerController : MonoBehaviour
                     SoundManager.Instance?.PlayByKey("Launch");
                     
                     try
-                    {
+                    {   
+                        CameraShaker.Instance.PlayShake(0.4f, 30);
                         await UniTask.Delay(6000, cancellationToken: token);
+                        CameraShaker.Instance.StopShake();
                     }
                     catch (OperationCanceledException)
                     {

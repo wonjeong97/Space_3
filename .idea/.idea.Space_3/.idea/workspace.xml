@@ -5,55 +5,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="73cf11a5-2fd2-4764-b9cb-f11f8526e1d7" name="변경" comment="">
-      <change beforePath="$PROJECT_DIR$/.editorconfig" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/dictionaries/project.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Arduino/Space_3.ino" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/RecyclePopup.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/RocketRecycle.meta" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/RocketRecycle/Recycle.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateFairing.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateFairing.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage01.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage01.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage02.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage02.anim" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage03.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage03.anim" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/BG_Sky.fbx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/BG_Sky.fbx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/BG_Sky.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/BG_Sky.fbx.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/발사장소.fbx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/발사장소.fbx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/발사장소.fbx.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/LauncherModel/발사장소.fbx.meta" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Modeling/V2/Nuti_위성.fbx" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Modeling/V2/Nuti_위성.fbx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Prefab/Nuri_Root.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Prefab/Nuri_Root.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/material/31.001.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/material/31.001.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/material/32.mat" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/material/32.mat.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/textures/BG_Sky.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/textures/BG_Sky.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AltitudeByTime.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AltitudeByTime.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/CountController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/CountController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/DistanceByAlt.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/DistanceByAlt.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/FocusObject.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/FocusObject.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/JetVFXAnim.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/JetVFXAnim.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/LaunchManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/LaunchManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/LauncherAnimEvent.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/LauncherAnimEvent.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/NuriAnimEvent.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/NuriAnimEvent.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/NuriTriggerController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/NuriTriggerController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/SlopeController.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/SlopeController.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/VelocityByTime.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/VelocityByTime.cs.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/ArduinoInputManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/ArduinoInputManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/AudioManager.cs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/AudioManager.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/2_Newton/NewtonManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/2_Newton/NewtonManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/3_RocketStructure/RSManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/3_RocketStructure/RSManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/4_RocketMake/RMManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/4_RocketMake/RMManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/5_RocketFuel/FuelManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/5_RocketFuel/FuelManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriAnimEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriAnimEvent.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/PostFX.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/RocketFollowCam.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/RocketFollowCam.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/7_RecycleRocket/RecycleManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/7_RecycleRocket/RecycleManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/UI/UICreator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/UI/UICreator.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/0_TitleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/0_TitleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/1_TutorialScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/1_TutorialScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/2_NewtonScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/2_NewtonScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/3_RocketStructure.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/3_RocketStructure.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/4_RocketMake.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/4_RocketMake.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/5_RocketFuel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/5_RocketFuel.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/6_RocketLaunch.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/6_RocketLaunch.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/7_RocketRecycle.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/7_RocketRecycle.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/1_Guide.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/1_Guide.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/2_Guide.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/2_Guide.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/3_Guide.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/3_Guide.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/5_Finish.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/Success.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/5_Finish.png.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/Success.png.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/popup1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketRecycle/popup1.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/FuelSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/FuelSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/LaunchSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/LaunchSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/NewtonSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/NewtonSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/RMSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/RMSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/RSSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/RSSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/RecycleSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/RecycleSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/TitleSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/TitleSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/TutorialSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/TutorialSetting.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/manifest.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/manifest.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Packages/packages-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/Packages/packages-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/TagManager.asset" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,34 +62,46 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 6
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 6
+}</component>
   <component name="ProjectId" id="35MvzheqDzRd7eWmiW3SPeCWiNP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "main",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="Unity 에디터에 연결.Unity 에디터에 연결">
     <configuration name="유닛 테스트(배치 모드)" type="RunUnityExe" factoryName="Unity Executable">
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.62f2\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath D:\Github\Space_3 -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="D:\Github\Space_3" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="ENV_FILE_PATHS" value="" />
+      <option name="REDIRECT_INPUT_PATH" value="" />
+      <option name="PTY_MODE" value="Auto" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="독립실행형 플레이어" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/Build\우주발사체.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="D:\Github\Space_3\Build" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="ENV_FILE_PATHS" value="" />
@@ -150,7 +161,10 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1762933019405</updated>
-      <workItem from="1762933021322" duration="1694000" />
+      <workItem from="1762933021322" duration="2711000" />
+      <workItem from="1762994038511" duration="1550000" />
+      <workItem from="1762998950948" duration="3172000" />
+      <workItem from="1763016145039" duration="4373000" />
     </task>
     <servers />
   </component>

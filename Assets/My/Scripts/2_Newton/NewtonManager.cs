@@ -56,7 +56,9 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
 
     /// <summary> 씬 비활성화 시 비디오/토큰/리소스 정리 </summary>
     protected override void OnDisable()
-    {
+    {   
+        base.OnDisable();
+        
         // 루프 입력 대기 토큰 정리
         CancelAndDispose(ref _skipCts);
 
@@ -84,10 +86,6 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
             }
             finally { _lastRT = null; }
         }
-
-        // LED 정리
-        try { ArduinoInputManager.Instance?.SetLedAll(false); }
-        catch (Exception e) { Debug.LogWarning("[NewtonManager] OnDisable-> LED 정리 중 예외: " + e.Message); }
     }
 
     #endregion
