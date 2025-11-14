@@ -190,13 +190,12 @@ public class NuriAnimEvent : MonoBehaviour
 
             _jetVFXAnimStage3?.Shrink();
 
-            await UniTask.Delay(7000, cancellationToken: token);
+            await UniTask.Delay(5000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage03");
         }
         catch (OperationCanceledException)
-        {
-        }
+        { }
         catch (Exception e)
         {
             Debug.LogError(e);

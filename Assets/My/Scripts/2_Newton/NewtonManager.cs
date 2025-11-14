@@ -86,6 +86,8 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
             }
             finally { _lastRT = null; }
         }
+        
+        SoundManager.Instance?.ResumeBGM();
     }
 
     #endregion

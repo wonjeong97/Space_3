@@ -20,9 +20,10 @@ public class NuriTriggerController : MonoBehaviour
     [SerializeField] private float tDropStage1 = 2f * 60f + 5f;           // 2:05
     [SerializeField] private float tSeparateFairing = 3f * 60f + 56f;     // 3:56
     [SerializeField] private float tDropStage2 = 4f * 60f + 30f;          // 4:30
+    [SerializeField] private float tDeltaAccelStart = 5f * 60f;           // 5:00
+    [SerializeField] private float tDeltaAccelStop = 11f * 60f + 45;      // 11:45
     [SerializeField] private float tStage3Off = 12f * 60f + 14f;          // 12:14
     [SerializeField] private float tSeparateSatellite = 13f * 60f + 5f;   // 13:05
-    [SerializeField] private float tCallNextScene = 15f * 60f;            // 15:00
 
     [Header("Polling Interval (sec)")]
     [SerializeField] private float pollInterval = 0.05f;
@@ -30,10 +31,11 @@ public class NuriTriggerController : MonoBehaviour
     private bool _firedDrop1;
     private bool _firedFairing;
     private bool _firedDrop2;
+    private bool _firedDeltaAccelStart;
+    private bool _firedDeltaAccelStop;
     private bool _firedStage3Off;
     private bool _firedSatellite;
-    private bool _firedNextScene;
-
+    
     private void Reset()
     {
         count = FindObjectOfType<CountController>();
@@ -62,8 +64,7 @@ public class NuriTriggerController : MonoBehaviour
             return;
         }
 
-        _firedDrop1 = _firedFairing = _firedDrop2 = _firedStage3Off = false;
-        _firedSatellite = _firedNextScene = false;
+        _firedDrop1 = _firedFairing = _firedDrop2 = _firedStage3Off = _firedSatellite = _firedDeltaAccelStart = _firedDeltaAccelStop = false;
         bool firedLaunchSound = false;
 
         while (!token.IsCancellationRequested)
@@ -113,6 +114,7 @@ public class NuriTriggerController : MonoBehaviour
                             return;
                         }
 
+                        LaunchManager.Instance.LerpCamera3Fov(2, 60f).Forget();
                         LaunchManager.Instance.SetGuideText("");
                         count.EndExternalHold();
                         LaunchManager.Instance.PauseInactivityTimer();
@@ -201,7 +203,8 @@ public class NuriTriggerController : MonoBehaviour
                         {
                             return;
                         }
-
+                        
+                        LaunchManager.Instance.LerpCamera3Fov(2, 50f).Forget();
                         LaunchManager.Instance.SetGuideText("");
                         count.EndExternalHold();
                         LaunchManager.Instance.PauseInactivityTimer();
@@ -222,6 +225,18 @@ public class NuriTriggerController : MonoBehaviour
 
                     LaunchManager.Instance.FadeInStagePublicAsync(5).Forget();
                     LaunchManager.Instance.FadeOutSubRocketStage2Async().Forget();
+                }
+
+                if (!_firedDeltaAccelStart && t >= tDeltaAccelStart && CountController.Instance != null)
+                {
+                    _firedDeltaAccelStart = true;
+                    CountController.Instance.DeltaTimeSpeed = 10f;
+                }
+
+                if (!_firedDeltaAccelStop && t >= tDeltaAccelStop && CountController.Instance != null)
+                {
+                    _firedDeltaAccelStop = true;
+                    CountController.Instance.DeltaTimeSpeed = 5f;
                 }
 
                 // T+ 12:14 Stage3Off

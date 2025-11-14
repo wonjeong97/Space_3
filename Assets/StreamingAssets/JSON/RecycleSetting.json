@@ -23,5 +23,10 @@
 	"size": { "x": 1942, "y": 195 },
 	"scale": {"x": 0.45, "y": 0.45, "z": 0.45 },
 	"sourceImage": "Image/RocketRecycle/6_End.png"
+  },
+  "subImage": {
+	"position": { "x": 1280, "y": 360 },
+	"size": { "x": 2560, "y": 720 },
+	"sourceImage": "Image/ForSub/3_assi-idle.png"
   }
 }

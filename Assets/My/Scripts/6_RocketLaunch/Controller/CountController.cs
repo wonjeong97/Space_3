@@ -57,6 +57,12 @@ public class CountController : MonoBehaviour
     private float _externalHoldTimeSnap; // 외부 홀드 시 표시/내부 시간을 고정할 값
     public  bool  IsExternallyHolding => _externalHold;
 
+    public float DeltaTimeSpeed
+    {
+        get => deltaTimeSpeed;
+        set => deltaTimeSpeed = value;
+    }
+
     // -> SLP 자동 스케줄 키들(체크포인트 통과 후 사용자 입력 없이 자동 진행)
     [Serializable] private struct SlopeKey { public int m; public int s; public float deg; public float T() => m * 60f + s; }
     [SerializeField] private SlopeKey[] slopeKeys = new SlopeKey[]

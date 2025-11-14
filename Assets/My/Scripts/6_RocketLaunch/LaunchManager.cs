@@ -924,7 +924,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         await FadeImageAsync(1f, 0f, newFadeTime, new[] { fadeImage3 });
     }
     
-    private async UniTask LerpCamera3Fov(float duration, float targetFov)
+    public async UniTask LerpCamera3Fov(float duration, float targetFov)
     {
         if (verticalCamera == null) return;
 

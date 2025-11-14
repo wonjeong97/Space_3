@@ -16,6 +16,8 @@ public class RecycleSetting
 
     public ImageSetting successImage;
     public ImageSetting messageImage;
+
+    public ImageSetting subImage;
 }
 
 /// <summary>
@@ -29,6 +31,7 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
     [SerializeField] private GameObject recycleVideo;
     [SerializeField] private GameObject successImage;
     [SerializeField] private GameObject messageImage;
+    [SerializeField] private GameObject subImage;
 
     protected override string JsonPath => "JSON/RecycleSetting.json";
 
@@ -40,6 +43,13 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
     private VideoPlayer _video;
 
     #region Unity lifecycle
+
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+
+        SoundManager.Instance?.StopBGM();
+    }
 
     /// <summary> 초기 세팅 및 입력 대기 -> 크로스페이드 -> 종료 타이머 -> 타이틀 복귀 </summary>
     protected override async UniTask Init()
@@ -60,6 +70,7 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
         SettingImageObject(recyclePopup, setting.recyclePopup);
         SettingImageObject(successImage, setting.successImage);
         SettingImageObject(messageImage, setting.messageImage);
+        SettingImageObject(subImage, setting.subImage);
         await SettingVideoObject(recycleVideo, setting.recycleVideo, _video, _raw, _audio);
 
         // 엔딩 백그라운드는 시작 시 비활성
@@ -70,8 +81,11 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
 
+        SoundManager.Instance?.CrossFadeBGMByKey("End");
+        TurnCamera3Async(token).Forget();
+        
         // 첫 페이드 인
-        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage3 });
+        await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 
         // 입력 대기 루프 (아두이노 버튼 or 키보드)
         while (!token.IsCancellationRequested)

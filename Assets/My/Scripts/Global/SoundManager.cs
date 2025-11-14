@@ -11,10 +11,10 @@ public sealed class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance;
 
-    [Header("Audio Sources")]
+    [Header("Audio Sources")] 
     [SerializeField] private AudioSource sfxSource; // 로켓/배경용
-    [SerializeField] private AudioSource crossSource;  // 크로스페이드용 내부 소스
-    [SerializeField] private AudioSource bgmSource;    // BGM 전용
+    [SerializeField] private AudioSource crossSource; // 크로스페이드용 내부 소스
+    [SerializeField] private AudioSource bgmSource; // BGM 전용
 
     private readonly Dictionary<string, AudioClip> _clipCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, SoundSetting> _soundMap = new(StringComparer.OrdinalIgnoreCase);
@@ -29,7 +29,6 @@ public sealed class SoundManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // DestroyCancellationToken은 여기서 한 번만 생성
             _destroyToken = this.GetCancellationTokenOnDestroy();
         }
         else if (Instance != this)
@@ -37,7 +36,7 @@ public sealed class SoundManager : MonoBehaviour
             Destroy(gameObject);
             return;
         }
-        
+
         if (sfxSource == null)
         {
             sfxSource = gameObject.AddComponent<AudioSource>();
@@ -422,6 +421,112 @@ public sealed class SoundManager : MonoBehaviour
         }
     }
 
+    /// <summary> 사운드 키로 BGM 크로스페이드 (bgmSource 기준) </summary>
+    public async UniTaskVoid CrossFadeBGMByKey(string key, float duration = 1f, float volumeScale = 1f, bool loop = true)
+    {
+        await UniTask.SwitchToMainThread();
+
+        if (this == null || _destroyToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (string.IsNullOrEmpty(key))
+        {
+            return;
+        }
+
+        if (!_soundMap.TryGetValue(key, out SoundSetting ss))
+        {
+            Debug.LogWarning($"[SoundManager] CrossFadeBGMByKey-> 미등록 키: {key}");
+            return;
+        }
+
+        AudioClip newClip;
+        try
+        {
+            newClip = await GetOrLoadClipAsync(ss.clipPath, _destroyToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SoundManager] CrossFadeBGMByKey-> 클립 로드 중 예외: {e}");
+            return;
+        }
+
+        if (newClip == null)
+        {
+            return;
+        }
+
+        if (this == null || _destroyToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (bgmSource == null)
+        {
+            Debug.LogError("[SoundManager] CrossFadeBGMByKey-> bgmSource가 할당되지 않음");
+            return;
+        }
+
+        if (crossSource == null)
+        {
+            Debug.LogError("[SoundManager] CrossFadeBGMByKey-> crossSource가 할당되지 않음");
+            return;
+        }
+
+        float baseVolume = ss.volume <= 0f ? 1f : ss.volume;
+        float targetVol = Mathf.Clamp01(baseVolume * Mathf.Max(0f, volumeScale));
+
+        float fadeTime = Mathf.Max(0.1f, duration);
+        float t = 0f;
+
+        // 새 BGM은 crossSource에서 서서히 페이드인
+        crossSource.clip = newClip;
+        crossSource.volume = 0f;
+        crossSource.loop = loop;
+        crossSource.Play();
+
+        float originalVol = bgmSource.isPlaying ? bgmSource.volume : 0f;
+
+        while (t < fadeTime && !_destroyToken.IsCancellationRequested && this != null)
+        {
+            t += Time.deltaTime;
+            float progress = t / fadeTime;
+
+            if (bgmSource.isPlaying)
+            {
+                bgmSource.volume = Mathf.Lerp(originalVol, 0f, progress);
+            }
+
+            crossSource.volume = Mathf.Lerp(0f, targetVol, progress);
+
+            await UniTask.Yield();
+        }
+
+        if (bgmSource != null)
+        {
+            if (bgmSource.isPlaying)
+            {
+                bgmSource.Stop();
+            }
+
+            bgmSource.clip = newClip;
+            bgmSource.volume = targetVol;
+            bgmSource.loop = loop;
+            bgmSource.Play();
+        }
+
+        crossSource.Stop();
+        crossSource.clip = null;
+        crossSource.volume = 0f;
+    }
+
+
     // ==============================================================
     // 내부 유틸
     // ==============================================================
@@ -447,8 +552,7 @@ public sealed class SoundManager : MonoBehaviour
             return null;
         }
 
-        using UnityWebRequest req =
-            UnityWebRequestMultimedia.GetAudioClip(new Uri(fullPath).AbsoluteUri, GuessAudioTypeByExtension(fullPath));
+        using UnityWebRequest req = UnityWebRequestMultimedia.GetAudioClip(new Uri(fullPath).AbsoluteUri, GuessAudioTypeByExtension(fullPath));
 
         await req.SendWebRequest().ToUniTask(cancellationToken: token);
 
