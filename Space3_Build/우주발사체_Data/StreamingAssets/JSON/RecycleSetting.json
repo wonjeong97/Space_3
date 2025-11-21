@@ -1,0 +1,32 @@
+{
+  "popupFadeTime": 1,
+  "gameCloseTime": 5,
+  "recyclePopup": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1920, "y": 1080 },
+	"sourceImage": "Image/RocketRecycle/RecyclePopup.png"
+  },
+  "recycleVideo": {
+	"position": { "x": 1273, "y": 633 },
+	"size": { "x": 385, "y": 643 },
+	"fileName": "Video/RocketRecycle/Recycle.mp4",
+	"volume": 1.0
+  },
+  "successImage": {
+	"position": { "x": 960, "y": 540 },
+	"size": { "x": 1875, "y": 1713 },
+	"scale": {"x": 0.45, "y": 0.45, "z": 0.45 },
+	"sourceImage": "Image/RocketRecycle/Success.png"
+  },
+  "messageImage": {
+	"position": { "x": 960, "y": 960 },
+	"size": { "x": 1942, "y": 195 },
+	"scale": {"x": 0.45, "y": 0.45, "z": 0.45 },
+	"sourceImage": "Image/RocketRecycle/6_End.png"
+  },
+  "subImage": {
+	"position": { "x": 1280, "y": 360 },
+	"size": { "x": 2560, "y": 720 },
+	"sourceImage": "Image/ForSub/3_assi-idle.png"
+  }
+}

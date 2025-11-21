@@ -264,18 +264,18 @@ public class ArduinoInputManager : MonoBehaviour
                 }
 
                 if (s.IndexOf("BTN 1", StringComparison.OrdinalIgnoreCase) >= 0)
-                {   
-                    SoundManager.Instance?.PlayByKey("ButtonSound");
+                {
+                    SoundManager.Instance?.PlayButtonDefault();
                     SetPressedBit(BIT_B1);
                 }
                 else if (s.IndexOf("BTN 2", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    SoundManager.Instance?.PlayByKey("ButtonSound");
+                    SoundManager.Instance?.PlayButtonDefault();
                     SetPressedBit(BIT_B2);
                 }
                 else if (s.IndexOf("BTN 3", StringComparison.OrdinalIgnoreCase) >= 0)
                 {
-                    SoundManager.Instance?.PlayByKey("ButtonSound");
+                    SoundManager.Instance?.PlayButtonDefault();
                     SetPressedBit(BIT_B3);
                 }
             }

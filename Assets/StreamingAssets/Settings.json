@@ -1,8 +1,8 @@
 {
-  "portName": "COM6",
+  "portName": "COM3",
   "baudRate": 9600,
   "buttonDelayTime": 1,
-  "inactivityTime": 1000160.0,
+  "inactivityTime": 160.0,
   "fadeTime": 0.5,
   "closeSetting": {
 	"position": { "x": 1, "y": 0 },
@@ -27,6 +27,7 @@
 	{ "key": "Popup_Close", "clipPath": "Sound/Popup_Close.wav", "volume": 1.0 },
 	{ "key": "End", "clipPath": "Sound/End.wav", "volume": 1.0 }
   ],
+  "buttonSound": { "key": "ButtonSound", "clipPath": "Sound/Button.wav", "volume": 1.0 },
   "canvas1TargetMonitorIndex": 0,
   "canvas2TargetMonitorIndex": 1,
   "canvas3TargetMonitorIndex": 2,

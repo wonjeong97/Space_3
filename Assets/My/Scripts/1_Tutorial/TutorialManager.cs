@@ -69,6 +69,7 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
 
             // 3) LED/카메라 시작
             StartBlinkGreenAsync(500, 160);
+            ArduinoInputManager.Instance?.SetLedAll(true);
             TurnCamera3Async(DestroyToken).Forget();
 
             // 4) 페이드 인

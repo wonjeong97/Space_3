@@ -9,11 +9,11 @@
 #define RELAY_2 6
 #define RELAY_3 5
 
-#define BUTTON_1 8
+#define BUTTON_1 12
 #define BUTTON_2 9
-#define BUTTON_3 12 // 10번 인식 x
+#define BUTTON_3 8 // 10번 인식 x
 
-#define LEDTABLE 11
+#define LEDTABLE 4
 #define NUMPIXELS 10
 Adafruit_NeoPixel pixels(NUMPIXELS, LEDTABLE, NEO_RGB + NEO_KHZ800);
 

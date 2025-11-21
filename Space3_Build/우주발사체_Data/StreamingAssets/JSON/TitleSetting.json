@@ -1,0 +1,23 @@
+{
+	"background": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/Title/1_BG.png"
+	},
+	"titleImage": {
+		"position": { "x": 960, "y": 540 },
+		"size": { "x": 1920, "y": 1080 },
+		"sourceImage": "Image/Title/1_Title.png"
+	},
+	"infoImage": {
+		"position": { "x": 960, "y": 925 },
+		"size": { "x": 3930, "y": 425 },
+		"scale": { "x": 0.5, "y": 0.5, "z": 0.5 },
+		"sourceImage": "Image/Title/1_Start.png"
+	},
+	"subImage": {
+		"position": { "x": 1280, "y": 360 },
+		"size": { "x": 2560, "y": 720 },
+		"sourceImage": "Image/ForSub/3_assi-idle.png"
+	}
+}

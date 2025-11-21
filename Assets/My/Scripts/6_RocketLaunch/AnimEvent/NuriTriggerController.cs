@@ -254,15 +254,8 @@ public class NuriTriggerController : MonoBehaviour
                     _firedSatellite = true;
 
                     LaunchManager.Instance?.FocusImage4ThenPingPong5();
-                    LaunchManager.Instance?.FadeInStagePublicAsync(5).Forget();
+                    LaunchManager.Instance?.FadeInStagePublicAsync(7).Forget();
                 }
-
-                // T+ 15:00 Call Next Scene
-                // if (!_firedNextScene && t >= tCallNextScene)
-                // {
-                //     _firedNextScene = true;
-                //     nuri.CallNextScene().Forget();
-                // }
             }
 
             try

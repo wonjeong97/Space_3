@@ -10,11 +10,8 @@ public class FuelSetting
     public float popupFadeTime;
     public float fuelFillSpeed;
 
-    public ImageSetting main1;
-    public ImageSetting main2;
-    public ImageSetting main3;
-
-    public ImageSetting[] main1Children;
+    public ImageSetting mainBackground;
+    public ImageSetting[] sequences;
 
     public ImageSetting fuelPopup;
     public ImageSetting subBg;
@@ -25,7 +22,6 @@ public class FuelSetting
     public ImageSetting[] fuels;
     public ImageSetting[] fuelTextImages;
     
-    public ImageSetting stageBgImage;
     public TextSetting objectiveText;
 
     public ImageSetting controllerBackground;
@@ -34,17 +30,14 @@ public class FuelSetting
     public ImageSetting buttonRight;
     public ImageSetting throttleBackground;
     public ImageSetting throttleButton;
-
     public TextSetting guideText;
-
-    public TextSetting timeText;
-    public TextSetting altitudeText;
-    public TextSetting velocityText;
-    public TextSetting distanceText;
+    
     public TextSetting timeValueText;
     public TextSetting altitudeValueText;
     public TextSetting velocityValueText;
     public TextSetting distanceValueText;
+    public ImageSetting slopeBg;
+    public ImageSetting slopePointer;
 }
 
 /// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
@@ -57,9 +50,6 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
     [Header("UI")]
     [SerializeField] private GameObject backgroundImage;
-    [SerializeField] private GameObject mainImage1;
-    [SerializeField] private GameObject mainImage2;
-    [SerializeField] private GameObject mainImage3;
     [SerializeField] private GameObject popupImage;
     [SerializeField] private GameObject subBgImage;
     [SerializeField] private GameObject subRocketImage;
@@ -82,12 +72,11 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject stage2FuelTextImage;
     [SerializeField] private GameObject stage3FuelTextImage;
 
-    [Header("mainImage1")] 
-    [SerializeField] private GameObject imageStageBg;
+    [Header("Sequences")] 
     [SerializeField] private Image[] sequences; // 메인1 하위 단계별 강조 이미지들
     [SerializeField] private GameObject textObjective; // 목표 텍스트
 
-    [Header("mainImage2")]
+    [Header("Controllers")]
     [SerializeField] private GameObject controllerBackground;
     [SerializeField] private GameObject buttonLeft;
     [SerializeField] private GameObject buttonMiddle;
@@ -96,15 +85,13 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject throttleButton;
     [SerializeField] private GameObject textGuide;
 
-    [Header("mainImage3")]
-    [SerializeField] private GameObject textTime;
-    [SerializeField] private GameObject textAltitude;
-    [SerializeField] private GameObject textVelocity;
-    [SerializeField] private GameObject textDistance;
+    [Header("Values")]
     [SerializeField] private GameObject textTimeValue;
     [SerializeField] private GameObject textAltitudeValue;
     [SerializeField] private GameObject textVelocityValue;
     [SerializeField] private GameObject textDistanceValue;
+    [SerializeField] private GameObject imageSlopeBg;
+    [SerializeField] private GameObject imageSlopePointer;
 
     #endregion
 
@@ -157,24 +144,21 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         _fuelFillSpeed = Mathf.Max(0f, setting.fuelFillSpeed);
 
         // 고정 이미지 세팅
-        SettingImageObject(backgroundImage, setting.main1);
-        SettingImageObject(mainImage1, setting.main1);
-        SettingImageObject(mainImage2, setting.main2);
-        SettingImageObject(mainImage3, setting.main3);
+        SettingImageObject(backgroundImage, setting.mainBackground);
         SettingImageObject(popupImage, setting.fuelPopup);
         SettingImageObject(subBgImage, setting.subBg);
         SettingImageObject(subRocketImage, setting.subRocket);
 
         // ===== mainImage1 =====
-        if (setting.main1Children != null && sequences != null)
+        if (setting.sequences != null && sequences != null)
         {
-            int count = Mathf.Min(setting.main1Children.Length, sequences.Length);
+            int count = Mathf.Min(setting.sequences.Length, sequences.Length);
             for (int i = 0; i < count; i++)
             {
                 if (sequences[i] == null) continue;
                 try
                 {
-                    SettingImageObject(sequences[i].gameObject, setting.main1Children[i]);
+                    SettingImageObject(sequences[i].gameObject, setting.sequences[i]);
                 }
                 catch (Exception e)
                 {
@@ -188,10 +172,9 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             StartAlphaPingPong(sequences[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
 
-        SettingImageObject(imageStageBg, setting.stageBgImage);
         SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요").Forget();
 
-        // ===== mainImage2 =====
+        // ===== Controllers =====
         SettingImageObject(controllerBackground, setting.controllerBackground);
         SettingImageObject(buttonLeft, setting.buttonLeft);
         SettingImageObject(buttonMiddle, setting.buttonMiddle);
@@ -200,15 +183,13 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(throttleButton, setting.throttleButton);
         SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
 
-        // ===== mainImage2 =====
-        SettingTextObject(textTime, setting.timeText).Forget();
-        SettingTextObject(textAltitude, setting.altitudeText).Forget();
-        SettingTextObject(textVelocity, setting.velocityText).Forget();
-        SettingTextObject(textDistance, setting.distanceText).Forget();
+        // ===== Values =====
         SettingTextObject(textTimeValue, setting.timeValueText).Forget();
         SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
         SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
         SettingTextObject(textDistanceValue, setting.distanceValueText).Forget();
+        SettingImageObject(imageSlopeBg, setting.slopeBg);
+        SettingImageObject(imageSlopePointer, setting.slopePointer);
 
         // 산화제 이미지 세팅
         SettingImageObject(stage1Oxidizer, setting.oxidizers[0]);

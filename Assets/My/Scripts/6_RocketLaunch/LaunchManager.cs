@@ -10,9 +10,7 @@ using UnityEngine.UI;
 public class LaunchSetting
 {
     public int rocketCountdown;
-    public ImageSetting main1;
-    public ImageSetting main2;
-    public ImageSetting main3;
+    public ImageSetting mainBackground;
     public ImageSetting subBg;
     public ImageSetting rocketStage1;
     public ImageSetting rocketStage2;
@@ -36,16 +34,11 @@ public class LaunchSetting
     public ImageSetting throttleButton;
 
     public TextSetting guideText;
-
-    public TextSetting timeText;
-    public TextSetting altitudeText;
-    public TextSetting velocityText;
-    public TextSetting distanceText;
+    
     public TextSetting timeValueText;
     public TextSetting altitudeValueText;
     public TextSetting velocityValueText;
     public TextSetting distanceValueText;
-
     public ImageSetting slopeBackgroundImage;
     public ImageSetting slopePointerImage;
 }
@@ -61,9 +54,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     private static readonly int Trigger = Animator.StringToHash("Trigger");
 
     [Header("UI")]
-    [SerializeField] private GameObject mainImage1;
-    [SerializeField] private GameObject mainImage2;
-    [SerializeField] private GameObject mainImage3;
+    [SerializeField] private GameObject mainBackground;
     [SerializeField] private GameObject countdownText;
     [SerializeField] private GameObject subBgImage;
     [SerializeField] private GameObject subRocketStage1Image;
@@ -89,12 +80,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject stage2FuelTextImage;
     [SerializeField] private GameObject stage3FuelTextImage;
 
-    [Header("MainImage1")]
+    [Header("Stage & Sequence")]
     [SerializeField] private Image[] stages;
     [SerializeField] private Image[] sequences;
     [SerializeField] private GameObject textObjective;
 
-    [Header("MainImage2")]
+    [Header("Controllers")]
     [SerializeField] private GameObject controllerBackground;
     [SerializeField] private GameObject buttonLeft;
     [SerializeField] private GameObject buttonMiddle;
@@ -103,11 +94,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     [SerializeField] private GameObject throttleButton;
     [SerializeField] private GameObject textGuide;
 
-    [Header("MainImage3")]
-    [SerializeField] private GameObject textTime;
-    [SerializeField] private GameObject textAltitude;
-    [SerializeField] private GameObject textVelocity;
-    [SerializeField] private GameObject textDistance;
+    [Header("Values")]
     [SerializeField] private GameObject textTimeValue;
     [SerializeField] private GameObject textAltitudeValue;
     [SerializeField] private GameObject textVelocityValue;
@@ -148,14 +135,8 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     {
         base.Awake();
 
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else if (Instance != this)
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else if (Instance != this) Destroy(gameObject);
     }
 
     protected override void OnDisable()
@@ -199,9 +180,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     protected override async UniTask Init()
     {
         // 이미지 배치
-        SettingImageObject(mainImage1, setting.main1);
-        SettingImageObject(mainImage2, setting.main2);
-        SettingImageObject(mainImage3, setting.main3);
+        SettingImageObject(mainBackground, setting.mainBackground);
         SettingImageObject(subBgImage, setting.subBg);
         SettingImageObject(subRocketStage1Image, setting.rocketStage1);
         SettingImageObject(subRocketStage2Image, setting.rocketStage2);
@@ -228,7 +207,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         SettingImageObject(stage2FuelTextImage, setting.fuelTextImages[1]);
         SettingImageObject(stage3FuelTextImage, setting.fuelTextImages[2]);
 
-        // mainImage1: 단계/시퀀스 세팅
+        // 단계/시퀀스 세팅
         if (setting.stages != null && stages != null)
         {
             int count = Mathf.Min(setting.stages.Length, stages.Length);
@@ -263,10 +242,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         await SetInitialGuideByThrottleAsync();
 
         // mainImage3: 계기판 텍스트/이미지
-        SettingTextObject(textTime, setting.timeText).Forget();
-        SettingTextObject(textAltitude, setting.altitudeText).Forget();
-        SettingTextObject(textVelocity, setting.velocityText).Forget();
-        SettingTextObject(textDistance, setting.distanceText).Forget();
         SettingTextObject(textTimeValue, setting.timeValueText, "T - 00:00:10").Forget();
         SettingTextObject(textAltitudeValue, setting.altitudeValueText).Forget();
         SettingTextObject(textVelocityValue, setting.velocityValueText).Forget();
@@ -949,30 +924,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             verticalCamera.fieldOfView = targetFov;
         }
     }
-
-    /*private void FixedUpdate()
-    {
-        if (Input.GetKeyUp(KeyCode.Alpha2))
-        {
-            try
-            {
-                ArduinoInputManager.Instance?.Send("THROTTLE ON");
-            }
-            catch
-            {
-            }
-        }
-        else if (Input.GetKeyUp(KeyCode.Alpha3))
-        {
-            try
-            {
-                ArduinoInputManager.Instance?.Send("THROTTLE OFF");
-            }
-            catch
-            {
-            }
-        }
-    }*/
 
     public async UniTask FadeVerticalAsync(float start, float end)
     {

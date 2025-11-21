@@ -34,6 +34,9 @@ public class NuriAnimEvent : MonoBehaviour
     [SerializeField] private GameObject stage3Flame;
     [SerializeField] private GameObject verticalCameraSocket;
 
+    [Header("Vertical Cam")] 
+    [SerializeField] private RocketFollowCam rfc;
+
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
 
@@ -99,10 +102,12 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage01");
+            rfc.LerpLookAtOffset(new Vector3(2.5f, 30f, 0f ), 2f);
 
             await UniTask.Delay(3000, cancellationToken: token);
 
             _jetVFXAnimStage2?.Expand();
+            stage1Smoke?.Stop();
 
             await UniTask.Delay(10000, cancellationToken: token);
 
@@ -164,9 +169,11 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage02");
+            rfc.LerpLookAtOffset(new Vector3(4f, 30f, 0f ), 2f);
 
             await UniTask.Delay(3000, cancellationToken: token);
-
+            
+            stage2Smoke?.Stop();
             _jetVFXAnimStage3.Expand();
 
             await UniTask.Delay(10000, cancellationToken: token);
@@ -193,6 +200,7 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(5000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage03");
+            rfc.LerpLookAtOffset(new Vector3(6f, 30f, 0f ), 2f);
         }
         catch (OperationCanceledException)
         { }

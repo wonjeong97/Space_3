@@ -12,9 +12,10 @@ public sealed class SoundManager : MonoBehaviour
     public static SoundManager Instance;
 
     [Header("Audio Sources")] 
-    [SerializeField] private AudioSource sfxSource; // 로켓/배경용
+    [SerializeField] private AudioSource sfxSource;   // 로켓/배경용
     [SerializeField] private AudioSource crossSource; // 크로스페이드용 내부 소스
-    [SerializeField] private AudioSource bgmSource; // BGM 전용
+    [SerializeField] private AudioSource bgmSource;   // BGM 전용
+    [SerializeField] private AudioSource buttonSource; // 버튼 클릭 전용
 
     private readonly Dictionary<string, AudioClip> _clipCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, SoundSetting> _soundMap = new(StringComparer.OrdinalIgnoreCase);
@@ -49,8 +50,17 @@ public sealed class SoundManager : MonoBehaviour
         {
             bgmSource = gameObject.AddComponent<AudioSource>();
             bgmSource.playOnAwake = false;
-            bgmSource.loop = true; // 기본적으로 루프
+            bgmSource.loop = true;
             bgmSource.spatialBlend = 0f;
+        }
+
+        // 버튼 전용 소스
+        if (buttonSource == null)
+        {
+            buttonSource = gameObject.AddComponent<AudioSource>();
+            buttonSource.playOnAwake = false;
+            buttonSource.loop = false;
+            buttonSource.spatialBlend = 0f;
         }
 
         crossSource = gameObject.AddComponent<AudioSource>();
@@ -105,7 +115,67 @@ public sealed class SoundManager : MonoBehaviour
     // ==============================================================
     // 퍼블릭 API
     // ==============================================================
+    
+    ///<Summary> Settings.buttonSound 기준 버튼 클릭 사운드를 별도 AudioSource로 재생 </Summary>
+    public async UniTaskVoid PlayButtonDefault()
+    {
+        await UniTask.SwitchToMainThread();
 
+        if (this == null || _destroyToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        Settings settings = JsonLoader.Instance?.settings;
+        if (settings == null || settings.buttonSound == null)
+        {
+            return;
+        }
+
+        string relPath = settings.buttonSound.clipPath;
+        if (string.IsNullOrEmpty(relPath))
+        {
+            return;
+        }
+
+        AudioClip clip;
+        try
+        {
+            clip = await GetOrLoadClipAsync(relPath, _destroyToken);
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"[SoundManager] PlayButtonDefault-> 버튼 클립 로드 중 예외: {e}");
+            return;
+        }
+
+        if (clip == null)
+        {
+            return;
+        }
+
+        if (this == null || _destroyToken.IsCancellationRequested)
+        {
+            return;
+        }
+
+        if (buttonSource == null)
+        {
+            Debug.LogError("[SoundManager] PlayButtonDefault-> buttonSource가 할당되지 않음");
+            return;
+        }
+
+        float baseVol = settings.buttonSound.volume <= 0f ? 1f : settings.buttonSound.volume;
+        float finalVol = Mathf.Clamp01(baseVol);
+
+        // 다른 효과음(sfxSource)와 독립적으로 겹쳐서 재생
+        buttonSource.PlayOneShot(clip, finalVol);
+    }
+    
     /// <summary> 사운드 키로 재생 (Settings.sounds 기준) </summary>
     public async UniTaskVoid PlayByKey(string key, bool loop = false)
     {
@@ -163,6 +233,7 @@ public sealed class SoundManager : MonoBehaviour
         sfxSource.clip = clip;
         sfxSource.volume = Mathf.Clamp01(ss.volume <= 0f ? 1f : ss.volume);
         sfxSource.Play();
+        Debug.Log($"[SoundManager] PlayByKey => {key}");
     }
 
     /// <summary> 경로로 직접 재생 </summary>

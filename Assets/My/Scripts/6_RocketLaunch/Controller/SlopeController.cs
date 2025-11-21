@@ -31,6 +31,7 @@ public class SlopeController : MonoBehaviour
     [SerializeField] private bool useLocalRotation = true;
     [SerializeField] private bool smoothRotation = false;
     [SerializeField] private float rotationLerpSpeed = 10f;
+    [SerializeField] private float rotateRatio;
 
     [Header("Enable Input Timing")]
     [Tooltip("이 시점(T+초) 이전에는 입력을 받지 않음")]
@@ -52,6 +53,10 @@ public class SlopeController : MonoBehaviour
 
     [Tooltip("바늘 회전 보간 속도")]
     [SerializeField] private float pointerLerpSpeed = 10f;
+    
+    [Header("Rocket FollowCam Link")]
+    [SerializeField] private RocketFollowCam rocketFollowCam;
+    [SerializeField] private float camOffsetPerDeg = 1f;
     // =========================================
 
     // ===== 외부 아날로그 입력(Arduino THROTTLE) =====
@@ -71,6 +76,7 @@ public class SlopeController : MonoBehaviour
     private bool _throttleOffSent;
     private bool _lastLocked;
     private Vector3 _rocketBaseEuler;
+    private float _lastSlopeForCamera;
 
     public float CurrentSlopeDeg { get; private set; }
     public bool IsInputLocked => _inputLocked;
@@ -88,6 +94,8 @@ public class SlopeController : MonoBehaviour
 
         if (rocketTransform)
             _rocketBaseEuler = useLocalRotation ? rocketTransform.localEulerAngles : rocketTransform.eulerAngles;
+
+        _lastSlopeForCamera = CurrentSlopeDeg;   // 카메라 연동 기준값 초기화
 
         UpdateLabel();
         ApplyRocketRotationImmediate();
@@ -214,6 +222,18 @@ public class SlopeController : MonoBehaviour
             }
         }
         _lastLocked = _inputLocked;
+        
+        // === 기울기 변화량을 카메라 offset.y에 반영 ===
+        if (rocketFollowCam != null)
+        {
+            float delta = CurrentSlopeDeg - _lastSlopeForCamera;
+            if (!Mathf.Approximately(delta, 0f))
+            {
+                // 기울기 변화량(증가/감소)에 비례해서 offset.y를 변경
+                rocketFollowCam.SubOffsetY(delta * camOffsetPerDeg);
+                _lastSlopeForCamera = CurrentSlopeDeg;
+            }
+        }
     }
 
     // -> 변화량 적용
@@ -268,7 +288,7 @@ public class SlopeController : MonoBehaviour
         Vector3 current = useLocalRotation ? rocketTransform.localEulerAngles : rocketTransform.eulerAngles;
         float targetAngle = Mathf.Clamp(90f - CurrentSlopeDeg, 0f, 90f);
 
-        float dstX = enableRotateX ? (_rocketBaseEuler.x + targetAngle) : current.x;
+        float dstX = enableRotateX ? (_rocketBaseEuler.x + targetAngle * rotateRatio) : current.x;
         float dstY = enableRotateY ? (_rocketBaseEuler.y + targetAngle) : current.y;
 
         float t = Mathf.Clamp01(rotationLerpSpeed * Time.deltaTime);
