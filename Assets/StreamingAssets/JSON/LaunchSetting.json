@@ -107,28 +107,28 @@
 	  "size": { "x": 628, "y": 288 },
 	  "sourceImage": "Image/MainDisplay/3_progress-3.png",
 	  "scale":  { "x": 0.5, "y": 0.5, "z": 0.5},
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.14 }
 	},
 	{
 	  "position": { "x": 210, "y": 425 },
 	  "size": { "x": 628, "y": 288 },
 	  "sourceImage": "Image/MainDisplay/3_progress-4.png",
 	  "scale":  { "x": 0.5, "y": 0.5, "z": 0.5},
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.14 }
 	},
 	{
 	  "position": { "x": 550, "y": 425 },
 	  "size": { "x": 628, "y": 288 },
 	  "sourceImage": "Image/MainDisplay/3_progress-5.png",
 	  "scale":  { "x": 0.5, "y": 0.5, "z": 0.5},
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.14 }
 	},
 	{
 	  "position": { "x": 830, "y": 425 },
 	  "size": { "x": 792, "y": 288 },
 	  "sourceImage": "Image/MainDisplay/3_progress-6.png",
 	  "scale":  { "x": 0.5, "y": 0.5, "z": 0.5},
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.28 }
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.14 }
 	}
   ],
   "oxidizers": [

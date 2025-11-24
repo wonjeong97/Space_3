@@ -34,7 +34,8 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
 
     /// <summary> 씬 초기화: UI 세팅 → 아두이노 준비 대기 → LED/카메라 시작 → 페이드 인 → 입력 대기 → 다음 씬 </summary>
     protected override async UniTask Init()
-    {
+    {   
+        SoundManager.Instance.PauseBGM();
         inputReceived = false;
 
         // 1) UI 세팅
@@ -89,7 +90,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
 
         // 3) 카메라/페이드 인
         TurnCamera3Async(ct).Forget();
-        SoundManager.Instance?.PlayBGMByKey("BGM");
+        
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
         if (ct.IsCancellationRequested || !this || !isActiveAndEnabled) return;
 

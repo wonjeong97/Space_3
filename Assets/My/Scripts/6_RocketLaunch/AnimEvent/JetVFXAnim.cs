@@ -11,6 +11,10 @@ public class JetVFXAnim : MonoBehaviour
     [Header("Animation Settings")]
     [SerializeField] private float animDuration = 0.6f;
     [SerializeField] private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
+    
+    [Header("Smoke Direction")]
+    [SerializeField] private Transform directionRef;
+    [SerializeField] private float smokeSpeed = 2f;
 
     private Vector3 _originalScaleA;
     private Vector3 _originalScaleB;
@@ -42,11 +46,16 @@ public class JetVFXAnim : MonoBehaviour
         
         _ps1.Play();
         _ps2.Play();
-        _ps3.Play();
+        if (_ps3) {
+            _ps3.Play();
+            if (directionRef) StartCoroutine(ParticleUtil.FollowDirectionalSmokeRoutine(_ps3, directionRef, smokeSpeed));
+        }
+
         
         StartCoroutine(ScaleAnim(targetA.transform, Vector3.zero, _originalScaleA));
         StartCoroutine(ScaleAnim(targetB.transform, Vector3.zero, _originalScaleB));
         StartCoroutine(ScaleAnim(targetC.transform, Vector3.zero, _originalScaleC));
+        
     }
 
     /// <summary> target들을 원래 크기 → 0으로 축소 </summary>

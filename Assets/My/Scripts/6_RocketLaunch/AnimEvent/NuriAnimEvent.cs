@@ -10,8 +10,9 @@ public class NuriAnimEvent : MonoBehaviour
     [Header("Animator")] 
     [SerializeField] private Animator separateAnimator;
 
-    [Header("Bottom Smoke")] 
+    [Header("Bottom Smoke & Flame")] 
     [SerializeField] private ParticleSystem bottomSmoke;
+    [SerializeField] private ParticleSystem rocketFlame;
 
     [Header("Fairing")]
     [SerializeField] private GameObject fairing1;
@@ -36,6 +37,11 @@ public class NuriAnimEvent : MonoBehaviour
 
     [Header("Vertical Cam")] 
     [SerializeField] private RocketFollowCam rfc;
+    
+    [Header("Smoke Direction Control")]
+    [SerializeField] private Transform rocketRoot;                // 기준 방향(없으면 this.transform)
+    [SerializeField] private float smokeFlowSpeed = 2f;           // 연기가 밀려나는 속도
+    [SerializeField] private ParticleSystem[] directionalSmokes;  // 방향 보정할 파티클들
 
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
@@ -64,18 +70,17 @@ public class NuriAnimEvent : MonoBehaviour
             bottomSmoke.Play();
         }
     }
-
+    
+    
     public void StopBottomSmoke()
     {
         if (!bottomSmoke || !bottomSmoke.isPlaying)
             return;
 
-        // 1) 루프 끄기 -> 자연스럽게 줄어들도록
         var main = bottomSmoke.main;
         main.loop = false;
 
-        // 2) 5초 뒤 완전 정지
-        StartCoroutine(StopAfterDelay(bottomSmoke, 5f));
+        StartCoroutine(StopAfterDelay(bottomSmoke, 0.1f));
     }
 
     private IEnumerator StopAfterDelay(ParticleSystem ps, float delay)
@@ -107,7 +112,6 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(3000, cancellationToken: token);
 
             _jetVFXAnimStage2?.Expand();
-            stage1Smoke?.Stop();
 
             await UniTask.Delay(10000, cancellationToken: token);
 
@@ -120,6 +124,11 @@ public class NuriAnimEvent : MonoBehaviour
         {
             Debug.LogError(e);
         }
+    }
+
+    public void StopStage1Smoke()
+    {
+        stage1Smoke?.Stop();
     }
 
     /// <summary> 페어링 분리: 연기 → 분리/물리활성 → 연기정지 → 파편 제거 </summary>
@@ -136,11 +145,7 @@ public class NuriAnimEvent : MonoBehaviour
 
             separateAnimator?.SetTrigger("Fairing");
 
-            await UniTask.Delay(2000, cancellationToken: token);
-            fairingSmoke?.Stop();
-            fairingSmokeVertical?.Stop();
-
-            await UniTask.Delay(2000, cancellationToken: token);
+            await UniTask.Delay(5000, cancellationToken: token);
 
             if (fairingSmoke) Destroy(fairingSmoke.gameObject);
             if (fairing1) Destroy(fairing1);
@@ -153,6 +158,12 @@ public class NuriAnimEvent : MonoBehaviour
         {
             Debug.LogError(e);
         }
+    }
+
+    public void StopFairingSmoke()
+    {
+        fairingSmoke?.Stop();
+        fairingSmokeVertical?.Stop();
     }
 
     /// <summary> 2단 분리: 2단 제트 축소 → 연기 → 분리 → 3단 점화/확장 → 폐기 </summary>
@@ -173,7 +184,6 @@ public class NuriAnimEvent : MonoBehaviour
 
             await UniTask.Delay(3000, cancellationToken: token);
             
-            stage2Smoke?.Stop();
             _jetVFXAnimStage3.Expand();
 
             await UniTask.Delay(10000, cancellationToken: token);
@@ -186,6 +196,11 @@ public class NuriAnimEvent : MonoBehaviour
         {
             Debug.LogError(e);
         }
+    }
+
+    public void StopStage2Smoke()
+    {
+        stage2Smoke?.Stop();
     }
 
     public async UniTask Stage3Off()

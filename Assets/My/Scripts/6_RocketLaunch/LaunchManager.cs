@@ -383,7 +383,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
             if (n == 1)
             {
-                LerpCamera3Fov(2, 70).Forget();
+                LerpCamera3Fov(2, 30).Forget();
             }
         }
     }
@@ -899,12 +899,16 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         await FadeImageAsync(1f, 0f, newFadeTime, new[] { fadeImage3 });
     }
     
-    public async UniTask LerpCamera3Fov(float duration, float targetFov)
+    /// <Summary>현재 FOV에서 매개변수 값만큼 줄어들도록 Lerp</Summary>
+    public async UniTask LerpCamera3Fov(float duration, float deltaFov)
     {
         if (verticalCamera == null) return;
 
         float d = Mathf.Max(0.01f, duration);
         float startFov = verticalCamera.fieldOfView;
+    
+        // 들어온 값만큼 빼는 방식 (deltaFov가 10이면 startFov - 10 으로)
+        float targetFov = startFov - deltaFov;
 
         float t = 0f;
         CancellationToken token = DestroyToken;

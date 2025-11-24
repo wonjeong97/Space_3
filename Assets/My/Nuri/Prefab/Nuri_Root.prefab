@@ -106,7 +106,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -467,8 +467,8 @@ ParticleSystem:
     gravityModifier:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 0.1
-      minScalar: 0.05
+      scalar: 0
+      minScalar: 0
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -4745,7 +4745,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -9384,7 +9384,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -14023,7 +14023,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -18656,7 +18656,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &3674998957733800991
 Transform:
   m_ObjectHideFlags: 0
@@ -18693,6 +18693,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   separateAnimator: {fileID: 0}
   bottomSmoke: {fileID: 0}
+  rocketFlame: {fileID: 0}
   fairing1: {fileID: 5603690031137309777}
   fairing2: {fileID: 9140857196728953931}
   fairingSmoke: {fileID: 0}
@@ -18706,6 +18707,10 @@ MonoBehaviour:
   stage3: {fileID: 0}
   stage3Flame: {fileID: 0}
   verticalCameraSocket: {fileID: 0}
+  rfc: {fileID: 0}
+  rocketRoot: {fileID: 0}
+  smokeFlowSpeed: 2
+  directionalSmokes: []
   collisionMode: 2
   interpolation: 1
 --- !u!95 &7794436010576052410
@@ -18835,7 +18840,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -23506,7 +23511,7 @@ ParticleSystem:
       m_PreInfinity: 2
       m_PostInfinity: 2
       m_RotationOrder: 4
-  moveWithTransform: 1
+  moveWithTransform: 0
   moveWithCustomTransform: {fileID: 0}
   scalingMode: 1
   randomSeed: 0
@@ -28106,6 +28111,14 @@ PrefabInstance:
       propertyPath: m_ApplyActiveColorSpace
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6228295472349301857, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: playOnAwake
       value: 1
@@ -28282,6 +28295,18 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8522441249715866179, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: moveWithTransform
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8522441249715866179, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: InitialModule.gravityModifier.minScalar
+      value: -0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 9221717749547019085, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: directionRef
+      value: 
+      objectReference: {fileID: 3674998957733800991}
     m_RemovedComponents:
     - {fileID: 1883610225177522265, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
     m_RemovedGameObjects:
@@ -28507,12 +28532,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: m_LocalPosition.z
       value: -5.2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6228295472349301857, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: playOnAwake
@@ -28690,6 +28723,18 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8522441249715866179, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: moveWithTransform
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8522441249715866179, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: InitialModule.gravityModifier.minScalar
+      value: -0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 9221717749547019085, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: directionRef
+      value: 
+      objectReference: {fileID: 3674998957733800991}
     m_RemovedComponents:
     - {fileID: 1883610225177522265, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
     m_RemovedGameObjects:
@@ -29199,12 +29244,20 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: m_LocalPosition.y
       value: 0.02
       objectReference: {fileID: 0}
     - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: m_LocalPosition.z
       value: 0.24
+      objectReference: {fileID: 0}
+    - target: {fileID: 6024921394728868199, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6228295472349301857, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
       propertyPath: playOnAwake
@@ -29382,6 +29435,18 @@ PrefabInstance:
       propertyPath: m_ConstrainProportionsScale
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8522441249715866179, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: moveWithTransform
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8522441249715866179, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: InitialModule.gravityModifier.minScalar
+      value: -0.15
+      objectReference: {fileID: 0}
+    - target: {fileID: 9221717749547019085, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
+      propertyPath: directionRef
+      value: 
+      objectReference: {fileID: 3674998957733800991}
     m_RemovedComponents:
     - {fileID: 1883610225177522265, guid: 3af2cbf07e2c60c4998ed2d6099f1dcc, type: 3}
     m_RemovedGameObjects:

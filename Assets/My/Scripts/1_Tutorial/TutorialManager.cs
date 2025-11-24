@@ -72,6 +72,8 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
             ArduinoInputManager.Instance?.SetLedAll(true);
             TurnCamera3Async(DestroyToken).Forget();
 
+            SoundManager.Instance?.PlayBGMByKey("BGM");
+            
             // 4) 페이드 인
             await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
 

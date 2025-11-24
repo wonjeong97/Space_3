@@ -114,7 +114,7 @@ public class NuriTriggerController : MonoBehaviour
                             return;
                         }
 
-                        LaunchManager.Instance.LerpCamera3Fov(2, 60f).Forget();
+                        LaunchManager.Instance.LerpCamera3Fov(2, 20f).Forget();
                         LaunchManager.Instance.SetGuideText("");
                         count.EndExternalHold();
                         LaunchManager.Instance.PauseInactivityTimer();
@@ -204,7 +204,7 @@ public class NuriTriggerController : MonoBehaviour
                             return;
                         }
                         
-                        LaunchManager.Instance.LerpCamera3Fov(2, 50f).Forget();
+                        LaunchManager.Instance.LerpCamera3Fov(2, 10f).Forget();
                         LaunchManager.Instance.SetGuideText("");
                         count.EndExternalHold();
                         LaunchManager.Instance.PauseInactivityTimer();

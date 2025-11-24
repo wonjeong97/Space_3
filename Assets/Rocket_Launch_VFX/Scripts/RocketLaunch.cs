@@ -24,6 +24,9 @@ public class RocketLaunch : MonoBehaviour
     [Header("T- Trigger Times (seconds)")]
     [Tooltip("T- 이 값 이하가 되면 사전 연기(takeOffSmoke)를 켬")]
     [SerializeField] private float tMinusPreSmoke = 10f;
+    
+    [Tooltip("T- 이 값 이하가 되면 Bottom Smoke를 끔")]
+    [SerializeField] private float tBottomSmokeOff = 5f;
 
     [Tooltip("T- 이 값 이하가 되면 엔진 점화 VFX(flames, 스파크 등)를 켬")]
     [SerializeField] private float tMinusEngineOn = 1f;
@@ -65,6 +68,7 @@ public class RocketLaunch : MonoBehaviour
             yield break;
         }
 
+        bool firedBottomSmokeOff = false;
         bool firedPreSmoke = false;
         bool firedEngineOn = false;
         bool firedLaunchVfx = false;
@@ -82,16 +86,20 @@ public class RocketLaunch : MonoBehaviour
                 {
                     firedPreSmoke = true;
                     SafePlay(engineSmokeParticles);
-                    
-                    Debug.Log("사전 연기");
+                }
+
+                if (!firedBottomSmokeOff && tMinus <= tBottomSmokeOff)
+                {
+                    firedBottomSmokeOff = true;
+                    nuriAnimEvent?.StopBottomSmoke();
                 }
 
                 // 2) 엔진 점화 VFX (T- 1)
                 if (!firedEngineOn && tMinus <= tMinusEngineOn)
                 {   
-                    Debug.Log("엔진 점화");
                     firedEngineOn = true;
-
+                    SafeStop(engineSmokeParticles, 0.1f);
+                    
                     LaunchManager.Instance?.FadeInStagePublicAsync(1).Forget();
 
                     SafeSetActive(flamesLight, true);
@@ -108,8 +116,6 @@ public class RocketLaunch : MonoBehaviour
                 {   
                     Debug.Log("이륙");
                     firedLaunchVfx = true;
-                    
-                    nuriAnimEvent?.StopBottomSmoke();
                     
                     // 1단 제트 플레임 확장 애니메이션
                     _stage01JetEngineVFX?.Expand();
@@ -132,7 +138,7 @@ public class RocketLaunch : MonoBehaviour
         // 공통 정리: 바로 Stop()하지 말고 loop를 끄고 일정 시간 후 정지
         SafeSetActive(flamesLight, false);
 
-        SafeStop(engineSmokeParticles,       stopDelaySeconds);
+        
         SafeStop(turbulenceSmokeParticles,   stopDelaySeconds);
         SafeStop(flamesAParticles,           stopDelaySeconds);
         SafeStop(flamesBParticles,           stopDelaySeconds);
