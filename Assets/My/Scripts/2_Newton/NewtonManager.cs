@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.Video;
@@ -29,6 +30,8 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
     [Header("UI")]
     [SerializeField] private GameObject videoPlayerObject; // 비디오를 표시할 GameObject (VideoPlayer + RawImage + AudioSource)
     [SerializeField] private GameObject subImage;
+    [SerializeField] private TextMeshProUGUI subtitleText1;
+    [SerializeField] private TextMeshProUGUI subtitleText2;
     
     #endregion
 
@@ -49,7 +52,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
 
     private int _ruleIndex;                     // 법칙 비디오 인덱스
     private VideoSetting[] _ruleSeq;            // 법칙 비디오 시퀀스
-
+    
     #endregion
 
     #region Unity Life-Cycle
@@ -120,19 +123,75 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
         try { ArduinoInputManager.Instance?.SetLedAll(false); } catch { /* 로그는 아래로 통일 */ }
         LedStrip.Range(0, 9, 255, 0, 0);
 
-        // 인트로 준비/재생
-        
-        SoundManager.Instance?.PauseBGM();
-        await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
-
         _vp.loopPointReached -= OnVideoEnded;
         _vp.loopPointReached += OnVideoEnded;
+        
+        // ===== 자막 Text 생성 및 SubtitleDisplayer 연결 =====
+        subtitleDisplayer = SubtitleDisplayer.Instance;
+        if (mainSettings != null && mainSettings.subtitleOn && subtitleDisplayer != null)
+        {
+            if (mainSettings.subtitle1Set != null)
+            {   
+                await SettingTextObject(subtitleText1.gameObject,  mainSettings.subtitle1Set);
+                if (subtitleText1 != null && subtitleText1.TryGetComponent(out TextMeshProUGUI tmp1))
+                {
+                    subtitleText1 = tmp1;                 
+                    subtitleText1.text = string.Empty;
+                    subtitleText1.gameObject.SetActive(false);
+                    subtitleText1.transform.SetAsLastSibling();
+                    subtitleDisplayer.FadeTime = mainSettings.subtitleFadeTime;
+                    
+                    ApplySubtitleOutline(subtitleText1);
+                }
+            }
 
+            if (mainSettings.subtitle2Set != null)
+            {   
+                await SettingTextObject(subtitleText2.gameObject, mainSettings.subtitle2Set);
+                if (subtitleText2 != null && subtitleText2.TryGetComponent(out TextMeshProUGUI tmp2))
+                {
+                    subtitleText2 = tmp2;
+                    subtitleText2.text = string.Empty;
+                    subtitleText2.gameObject.SetActive(false);
+                    subtitleText2.transform.SetAsLastSibling();
+                    
+                    ApplySubtitleOutline(subtitleText2);
+                }
+            }
+
+            subtitleDisplayer.Text = subtitleText1;
+            subtitleDisplayer.Text2 = subtitleText2;
+        }
+
+        // 인트로 준비/재생
+        SoundManager.Instance?.PauseBGM();
+        await SettingVideoObject(videoPlayerObject, setting.introVideo, _vp, _raw, _audio);
+        
         BindInactivityPolicyToVideo(_vp, false, DestroyToken); // 인트로: 루프 아님
 
         // 3번 모니터 카메라 회전 및 페이드 인
         TurnCamera3Async(DestroyToken).Forget();
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
+    }
+    
+    private void ApplySubtitleOutline(TextMeshProUGUI tmp)
+    {
+        if (tmp == null) return;
+
+        // 다른 텍스트와 공유하지 않도록 머티리얼 인스턴스 생성
+        Material mat = Instantiate(tmp.fontMaterial);
+        tmp.fontMaterial = mat;
+
+        // Outline 키워드 활성화
+        tmp.fontMaterial.EnableKeyword("OUTLINE_ON");
+
+        // Settings에 값이 있다면 사용, 없으면 기본값
+        float width = 0.2f;
+        Color color = Color.black;
+
+        // 외곽선 두께/색 설정
+        tmp.fontMaterial.SetFloat(ShaderUtilities.ID_OutlineWidth, width);
+        tmp.fontMaterial.SetColor(ShaderUtilities.ID_OutlineColor, color);
     }
 
     #endregion

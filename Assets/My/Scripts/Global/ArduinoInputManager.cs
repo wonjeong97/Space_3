@@ -287,6 +287,13 @@ public class ArduinoInputManager : MonoBehaviour
             }
         }
     }
+    
+    // 디버그용 (키보드 방향키를 버튼으로 매핑)
+    public void SimulateButton(int buttonIndex)
+    {
+        string line = $"BTN{buttonIndex}";
+        LineReceived?.Invoke(line);
+    }
 
     // 스레드에서 눌림 비트를 세팅
     private void SetPressedBit(int bit)

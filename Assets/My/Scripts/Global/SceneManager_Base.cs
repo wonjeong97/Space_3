@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.Video;
 
-public abstract class SceneManager_Base<T> : MonoBehaviour
+public abstract class SceneManager_Base<T> : MonoBehaviour, ISceneResettable
 {
     #region Serialized Refs
 
@@ -42,13 +42,14 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     protected static bool TransitionInProgress => _sTransitionInProgress;
 
     [NonSerialized] protected T setting;    // JSON 설정 데이터 참조
-    private Settings _mainSettings;         // 공통 설정 참조
+    protected Settings mainSettings;         // 공통 설정 참조
 
     // ===== protected =====
     protected bool canInput;        // 입력 가능 여부 (페이드 중 방지)
     protected int buttonDelayTime;  // 버튼 클릭 간 딜레이 시간 (ms)
     protected bool inputReceived;   // 입력 한 번만 허용할 때 사용
     protected float fadeTime;       // 페이드 시간 설정
+    protected SubtitleDisplayer subtitleDisplayer;
 
     // ===== private =====
     private readonly Dictionary<GameObject, CancellationTokenSource> _anchoredYAnimCts = new Dictionary<GameObject, CancellationTokenSource>(); // Y좌표 애니메이션 관리
@@ -117,21 +118,21 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     {
         try
         {
-            _mainSettings ??= JsonLoader.Instance.settings;
+            mainSettings ??= JsonLoader.Instance.settings;
             setting = JsonLoader.Instance.LoadJsonData<T>(JsonPath);
 
-            _camera3TurnSpeed = _mainSettings.camera3TurnSpeed;
-            fadeTime = _mainSettings.fadeTime;
-            _inactivityThreshold = _mainSettings.inactivityTime;
-            buttonDelayTime = _mainSettings.buttonDelayTime;
+            _camera3TurnSpeed = mainSettings.camera3TurnSpeed;
+            fadeTime = mainSettings.fadeTime;
+            _inactivityThreshold = mainSettings.inactivityTime;
+            buttonDelayTime = mainSettings.buttonDelayTime;
 
             // 윈도우 디스플레이 순서가 바뀌어도 JSON으로 지정 가능
-            mainCamera.targetDisplay = _mainSettings.canvas1TargetMonitorIndex;
-            mainCanvas.targetDisplay = _mainSettings.canvas1TargetMonitorIndex;
-            subCamera.targetDisplay = _mainSettings.canvas2TargetMonitorIndex;
-            subCanvas.targetDisplay = _mainSettings.canvas2TargetMonitorIndex;
-            verticalCamera.targetDisplay = _mainSettings.canvas3TargetMonitorIndex;
-            verticalCanvas.targetDisplay = _mainSettings.canvas3TargetMonitorIndex;
+            mainCamera.targetDisplay = mainSettings.canvas1TargetMonitorIndex;
+            mainCanvas.targetDisplay = mainSettings.canvas1TargetMonitorIndex;
+            subCamera.targetDisplay = mainSettings.canvas2TargetMonitorIndex;
+            subCanvas.targetDisplay = mainSettings.canvas2TargetMonitorIndex;
+            verticalCamera.targetDisplay = mainSettings.canvas3TargetMonitorIndex;
+            verticalCanvas.targetDisplay = mainSettings.canvas3TargetMonitorIndex;
 
             await InitSafe();
         }
@@ -147,7 +148,23 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
     /// <summary> 무입력 타임아웃 및 디버그 스킵 처리 </summary>
     protected virtual void Update()
-    {
+    {   
+        if (ArduinoInputManager.Instance != null)
+        {
+            if (Input.GetKeyDown(KeyCode.LeftArrow))
+            {
+                ArduinoInputManager.Instance.SimulateButton(1); // BTN1
+            }
+            else if (Input.GetKeyDown(KeyCode.DownArrow))
+            {
+                ArduinoInputManager.Instance.SimulateButton(2); // BTN2
+            }
+            else if (Input.GetKeyDown(KeyCode.RightArrow))
+            {
+                ArduinoInputManager.Instance.SimulateButton(3); // BTN3
+            }
+        }
+        
         if (useInactivityTimeout)
         {
             if (SceneManager.GetActiveScene().buildIndex != 0)
@@ -335,6 +352,15 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
         fromGo.SetActive(false);
         SetAlpha(to, 1f);
     }
+    
+    /// <summary> 외부에서 타이틀(0번 씬)로 복귀 요청할 때 사용하는 헬퍼 </summary>
+    public void ResetToTitle()
+    {
+        if (_isLoading || TransitionInProgress) return;
+
+        _sTransitionInProgress = true;
+        LoadSceneAsync(0, new[] { fadeImage1, fadeImage2, fadeImage3 }).Forget();
+    }
 
     /// <summary> 페이드 후 씬 로드(0번 씬은 동기 로드) </summary>
     protected async UniTask LoadSceneAsync(int buildIndex, Image[] fadeImages)
@@ -486,8 +512,9 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
     /// <summary> 사용자 입력이 있었는지 간단 체크 </summary>
     private bool IsAnyUserInputDown()
     {
-        if (Input.anyKeyDown) return true;
-        if (Input.touchCount > 0) return true;
+        if (Input.GetKeyDown(KeyCode.LeftArrow))  return true; // BTN1
+        if (Input.GetKeyDown(KeyCode.DownArrow))  return true; // BTN2
+        if (Input.GetKeyDown(KeyCode.RightArrow)) return true; // BTN3
         return false;
     }
 
@@ -599,6 +626,25 @@ public abstract class SceneManager_Base<T> : MonoBehaviour
 
         VideoManager.Instance.WireRawImageAndRenderTexture(vp, raw, new Vector2Int(Mathf.RoundToInt(vs.size.x), Mathf.RoundToInt(vs.size.y)));
         string url = VideoManager.Instance.ResolvePlayableUrl(vs.fileName);
+        
+        if (subtitleDisplayer != null)
+        {
+            if (mainSettings != null && mainSettings.subtitleOn)
+            {   
+                if (string.IsNullOrEmpty(vs.subtitle))
+                {
+                    subtitleDisplayer.StopSubtitle();
+                }
+                else
+                {   
+                    subtitleDisplayer.StartSubtitleFromStreamingAssets(vs.subtitle);
+                }
+            }
+            else
+            {
+                subtitleDisplayer.StopSubtitle();
+            }
+        }
 
         await VideoManager.Instance.PrepareAndPlayAsync(vp, url, audioSource, vs.volume, DestroyToken).AsUniTask();
     }

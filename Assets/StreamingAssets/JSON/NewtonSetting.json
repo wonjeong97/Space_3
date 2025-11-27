@@ -1,22 +1,4 @@
 {
-  "__background": {
-	"position": { "x": 960, "y": 540 },
-	"size": { "x": 1920, "y": 1080 },
-	"sourceImage": "Image/Newton/0_BG.png",
-	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },
-  "__infoImage1": {
-	"position": { "x": 960, "y": 100 },
-	"size": { "x": 750, "y": 80 },
-	"sourceImage": "Image/Newton/1_Info.png",
-	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },
-  "__infoImage2": {
-	"position": { "x": 960, "y": 970 },
-	"size": { "x": 1000, "y": 120 },
-	"sourceImage": "Image/Newton/2_Info.png",
-	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
-  },
   "subImage": {
 	"position": { "x": 1280, "y": 360 },
 	"size": { "x": 2560, "y": 720 },
@@ -26,7 +8,8 @@
 	"position": { "x": 960, "y": 540 },
 	"size": { "x": 1920, "y": 1080 },
 	"fileName": "Video/Newton/Intro.mp4",
-	"volume": 1.0
+	"volume": 1.0,
+	"subtitle": "Video/Newton/Intro.srt"
   },
   "newtonsRuleVideos": [
 	{

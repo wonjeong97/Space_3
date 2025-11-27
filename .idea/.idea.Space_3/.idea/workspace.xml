@@ -6,18 +6,23 @@
   <component name="ChangeListManager">
     <list default="true" id="73cf11a5-2fd2-4764-b9cb-f11f8526e1d7" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateFairing.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateFairing.anim" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage01.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage01.anim" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage02.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/SeparateStage02.anim" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Prefab/Nuri_Root.prefab" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Prefab/Nuri_Root.prefab" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/JetVFXAnim.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/JetVFXAnim.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriAnimEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriAnimEvent.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/LaunchManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/LaunchManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/Rocket_Launch_VFX/Scripts/RocketLaunch.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Rocket_Launch_VFX/Scripts/RocketLaunch.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Fonts/TMPro/Freesentation-4Regular SDF.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Fonts/TMPro/Freesentation-4Regular SDF.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/2_Newton/NewtonManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/2_Newton/NewtonManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/ArduinoInputManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/ArduinoInputManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/JsonLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/JsonLoader.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/0_TitleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/0_TitleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/1_TutorialScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/1_TutorialScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/2_NewtonScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/2_NewtonScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/3_RocketStructure.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/3_RocketStructure.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/4_RocketMake.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/4_RocketMake.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/5_RocketFuel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/5_RocketFuel.unity" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/Scenes/6_RocketLaunch.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/6_RocketLaunch.unity" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/FuelSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/FuelSetting.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/LaunchSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/LaunchSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/7_RocketRecycle.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/7_RocketRecycle.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketMake/3_위성 정보.png" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Image/RocketMake/3_위성 정보.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/NewtonSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/NewtonSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Newton/Intro.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Newton/Intro.mp4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" beforeDir="false" afterPath="$PROJECT_DIR$/ProjectSettings/ProjectSettings.asset" afterDir="false" />
     </list>
@@ -30,7 +35,14 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/0_Title/TitleManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/1_Tutorial/TutorialManager.cs" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/Particle/ParticleUtil.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/Global/GameReset.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/Global/ISceneResetter.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/Global/JsonLoader.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
@@ -73,7 +85,7 @@
       <method v="2" />
     </configuration>
     <configuration name="독립실행형 플레이어" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/Space3_Build\우주발사체.exe" />
+      <option name="EXE_PATH" value="E:/3.우주발사체\Space-3.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="D:\Github\Space_3\Build" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -148,6 +160,10 @@
       <workItem from="1763597505888" duration="5405000" />
       <workItem from="1763963120771" duration="7462000" />
       <workItem from="1763971981806" duration="10000" />
+      <workItem from="1763974889310" duration="440000" />
+      <workItem from="1764118824828" duration="915000" />
+      <workItem from="1764152627215" duration="1389000" />
+      <workItem from="1764203045225" duration="3915000" />
     </task>
     <servers />
   </component>

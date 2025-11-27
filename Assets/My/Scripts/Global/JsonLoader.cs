@@ -128,6 +128,7 @@ public class VideoSetting
     public Vector2 size;
     public string fileName;
     public float volume;
+    public string subtitle;
 }
 
 [Serializable]
@@ -222,6 +223,7 @@ public class Settings
     public float inactivityTime; // 입력이 없을 시 타이틀로 되돌아가는 시간
     public float fadeTime;
     public CloseSetting closeSetting;
+    public CloseSetting resetSetting;
     public FontMaps fontMap;
     public SoundSetting[] sounds;
     
@@ -232,6 +234,11 @@ public class Settings
     public float camera3TurnSpeed;
     public SoundSetting buttonSound;
     public float uiBlinkTime;
+    
+    public bool subtitleOn;
+    public float subtitleFadeTime;
+    public TextSetting subtitle1Set;
+    public TextSetting subtitle2Set;
 }
 
 #endregion
