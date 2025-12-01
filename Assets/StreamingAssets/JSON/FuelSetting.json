@@ -167,16 +167,19 @@
   "buttonLeft": {
 	"position": { "x": 80, "y": 105 },
 	"size": { "x": 80, "y": 80 },
+	"scale": {"x": 0.7, "y": 0.7, "z": 0.7},
 	"sourceImage": "Image/MainDisplay/ButtonOff.png"
   },
   "buttonMiddle": {
 	"position": { "x": 165, "y": 105 },
 	"size": { "x": 80, "y": 80 },
+	"scale": {"x": 0.7, "y": 0.7, "z": 0.7},
 	"sourceImage": "Image/MainDisplay/ButtonOff.png"
   },
   "buttonRight": {
 	"position": { "x": 250, "y": 105 },
 	"size": { "x": 80, "y": 80 },
+	"scale": {"x": 0.7, "y": 0.7, "z": 0.7},
 	"sourceImage": "Image/MainDisplay/ButtonOff.png"
   },
   "throttleBackground": {

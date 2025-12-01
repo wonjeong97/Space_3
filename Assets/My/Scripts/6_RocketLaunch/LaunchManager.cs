@@ -283,7 +283,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             try { ArduinoInputManager.Instance?.Send("THROTTLE OFF"); }
             catch (Exception e) { LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "Send THROTTLE OFF failed: " + e.Message); }
             
-            SettingTextObject(textGuide, setting.guideText, "로켓 거치 중").Forget();
+            SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").Forget();
             StopAnimateThrottleY();
         }
         
@@ -298,7 +298,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         nuriAnimEvent?.StartBottomSmoke(); // 로켓 하단 연기 시작
         
         SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
-        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
+        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
         
         ArduinoInputManager.Instance?.SetLedAll(true);
         StartBlinkGreenAsync(500, 160);
@@ -845,13 +845,13 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             if (Mathf.Abs(throttle) <= zeroDeadband)
             {
                 _needThrottleDown = false;
-                await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중").AttachExternalCancellation(token);
+                await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").AttachExternalCancellation(token);
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
             }
             else
             {
                 _needThrottleDown = true;
-                await SettingTextObject(textGuide, setting.guideText, "스로틀을 내려주세요.").AttachExternalCancellation(token);
+                await SettingTextObject(textGuide, setting.guideText, "각도 조정기를 내려주세요.").AttachExternalCancellation(token);
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
                 AnimateThrottleY(0f, -110f, 0.8f, 0.2f);
             }
@@ -860,7 +860,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             // 응답이 없으면 보수적으로 버튼 입력 대기
             _needThrottleDown = false;
-            await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중").AttachExternalCancellation(token);
+            await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").AttachExternalCancellation(token);
             SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
         }
     }

@@ -166,11 +166,11 @@ public class SlopeController : MonoBehaviour
                     LaunchManager.Instance.InputReceived = false;
                 }
                 // 아두이노가 없으면 키보드 입력 사용
-                if (Input.GetKeyDown(KeyCode.UpArrow))   changed |= TryApplyDelta(-stepPerPress);
-                if (Input.GetKeyDown(KeyCode.DownArrow)) changed |= TryApplyDelta(stepPerPress);
+                if (Input.GetKeyDown(KeyCode.Alpha1))   changed |= TryApplyDelta(-stepPerPress);
+                if (Input.GetKeyDown(KeyCode.Alpha2)) changed |= TryApplyDelta(stepPerPress);
 
-                if (Input.GetKey(KeyCode.UpArrow))   changed |= TryApplyDelta(stepWhileHeldPerSec * Time.deltaTime);
-                if (Input.GetKey(KeyCode.DownArrow)) changed |= TryApplyDelta(-stepWhileHeldPerSec * Time.deltaTime);
+                if (Input.GetKey(KeyCode.Alpha1))   changed |= TryApplyDelta(stepWhileHeldPerSec * Time.deltaTime);
+                if (Input.GetKey(KeyCode.Alpha2)) changed |= TryApplyDelta(-stepWhileHeldPerSec * Time.deltaTime);
             }
 
             // 변경 반영

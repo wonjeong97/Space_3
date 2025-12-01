@@ -172,7 +172,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             StartAlphaPingPong(sequences[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
         }
 
-        SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요").Forget();
+        SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요.").Forget();
 
         // ===== Controllers =====
         SettingImageObject(controllerBackground, setting.controllerBackground);
@@ -181,7 +181,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(buttonRight, setting.buttonRight);
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
-        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요").Forget();
+        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
 
         // ===== Values =====
         SettingTextObject(textTimeValue, setting.timeValueText).Forget();
@@ -281,7 +281,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
                     // LED2 블링크 시작
                     _blinkCts = new CancellationTokenSource();
-                    SettingTextObject(textGuide, setting.guideText, "가운데 버튼을 누르세요").Forget();
+                    SettingTextObject(textGuide, setting.guideText, "2단 버튼을 누르세요.").Forget();
                     BlinkLedAsync(2, 300, 300, _blinkCts.Token).Forget();
                     StartButtonBlink(buttonMiddle);
 
@@ -321,7 +321,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
                     // LED3 블링크 시작
                     _blinkCts = new CancellationTokenSource();
-                    SettingTextObject(textGuide, setting.guideText, "오른쪽 버튼을 누르세요").Forget();
+                    SettingTextObject(textGuide, setting.guideText, "3단 버튼을 누르세요.").Forget();
                     BlinkLedAsync(3, 300, 300, _blinkCts.Token).Forget();
                     StartButtonBlink(buttonRight);
 
@@ -449,7 +449,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SetAlpha(img, 0f);
 
         // 팝업이 사라진 뒤 첫 단계 안내
-        SettingTextObject(textGuide, setting.guideText, "왼쪽 버튼을 누르세요").Forget();
+        SettingTextObject(textGuide, setting.guideText, "1단 버튼을 누르세요.").Forget();
         StartButtonBlink(buttonLeft);
         if (_blinkCts == null) _blinkCts = new CancellationTokenSource();
         BlinkLedAsync(ledIndex: 1, onMs: 300, offMs: 300, token: _blinkCts.Token).Forget();

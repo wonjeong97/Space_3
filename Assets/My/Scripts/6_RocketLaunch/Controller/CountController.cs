@@ -191,7 +191,7 @@ public class CountController : MonoBehaviour
                         
                         // 스로틀 버튼 애니메이션 실행
                         LaunchManager.Instance?.AnimateThrottleY(-110f, 0f, 0.8f, 0.2f);
-                        LaunchManager.Instance?.SetGuideText("스로틀을 올리세요.");
+                        LaunchManager.Instance?.SetGuideText("각도 조정기를 올리세요.");
                         LaunchManager.Instance?.ResumeInactivityTimer();
                         
                         // 표기/내부 시간 고정

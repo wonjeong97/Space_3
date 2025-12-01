@@ -19,9 +19,9 @@
   },
   "imageInfo": {
 	"position": { "x": 960, "y": 985 },
-	"size": { "x": 1942, "y": 183 },
+	"size": { "x": 1943, "y": 194 },
 	"scale": { "x": 0.7, "y": 0.7, "z": 0.7 },
-	"sourceImage": "Image/Tutorial/3_체험방법_txt.png",
+	"sourceImage": "Image/MainDisplay/3_txt.png",
 	"color": { "r": 1, "g": 1, "b": 1, "a": 1 }
   },
   "subImage": {

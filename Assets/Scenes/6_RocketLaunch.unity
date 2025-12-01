@@ -18042,7 +18042,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 0, y: -46.942093}
+  m_AnchoredPosition: {x: 0, y: -109.23348}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1125616459
@@ -24012,7 +24012,7 @@ MonoBehaviour:
   target: {fileID: 1566305590}
   baseY: -1.5
   topY: 7000
-  maxAltitudeKm: 550
+  maxAltitudeKm: 250
   useLocalPosition: 1
   smoothDamp: 0.05
   altitudeKeys:
