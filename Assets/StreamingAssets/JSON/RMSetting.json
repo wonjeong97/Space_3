@@ -57,13 +57,13 @@
 	{
 	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1920, "y": 1080 },
-	  "fileName": "Video/RocketMake/2_Make.webm",
+	  "fileName": "Video/RocketMake/2_Make-Loop.webm",
 	  "volume": 1.0
 	},
 	{
 	  "position": { "x": 960, "y": 540 },
 	  "size": { "x": 1920, "y": 1080 },
-	  "fileName": "Video/RocketMake/3_Make.webm",
+	  "fileName": "Video/RocketMake/3_Make-Loop.webm",
 	  "volume": 1.0
 	}
   ]
