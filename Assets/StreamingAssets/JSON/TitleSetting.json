@@ -19,5 +19,13 @@
 		"position": { "x": 1280, "y": 360 },
 		"size": { "x": 2560, "y": 720 },
 		"sourceImage": "Image/ForSub/3_assi-idle.png"
-	}
+	},
+  "idleVideo": {
+	"name": "idleVideo",
+	"position": { "x": 0, "y": 0 },
+	"size": { "x": 1080, "y": 3840 },
+	"fileName": "Video/Title/Idle.mp4",
+	"volume": 1.0,
+	"subtitle": ""
+  }
 }

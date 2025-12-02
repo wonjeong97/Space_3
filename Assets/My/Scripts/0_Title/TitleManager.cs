@@ -3,6 +3,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.Video;
 
 [Serializable]
 public class TitleSetting
@@ -12,6 +13,7 @@ public class TitleSetting
     public ImageSetting titleImage;
 
     public ImageSetting subImage;
+    public VideoSetting idleVideo;
 }
 
 /// <summary> 타이틀 씬 관리 클래스 </summary>
@@ -27,10 +29,17 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     [SerializeField] private GameObject infoImage;       // "시작하려면 아무 버튼이나 누르세요"
     [SerializeField] private GameObject titleImage;      // 우주발사체 타이틀 이미지
     [SerializeField] private GameObject subImage;        // "누리호 발사 임무" 이미지
+    
+    [Header("Video")]
+    [SerializeField] private GameObject verticalVideoObject;
 
     #endregion
 
     #region Initialization
+    
+    private VideoPlayer _vp;
+    private RawImage _raw;
+    private AudioSource _audio;
 
     /// <summary> 씬 초기화: UI 세팅 → 아두이노 준비 대기 → LED/카메라 시작 → 페이드 인 → 입력 대기 → 다음 씬 </summary>
     protected override async UniTask Init()
@@ -44,6 +53,19 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
         SettingImageObject(infoImage, setting.infoImage);
         SettingImageObject(subImage, setting.subImage);
 
+        if (verticalVideoObject != null && setting.idleVideo != null)
+        {
+            _vp = verticalVideoObject.GetComponent<VideoPlayer>();
+            _raw = verticalVideoObject.GetComponent<RawImage>();
+            _audio = verticalVideoObject.GetComponent<AudioSource>();
+            
+            await SettingVideoObject(verticalVideoObject, setting.idleVideo, _vp, _raw, _audio);
+            if (_vp != null)
+            {
+                _vp.isLooping = true;
+            }
+        }
+        
         await UniTask.Yield();
 
         // 2) 아두이노 준비 대기
@@ -88,9 +110,7 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
             StartBlinkGreenAsync(500, 160);
         }
 
-        // 3) 카메라/페이드 인
-        TurnCamera3Async(ct).Forget();
-        
+        // 3) 페이드 인
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
         if (ct.IsCancellationRequested || !this || !isActiveAndEnabled) return;
 
@@ -109,6 +129,15 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     }
 
     #endregion
+    
+    protected override void OnDisable()
+    {
+        base.OnDisable();
+        if (_vp != null)
+        {
+            _vp.Stop();
+        }
+    }
 
     #region Helpers
 
