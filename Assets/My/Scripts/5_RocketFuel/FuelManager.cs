@@ -43,6 +43,9 @@ public class FuelSetting
 /// <summary> 우주발사체의 연료/산화제 씬 관리 매니저 </summary>
 public sealed class FuelManager : SceneManager_Base<FuelSetting>
 {
+    private static readonly int Trigger = Animator.StringToHash("Trigger");
+    public static FuelManager Instance;
+
     // ===== JSON 경로 =====
     protected override string JsonPath => "JSON/FuelSetting.json";
 
@@ -92,6 +95,9 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     [SerializeField] private GameObject textDistanceValue;
     [SerializeField] private GameObject imageSlopeBg;
     [SerializeField] private GameObject imageSlopePointer;
+    
+    [Header("Launcher")]
+    [SerializeField] private Animator launcherAnimator;
 
     #endregion
 
@@ -99,7 +105,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
     // private
     private CancellationTokenSource _blinkCts; // LED 블링크 토큰
-    private CancellationTokenSource _main1AlphaCts; // 메인1 강조 이미지 알파 핑퐁 토큰
+    private CancellationTokenSource[] _sequenceCts; // 시퀀스 이미지별 핑퐁 제어용 배열 토큰
     private CancellationTokenSource _popupFadeCts; // 팝업 페이드 토큰
 
     private float _fuelFillSpeed; // 연료 증가 속도 (fillAmount/sec)
@@ -112,10 +118,20 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     private enum Phase { RocketMove, FuelInjection1, FuelInjection2, FuelInjection3, Done }
 
     private Phase _phase = Phase.RocketMove; // 현재 단계
+    
+    public bool RocketReady { get; set; }
 
     #endregion
 
     #region Unity Life-Cycle
+    
+    protected override void Awake()
+    {
+        base.Awake();
+
+        if (Instance == null) Instance = this;
+        else if (Instance != this) Destroy(gameObject);
+    }
 
     /// <summary> 비활성화 시 토큰/LED 정리 </summary>
     protected override void OnDisable()
@@ -124,7 +140,16 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         try
         {
             CancelAndDispose(ref _blinkCts);
-            CancelAndDispose(ref _main1AlphaCts);
+            
+            // 시퀀스 토큰 배열 정리
+            if (_sequenceCts != null)
+            {
+                for (int i = 0; i < _sequenceCts.Length; i++)
+                {
+                    CancelAndDispose(ref _sequenceCts[i]);
+                }
+            }
+            
             CancelAndDispose(ref _popupFadeCts);
         }
         catch (Exception e)
@@ -167,10 +192,8 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             }
         }
 
-        if (sequences != null && sequences.Length > 1 && sequences[1] != null)
-        {
-            StartAlphaPingPong(sequences[1], 0.28f, 1.0f, 2.0f, ref _main1AlphaCts);
-        }
+        // 시작 시 0번 인덱스 핑퐁 시작
+        StartSequencePingPong(0);
 
         SettingTextObject(textObjective, setting.objectiveText, "연료를 주입하세요.").Forget();
 
@@ -181,7 +204,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(buttonRight, setting.buttonRight);
         SettingImageObject(throttleBackground, setting.throttleBackground);
         SettingImageObject(throttleButton, setting.throttleButton);
-        SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
+        SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").Forget();
 
         // ===== Values =====
         SettingTextObject(textTimeValue, setting.timeValueText).Forget();
@@ -212,16 +235,29 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SettingImageObject(stage3FuelTextImage, setting.fuelTextImages[2]);
 
         InitFuelImage(); // fillAmount 0으로 초기화
-
-        ArduinoInputManager.Instance?.SetLedAll(true);
-        SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
-
+        
+        StopLedEffects();
+        ArduinoInputManager.Instance?.SetLedAll(false);
+        SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
+        LedStrip.Range(0, 9, 255, 0, 0);
+        
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
-        StartBlinkGreenAsync(500, 160);
 
+        launcherAnimator?.SetTrigger(Trigger);
         _phase = Phase.FuelInjection1;
         _blinkCts = new CancellationTokenSource();
-
+        
+        // RocketReady 대기
+        await UniTask.WaitUntil(() => RocketReady, cancellationToken: DestroyToken);
+        
+        // RocketReady true 시점: 0번 고정 -> 1번 핑퐁
+        StopSequencePingPong(0);
+        StartSequencePingPong(1);
+        
+        _popupFadeCts = new CancellationTokenSource();
+        PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token).Forget();
+        SoundManager.Instance?.PlayByKey("Popup_Close");
+        
         await FuelFillAsync(); // 시작
     }
 
@@ -232,7 +268,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
     /// <summary> 단계별 입력/증가 루프를 비동기로 진행 </summary>
     private async UniTask FuelFillAsync()
     {
-        // 1단계: 왼쪽 버튼/LeftArrow
+        // 1단계: 왼쪽 버튼 3번
         while (canInput && _phase == Phase.FuelInjection1)
         {
             ArduinoInputManager.ButtonId btn = ArduinoInputManager.ButtonId.None;
@@ -241,47 +277,21 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 ArduinoInputManager.Instance.TryConsumeAnyPress(out btn);
             }
 
-            // 첫 입력 시 팝업 페이드 아웃 시작
-            if (btn != ArduinoInputManager.ButtonId.None || Input.GetKeyDown(KeyCode.LeftArrow))
+            // 3번 눌러야 하므로 1회당 0.34f(약 34%)씩 증가 (Input.GetKeyDown 사용)
+            if (btn == ArduinoInputManager.ButtonId.Button1 || Input.GetKeyDown(KeyCode.LeftArrow))
             {
-                if (_popupFadeCts == null)
-                {
-                    _popupFadeCts = new CancellationTokenSource();
-                    try
-                    {
-                        ArduinoInputManager.Instance?.SetLedAll(false);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED 전체 끄기 중 예외: {e.Message}");
-                    }
-
-                    SoundManager.Instance?.PlayByKey("Popup_Close");
-                    SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
-                    PopupFadeAsync(_popupFadeTime, _popupFadeCts.Token).Forget();
-                }
-            }
-
-            if (btn == ArduinoInputManager.ButtonId.Button1 || Input.GetKey(KeyCode.LeftArrow))
-            {
-                if (IncreaseFill(_fuel1Image, _fuelFillSpeed * Time.deltaTime))
+                if (IncreaseFill(_fuel1Image, 0.34f))
                 {
                     // LED1 블링크 종료
                     CancelAndDispose(ref _blinkCts);
-                    try
-                    {
-                        ArduinoInputManager.Instance?.SetLed(1, false);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED1 끄기 중 예외: {e.Message}");
-                    }
+                    try { ArduinoInputManager.Instance?.SetLed(1, false); }
+                    catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED1 끄기 중 예외: {e.Message}"); }
 
                     StopButtonBlink(buttonLeft);
 
                     // LED2 블링크 시작
                     _blinkCts = new CancellationTokenSource();
-                    SettingTextObject(textGuide, setting.guideText, "2단 버튼을 누르세요.").Forget();
+                    SettingTextObject(textGuide, setting.guideText, "2단(연료주입) 버튼을\n누르세요.").Forget();
                     BlinkLedAsync(2, 300, 300, _blinkCts.Token).Forget();
                     StartButtonBlink(buttonMiddle);
 
@@ -293,7 +303,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             await UniTask.Yield();
         }
 
-        // 2단계: 가운데 버튼/DownArrow
+        // 2단계: 가운데 버튼 2번
         while (canInput && _phase == Phase.FuelInjection2)
         {
             ArduinoInputManager.ButtonId btn = ArduinoInputManager.ButtonId.None;
@@ -302,26 +312,21 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 ArduinoInputManager.Instance.TryConsumeAnyPress(out btn);
             }
 
-            if (btn == ArduinoInputManager.ButtonId.Button2 || Input.GetKey(KeyCode.DownArrow))
+            // 2번 눌러야 하므로 1회당 0.51f(약 51%)씩 증가
+            if (btn == ArduinoInputManager.ButtonId.Button2 || Input.GetKeyDown(KeyCode.DownArrow))
             {
-                if (IncreaseFill(_fuel2Image, _fuelFillSpeed * Time.deltaTime))
+                if (IncreaseFill(_fuel2Image, 0.51f))
                 {
                     // LED2 블링크 종료
                     CancelAndDispose(ref _blinkCts);
-                    try
-                    {
-                        ArduinoInputManager.Instance?.SetLed(2, false);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED2 끄기 중 예외: {e.Message}");
-                    }
+                    try { ArduinoInputManager.Instance?.SetLed(2, false); }
+                    catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED2 끄기 중 예외: {e.Message}"); }
 
                     StopButtonBlink(buttonMiddle);
 
                     // LED3 블링크 시작
                     _blinkCts = new CancellationTokenSource();
-                    SettingTextObject(textGuide, setting.guideText, "3단 버튼을 누르세요.").Forget();
+                    SettingTextObject(textGuide, setting.guideText, "3단(연료주입) 버튼을\n누르세요.").Forget();
                     BlinkLedAsync(3, 300, 300, _blinkCts.Token).Forget();
                     StartButtonBlink(buttonRight);
 
@@ -332,7 +337,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
             await UniTask.Yield();
         }
 
-        // 3단계: 오른쪽 버튼/RightArrow
+        // 3단계: 오른쪽 버튼 1번
         while (canInput && _phase == Phase.FuelInjection3)
         {
             ArduinoInputManager.ButtonId btn = ArduinoInputManager.ButtonId.None;
@@ -341,20 +346,15 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 ArduinoInputManager.Instance.TryConsumeAnyPress(out btn);
             }
 
-            if (btn == ArduinoInputManager.ButtonId.Button3 || Input.GetKey(KeyCode.RightArrow))
+            // 1번 눌러야 하므로 1회당 1.1f(100% 이상) 증가
+            if (btn == ArduinoInputManager.ButtonId.Button3 || Input.GetKeyDown(KeyCode.RightArrow))
             {
-                if (IncreaseFill(_fuel3Image, _fuelFillSpeed * Time.deltaTime))
+                if (IncreaseFill(_fuel3Image, 1.1f))
                 {
                     // LED3 블링크 종료
                     CancelAndDispose(ref _blinkCts);
-                    try
-                    {
-                        ArduinoInputManager.Instance?.SetLed(3, false);
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED3 끄기 중 예외: {e.Message}");
-                    }
+                    try { ArduinoInputManager.Instance?.SetLed(3, false); }
+                    catch (Exception e) { Debug.LogWarning($"[FuelManager] FuelFillAsync-> LED3 끄기 중 예외: {e.Message}"); }
 
                     StopButtonBlink(buttonRight);
 
@@ -449,7 +449,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         SetAlpha(img, 0f);
 
         // 팝업이 사라진 뒤 첫 단계 안내
-        SettingTextObject(textGuide, setting.guideText, "1단 버튼을 누르세요.").Forget();
+        SettingTextObject(textGuide, setting.guideText, "1단(연료주입) 버튼을\n누르세요.").Forget();
         StartButtonBlink(buttonLeft);
         if (_blinkCts == null) _blinkCts = new CancellationTokenSource();
         BlinkLedAsync(ledIndex: 1, onMs: 300, offMs: 300, token: _blinkCts.Token).Forget();
@@ -472,7 +472,13 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         {
             CancelAndDispose(ref _popupFadeCts);
             CancelAndDispose(ref _blinkCts);
-            CancelAndDispose(ref _main1AlphaCts);
+            
+            // 시퀀스 토큰 정리
+            if (_sequenceCts != null)
+            {
+                for (int i = 0; i < _sequenceCts.Length; i++)
+                    CancelAndDispose(ref _sequenceCts[i]);
+            }
 
             try
             {
@@ -499,6 +505,44 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
         catch (Exception e)
         {
             Debug.LogError($"[FuelManager] OnDebugSkip-> 예외: {e}");
+        }
+    }
+
+    #endregion
+
+    #region Sequence Helpers (PingPong / Fix)
+
+    // 특정 시퀀스 인덱스 핑퐁 시작
+    private void StartSequencePingPong(int index)
+    {
+        if (sequences == null || index < 0 || index >= sequences.Length) return;
+        if (!sequences[index]) return;
+
+        // 토큰 배열 초기화
+        if (_sequenceCts == null || _sequenceCts.Length != sequences.Length)
+        {
+            _sequenceCts = new CancellationTokenSource[sequences.Length];
+        }
+
+        // 기존 동작 취소 후 새로 시작
+        CancelAndDispose(ref _sequenceCts[index]);
+        _sequenceCts[index] = new CancellationTokenSource();
+
+        // 파라미터: 최소알파 0.28, 최대 1.0, 주기 2초
+        StartAlphaPingPong(sequences[index], 0.28f, 1.0f, 2.0f, ref _sequenceCts[index]);
+    }
+
+    // 특정 시퀀스 인덱스 핑퐁 중지 및 알파 1로 고정
+    private void StopSequencePingPong(int index)
+    {
+        if (_sequenceCts != null && index >= 0 && index < _sequenceCts.Length)
+        {
+            CancelAndDispose(ref _sequenceCts[index]);
+        }
+
+        if (sequences != null && index >= 0 && index < sequences.Length && sequences[index] != null)
+        {
+            SetAlpha(sequences[index], 1.0f);
         }
     }
 

@@ -104,7 +104,6 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     [Header("Rocket")]
     [SerializeField] private GameObject launcherObj;
-    [SerializeField] private Animator launcherAnimator;
     [SerializeField] private GameObject rocketVFX;
     [SerializeField] private NuriAnimEvent nuriAnimEvent;
 
@@ -114,20 +113,22 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     private int _rocketCountdown;
     private RocketLaunch _rocketLaunch;
 
-    private CancellationTokenSource[] _alphaCts;
-    private CancellationTokenSource[] _stageCts;
+    private CancellationTokenSource[] _alphaCts; // Sequence용 CTS
+    private CancellationTokenSource[] _stageCts; // Stage용 CTS
     private readonly Dictionary<GameObject, CancellationTokenSource> _rocketFadeCts = new Dictionary<GameObject, CancellationTokenSource>();
 
     private bool _needThrottleDown;
     private readonly int _throttleZeroDeadband = 10;
 
     public bool RocketReady { get; set; }
-
+    
     public Camera VerticalCamera
     {
         get => verticalCamera;
         private set =>  verticalCamera = value;
     }
+    
+    public Cubemap spaceSkybox; // 인스펙터에서 할당
 
     #region Unity lifecycle
 
@@ -260,8 +261,9 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             SetAlpha(tmp, 0f);
         }
 
-        // 시퀀스 핑퐁 애니메이션
+        // 시퀀스 핑퐁 애니메이션 (Sequence 2번)
         StartPingPongAt(2, 0.28f, 1.0f, 2.0f);
+        StartStagePingPong(1);
 
         // 첫 페이드
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
@@ -283,19 +285,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             try { ArduinoInputManager.Instance?.Send("THROTTLE OFF"); }
             catch (Exception e) { LogUtil.LogWarn(nameof(LaunchManager),nameof(Init), "Send THROTTLE OFF failed: " + e.Message); }
             
-            SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").Forget();
+            SettingTextObject(textGuide, setting.guideText, "대기 중.").Forget();
             StopAnimateThrottleY();
         }
-        
-        launcherAnimator?.SetTrigger(Trigger);
 
-        // 거치 애니메이션 동안 입력 차단
-        while (!RocketReady)
-        {
-            await UniTask.Yield();
-        }
-
-        nuriAnimEvent?.StartBottomSmoke(); // 로켓 하단 연기 시작
+        nuriAnimEvent?.StartBottomAndEngineSmoke(); // 로켓 하단 연기 시작
         
         SetButtonsOn(buttonLeft, buttonMiddle, buttonRight);
         SettingTextObject(textGuide, setting.guideText, "아무 버튼을 누르세요.").Forget();
@@ -314,11 +308,11 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);
                 LedStrip.Range(0, 9, 255, 0, 0);
-                SoundManager.Instance?.PlayByKey("Countdown");
+                SoundManager.Instance?.PlayAnnounceByKey("Countdown");
 
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
 
-                // 2번 고정, 3번 핑퐁
+                // Sequence 제어: 2번 고정, 3번 핑퐁
                 StopPingPongAndSetAlpha(2, 1.0f);
                 StartPingPongAt(3, 0.28f, 1.0f, 2.0f);
                 break;
@@ -383,7 +377,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
             if (n == 1)
             {
-                LerpCamera3Fov(2, 30).Forget();
+                LerpCamera3Fov(2, 10).Forget();
             }
         }
     }
@@ -464,49 +458,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     #endregion
 
-    #region Stage images fade-in (main)
-
-    /// <summary> 로켓 발사 중 스테이지 이미지를 페이드인 </summary>
-    private async UniTask FadeInStageAsync(int index, float duration = 0.6f)
-    {
-        if (!TryGetStageGraphic(index, out Graphic g)) return;
-
-        if (_stageCts == null || (stages != null && _stageCts.Length != stages.Length))
-        {
-            int len = stages != null ? stages.Length : 0;
-            _stageCts = (len > 0) ? new CancellationTokenSource[len] : null;
-        }
-
-        if (_stageCts != null && index >= 0 && index < _stageCts.Length)
-        {
-            CancelAndDispose(ref _stageCts[index]);
-            _stageCts[index] = new CancellationTokenSource();
-        }
-
-        CancellationToken token = (_stageCts != null && index >= 0 && index < _stageCts.Length)
-            ? _stageCts[index].Token
-            : DestroyToken;
-
-        float d = Mathf.Max(0.01f, duration);
-        float t = 0f;
-
-        float startA = g.color.a;
-        while (t < d)
-        {
-            if (token.IsCancellationRequested) return;
-            t += Time.deltaTime;
-            float a = Mathf.Lerp(startA, 1f, t / d);
-            SetAlpha(g, a);
-            await UniTask.Yield();
-        }
-
-        SetAlpha(g, 1f);
-    }
-
-    public UniTask FadeInStagePublicAsync(int index, float duration = 0.6f)
-    {
-        return FadeInStageAsync(index, duration);
-    }
+    #region Stage Helpers (New Logic)
 
     private bool TryGetStageGraphic(int index, out Graphic g)
     {
@@ -516,6 +468,47 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         if (!stages[index]) return false;
         g = stages[index];
         return true;
+    }
+
+    // [추가] Stage 전용 핑퐁 시작 (Sequence와 별도로 동작)
+    public void StartStagePingPong(int index, float minA = 0.28f, float maxA = 1.0f, float periodSec = 2.0f)
+    {
+        if (!TryGetStageGraphic(index, out Graphic g)) return;
+
+        // 배열/토큰 초기화
+        if (_stageCts == null || _stageCts.Length != stages.Length)
+        {
+            int len = stages != null ? stages.Length : 0;
+            _stageCts = (len > 0) ? new CancellationTokenSource[len] : null;
+        }
+
+        if (_stageCts == null) return;
+
+        // 기존 동작 취소 후 새로 시작
+        if (_stageCts[index] != null) CancelAndDispose(ref _stageCts[index]);
+
+        StartAlphaPingPong(g, minA, maxA, periodSec, ref _stageCts[index]);
+    }
+
+    // [추가] Stage 전용 핑퐁 중지 및 알파 1로 고정
+    public void FixStageAlpha(int index)
+    {
+        if (_stageCts != null && index >= 0 && index < _stageCts.Length)
+        {
+            CancelAndDispose(ref _stageCts[index]);
+        }
+
+        if (TryGetStageGraphic(index, out Graphic g))
+        {
+            SetAlpha(g, 1.0f);
+        }
+    }
+
+    // [하위 호환용] 트리거 컨트롤러 등에서 FadeInStagePublicAsync 호출 시 Stage 핑퐁 시작으로 연결
+    public UniTask FadeInStagePublicAsync(int index, float duration = 0.6f)
+    {
+        StartStagePingPong(index);
+        return UniTask.CompletedTask;
     }
 
     #endregion
@@ -845,7 +838,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
             if (Mathf.Abs(throttle) <= zeroDeadband)
             {
                 _needThrottleDown = false;
-                await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").AttachExternalCancellation(token);
+                await SettingTextObject(textGuide, setting.guideText, "대기 중.").AttachExternalCancellation(token);
                 SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
             }
             else
@@ -860,7 +853,7 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
         {
             // 응답이 없으면 보수적으로 버튼 입력 대기
             _needThrottleDown = false;
-            await SettingTextObject(textGuide, setting.guideText, "로켓 거치 중.").AttachExternalCancellation(token);
+            await SettingTextObject(textGuide, setting.guideText, "대기 중.").AttachExternalCancellation(token);
             SetButtonsOff(buttonLeft, buttonMiddle, buttonRight);
         }
     }
@@ -888,13 +881,12 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
 
     #endregion
     
-    public async UniTask CallEndRocket()
+    public async UniTask FadeAndDeleteBg()
     {
-        float newFadeTime = fadeTime + 1;
+        float newFadeTime = 1.0f;
         await FadeImageAsync(0f, 1f, newFadeTime, new[] { fadeImage3 });
         
         launcherObj?.SetActive(false);
-        await UniTask.Delay(2000, cancellationToken: DestroyToken);
         
         await FadeImageAsync(1f, 0f, newFadeTime, new[] { fadeImage3 });
     }
@@ -932,5 +924,18 @@ public class LaunchManager : SceneManager_Base<LaunchSetting>
     public async UniTask FadeVerticalAsync(float start, float end)
     {
         await FadeImageAsync(start, end, fadeTime, new[] { fadeImage3 });
+    }
+    
+    public void StartSkyboxCrossFade(float duration = 4.0f)
+    {
+        if (SkyboxBlender.Instance != null && spaceSkybox != null)
+        {
+            // SkyboxBlender를 통해 크로스 페이드 시작
+            SkyboxBlender.Instance.ChangeSkyboxAsync(spaceSkybox, duration, DestroyToken).Forget();
+        }
+        else
+        {
+            Debug.LogWarning("[LaunchManager] SkyboxBlender 인스턴스나 spaceSkybox가 설정되지 않았습니다.");
+        }
     }
 }

@@ -10,7 +10,7 @@
   "fuelPopup": {
 	"position": { "x": 960, "y": 540 },
 	"size": { "x": 1920, "y": 1080 },
-	"sourceImage": "Image/RocketFuel/Fuel_Popup_Black.png"
+	"sourceImage": "Image/RocketFuel/3_연료 주입.png"
   },
   "subBg": {
 	"position": { "x": 1280, "y": 360 },
@@ -29,14 +29,14 @@
 	  "size": { "x": 628, "y": 288 },
 	  "sourceImage": "Image/MainDisplay/3_progress-1.png",
 	  "scale":  { "x": 0.5, "y": 0.5, "z": 0.5},
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.14 }
 	},
 	{
 	  "position": { "x": -400, "y": 425 },
 	  "size": { "x": 628, "y": 288 },
 	  "sourceImage": "Image/MainDisplay/3_progress-2.png",
 	  "scale":  { "x": 0.5, "y": 0.5, "z": 0.5},
-	  "color": { "r": 1, "g": 1, "b": 1, "a": 1 }
+	  "color": { "r": 1, "g": 1, "b": 1, "a": 0.14 }
 	},
 	{
 	  "position": { "x": -110, "y": 425 },
@@ -239,6 +239,7 @@
   "slopePointer":  {
 	"position": { "x": 0, "y": 0 },
 	"size": { "x": 489, "y": 153 },
+	"rotation":{ "x": 0, "y": 0, "z": 90 },
 	"sourceImage": "Image/MainDisplay/SlopePointer.png"
   }
 }

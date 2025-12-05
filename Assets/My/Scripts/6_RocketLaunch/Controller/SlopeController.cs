@@ -56,7 +56,7 @@ public class SlopeController : MonoBehaviour
     
     [Header("Rocket FollowCam Link")]
     [SerializeField] private RocketFollowCam rocketFollowCam;
-    [SerializeField] private float camOffsetPerDeg = 1f;
+    [SerializeField] private float camOffsetPerDeg = 0.5f;
     // =========================================
 
     // ===== 외부 아날로그 입력(Arduino THROTTLE) =====
@@ -230,7 +230,7 @@ public class SlopeController : MonoBehaviour
             if (!Mathf.Approximately(delta, 0f))
             {
                 // 기울기 변화량(증가/감소)에 비례해서 offset.y를 변경
-                rocketFollowCam.SubOffsetY(delta * camOffsetPerDeg);
+                rocketFollowCam.SubOffsetY(delta * (camOffsetPerDeg / 5));
                 _lastSlopeForCamera = CurrentSlopeDeg;
             }
         }

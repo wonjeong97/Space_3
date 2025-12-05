@@ -182,7 +182,9 @@ public class CountController : MonoBehaviour
 
                         // 안내 문구 출력
                         UpdateHint(true);
-                        LaunchManager.Instance?.FadeInStagePublicAsync(2).Forget(); // 2. 피치 기동 이미지 페이드 인
+                        LaunchManager.Instance?.FixStageAlpha(1);
+                        LaunchManager.Instance?.StartStagePingPong(2);
+                        
                         if (!firedGreenLed)
                         {
                             firedGreenLed = true;
@@ -228,6 +230,8 @@ public class CountController : MonoBehaviour
                             UpdateHint(false);
                             LaunchManager.Instance?.PublicStopLedEffects();
                             LedStrip.Range(0, 9, 255, 0, 0);
+                            
+                            LaunchManager.Instance?.FixStageAlpha(2);
 
                             // -> 이후는 자동 SLP 진행 모드로 전환 + 입력 잠금(스냅)
                             _autoSlopeEnabled = true;

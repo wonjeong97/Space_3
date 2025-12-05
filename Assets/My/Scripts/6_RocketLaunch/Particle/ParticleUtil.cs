@@ -12,7 +12,7 @@ public class ParticleUtil : MonoBehaviour
         vel.enabled = true;
         vel.space = ParticleSystemSimulationSpace.World;
 
-        Vector3 dir = -dirRef.up; // 필요하면 -dirRef.forward로 변경
+        Vector3 dir = dirRef.up; // 필요하면 -dirRef.forward로 변경
         vel.x = dir.x * speed;
         vel.y = dir.y * speed;
         vel.z = dir.z * speed;

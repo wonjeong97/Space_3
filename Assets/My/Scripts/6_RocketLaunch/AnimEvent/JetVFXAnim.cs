@@ -7,9 +7,10 @@ public class JetVFXAnim : MonoBehaviour
     [SerializeField] private GameObject targetA;
     [SerializeField] private GameObject targetB;
     [SerializeField] private GameObject targetC;
+    [SerializeField] private GameObject addtionalSmoke;
 
     [Header("Animation Settings")]
-    [SerializeField] private float animDuration = 0.6f;
+    [SerializeField] private float animDuration = 0.3f;
     [SerializeField] private AnimationCurve curve = AnimationCurve.EaseInOut(0, 0, 1, 1);
     
     [Header("Smoke Direction")]
@@ -19,10 +20,12 @@ public class JetVFXAnim : MonoBehaviour
     private Vector3 _originalScaleA;
     private Vector3 _originalScaleB;
     private Vector3 _originalScaleC;
+    private Vector3 _originalScaleD;
 
     private ParticleSystem _ps1;
     private ParticleSystem _ps2;
     private ParticleSystem _ps3;
+    private ParticleSystem _smokePs;
 
     private void Awake()
     {
@@ -31,10 +34,12 @@ public class JetVFXAnim : MonoBehaviour
             _originalScaleA = targetA.transform.localScale;
             _originalScaleB = targetB.transform.localScale;
             _originalScaleC = targetC.transform.localScale;
+            if (addtionalSmoke) _originalScaleD = addtionalSmoke.transform.localScale;
             
             _ps1 = targetA.GetComponent<ParticleSystem>();
             _ps2 = targetB.GetComponent<ParticleSystem>();
             _ps3 = targetC.GetComponent<ParticleSystem>();
+            if (addtionalSmoke) _smokePs = addtionalSmoke.GetComponent<ParticleSystem>();
         }
     }
 
@@ -51,11 +56,16 @@ public class JetVFXAnim : MonoBehaviour
             if (directionRef) StartCoroutine(ParticleUtil.FollowDirectionalSmokeRoutine(_ps3, directionRef, smokeSpeed));
         }
 
+        if (_smokePs)
+        {
+            _smokePs.Play();
+            if (directionRef) StartCoroutine(ParticleUtil.FollowDirectionalSmokeRoutine(_smokePs, directionRef, smokeSpeed));
+        }
         
         StartCoroutine(ScaleAnim(targetA.transform, Vector3.zero, _originalScaleA));
         StartCoroutine(ScaleAnim(targetB.transform, Vector3.zero, _originalScaleB));
         StartCoroutine(ScaleAnim(targetC.transform, Vector3.zero, _originalScaleC));
-        
+        StartCoroutine(ScaleAnim(addtionalSmoke.transform, Vector3.zero, _originalScaleD));
     }
 
     /// <summary> target들을 원래 크기 → 0으로 축소 </summary>
@@ -64,6 +74,7 @@ public class JetVFXAnim : MonoBehaviour
         if (targetA) StartCoroutine(ScaleAnim(targetA.transform, _originalScaleA, Vector3.zero));
         if (targetB) StartCoroutine(ScaleAnim(targetB.transform, _originalScaleB, Vector3.zero));
         if (targetC) StartCoroutine(ScaleAnim(targetC.transform, _originalScaleC, Vector3.zero));
+        if (addtionalSmoke) _smokePs.Stop();
     }
 
     /// <summary> 스케일 보간 애니메이션 </summary>

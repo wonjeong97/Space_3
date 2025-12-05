@@ -73,7 +73,7 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
         if (_vp != null)
         {
             try
-            {
+            {   
                 _vp.isLooping = false;
                 _vp.loopPointReached -= OnVideoEnded;
                 _vp.loopPointReached += OnVideoEnded;

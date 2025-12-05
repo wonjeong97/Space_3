@@ -129,6 +129,7 @@ public class VideoSetting
     public string fileName;
     public float volume;
     public string subtitle;
+    public float videoSpeed = 1.0f;
 }
 
 [Serializable]

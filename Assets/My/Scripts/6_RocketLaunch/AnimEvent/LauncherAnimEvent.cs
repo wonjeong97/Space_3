@@ -50,16 +50,11 @@ public class LauncherAnimEvent : MonoBehaviour
         LogUtil.Log(nameof(LauncherAnimEvent),nameof(InternalDetach), $"Detached '{child.name}' -> {parentName}");
     }
 
-    public void DeactivateLauncher()
-    {
-        if (launcherObj != null) launcherObj.SetActive(false);
-    }
-
     public void SetRocketReady()
     {
-        if (LaunchManager.Instance)
+        if (FuelManager.Instance)
         {
-            LaunchManager.Instance.RocketReady = true;
+            FuelManager.Instance.RocketReady = true;
         }
     }
 }

@@ -16,6 +16,7 @@ public sealed class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource crossSource; // 크로스페이드용 내부 소스
     [SerializeField] private AudioSource bgmSource;   // BGM 전용
     [SerializeField] private AudioSource buttonSource; // 버튼 클릭 전용
+    [SerializeField] private AudioSource announceSource;
 
     private readonly Dictionary<string, AudioClip> _clipCache = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<string, SoundSetting> _soundMap = new(StringComparer.OrdinalIgnoreCase);
@@ -61,6 +62,14 @@ public sealed class SoundManager : MonoBehaviour
             buttonSource.playOnAwake = false;
             buttonSource.loop = false;
             buttonSource.spatialBlend = 0f;
+        }
+        
+        if (announceSource == null)
+        {
+            announceSource = gameObject.AddComponent<AudioSource>();
+            announceSource.playOnAwake = false;
+            announceSource.loop = false;
+            announceSource.spatialBlend = 0f; // 2D 사운드
         }
 
         crossSource = gameObject.AddComponent<AudioSource>();
@@ -115,6 +124,53 @@ public sealed class SoundManager : MonoBehaviour
     // ==============================================================
     // 퍼블릭 API
     // ==============================================================
+    
+    /// <summary> BGM을 제외한 모든 효과음(SFX, Cross, Announce, Button) 정지 </summary>
+    public void StopSFX()
+    {
+        if (sfxSource != null) sfxSource.Stop();
+        if (crossSource != null) crossSource.Stop();
+        if (announceSource != null) announceSource.Stop();
+        if (buttonSource != null) buttonSource.Stop();
+    }
+    
+    public async UniTaskVoid PlayAnnounceByKey(string key)
+    {
+        await UniTask.SwitchToMainThread();
+
+        if (this == null || _destroyToken.IsCancellationRequested) return;
+        if (string.IsNullOrEmpty(key)) return;
+
+        if (!_soundMap.TryGetValue(key, out SoundSetting ss))
+        {
+            Debug.LogWarning($"[SoundManager] PlayAnnounceByKey-> 미등록 키: {key}");
+            return;
+        }
+
+        AudioClip clip;
+        try
+        {
+            clip = await GetOrLoadClipAsync(ss.clipPath, _destroyToken);
+        }
+        catch { return; }
+
+        if (clip == null) return;
+        if (this == null || _destroyToken.IsCancellationRequested) return;
+
+        if (announceSource == null)
+        {
+            Debug.LogError("[SoundManager] PlayAnnounceByKey-> announceSource가 없습니다.");
+            return;
+        }
+
+        // 겹쳐서 재생하지 않고 이전 멘트를 끊을지 여부는 기획에 따라 결정 (여기서는 덮어쓰기/즉시재생)
+        announceSource.Stop(); 
+        announceSource.clip = clip;
+        announceSource.volume = Mathf.Clamp01(ss.volume <= 0f ? 1f : ss.volume);
+        announceSource.Play();
+        
+        Debug.Log($"[SoundManager] PlayAnnounce => {key}");
+    }
     
     ///<Summary> Settings.buttonSound 기준 버튼 클릭 사운드를 별도 AudioSource로 재생 </Summary>
     public async UniTaskVoid PlayButtonDefault()
@@ -381,6 +437,16 @@ public sealed class SoundManager : MonoBehaviour
         crossSource.volume = 0f;
     }
 
+    public void StopCrossSound()
+    {
+        if (crossSource != null)
+        {
+            crossSource.Stop();
+            crossSource.clip = null;
+            crossSource.volume = 0f;
+        }
+    }
+    
     /// <summary> 사운드 키로 BGM 재생 (Settings.sounds 기준) - bgmSource를 사용하므로 씬 전환과 무관하게 유지됨 </summary>
     public async UniTaskVoid PlayBGMByKey(string key, bool loop = true, float volumeScale = 1f)
     {

@@ -23,7 +23,7 @@
   "idleVideo": {
 	"name": "idleVideo",
 	"position": { "x": 0, "y": 0 },
-	"size": { "x": 1080, "y": 3840 },
+	"size": { "x": 2160, "y": 3840 },
 	"fileName": "Video/Title/Idle.mp4",
 	"volume": 1.0,
 	"subtitle": ""

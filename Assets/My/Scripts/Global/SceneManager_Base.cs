@@ -20,7 +20,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour, ISceneResettable
     [Header("Canvas")]
     [SerializeField] protected Canvas mainCanvas;     // 1920 x 1080 캔버스
     [SerializeField] protected Canvas subCanvas;      // 1920 x 540 캔버스
-    [SerializeField] protected Canvas verticalCanvas; // 1080 x 3840 캔버스
+    [SerializeField] protected Canvas verticalCanvas; // 2160 x 3840 캔버스
 
     [Header("Fade Images")] 
     [SerializeField] protected Image fadeImage1; // Display1 Fade
@@ -490,7 +490,7 @@ public abstract class SceneManager_Base<T> : MonoBehaviour, ISceneResettable
         {
             Debug.LogWarning($"[SceneManager_Base] OnBeforeSceneUnload-> StopAllCoroutines 실패: {e.Message}");
         }
-
+        SoundManager.Instance?.StopSFX();
         StopLedEffects();
 
         try

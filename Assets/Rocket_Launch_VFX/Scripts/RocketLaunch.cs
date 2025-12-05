@@ -20,6 +20,7 @@ public class RocketLaunch : MonoBehaviour
     public ParticleSystem sparksParticles;
     public ParticleSystem takeOffSmokeParticles;
     public ParticleSystem launchSmokeParticle;
+    public ParticleSystem shockwaveSmokeParticle;
 
     [Header("T- Trigger Times (seconds)")]
     [Tooltip("T- 이 값 이하가 되면 사전 연기(takeOffSmoke)를 켬")]
@@ -29,7 +30,7 @@ public class RocketLaunch : MonoBehaviour
     [SerializeField] private float tBottomSmokeOff = 5f;
 
     [Tooltip("T- 이 값 이하가 되면 엔진 점화 VFX(flames, 스파크 등)를 켬")]
-    [SerializeField] private float tMinusEngineOn = 1f;
+    [SerializeField] private float tMinusEngineOn = 2f;
 
     [Tooltip("T- 이 값 이하가 되면 이륙 연기 및 제트 배기 VFX를 켬 (보통 0)")]
     [SerializeField] private float tMinusLaunchVfx = 0.5f;
@@ -91,7 +92,7 @@ public class RocketLaunch : MonoBehaviour
                 if (!firedBottomSmokeOff && tMinus <= tBottomSmokeOff)
                 {
                     firedBottomSmokeOff = true;
-                    nuriAnimEvent?.StopBottomSmoke();
+                    nuriAnimEvent?.StopBottomAndEngineSmoke();
                 }
 
                 // 2) 엔진 점화 VFX (T- 1)
@@ -109,16 +110,18 @@ public class RocketLaunch : MonoBehaviour
                     SafePlay(flamesBParticles);
                     SafePlay(sparksParticles);
                     SafePlay(launchSmokeParticle);
+                    _stage01JetEngineVFX?.Expand();
+                    SoundManager.Instance?.PlayByKey("Launch");
                 }
 
                 // 3) 이륙 VFX (T- 0)
                 if (!firedLaunchVfx && tMinus <= tMinusLaunchVfx)
                 {   
-                    Debug.Log("이륙");
                     firedLaunchVfx = true;
                     
+                    SafePlay(shockwaveSmokeParticle);
                     // 1단 제트 플레임 확장 애니메이션
-                    _stage01JetEngineVFX?.Expand();
+                    //_stage01JetEngineVFX?.Expand();
                 }
             }
             else

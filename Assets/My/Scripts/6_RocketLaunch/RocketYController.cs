@@ -3,8 +3,7 @@ using UnityEngine;
 /// <summary>
 /// CountController의 T+ 시간에 따라 고도(km) 키프레임을 보간해서
 /// 로켓(또는 지정한 Transform)의 Y를 올려주는 컨트롤러.
-/// - 고도(km)를 배경 높이(Y)로 스케일링해서 사용.
-/// - 세그먼트 경계 없이 부드럽게 이어짐.
+/// - AnimationCurve를 사용해 키프레임 사이의 움직임(가속/감속)을 조절 가능.
 /// </summary>
 public sealed class RocketYController : MonoBehaviour
 {
@@ -29,6 +28,11 @@ public sealed class RocketYController : MonoBehaviour
     [Tooltip("SmoothDamp 시간. 0이면 즉시 반영, 값이 클수록 천천히 따라감")]
     [Range(0f, 0.5f)]
     [SerializeField] private float smoothDamp = 0.05f;
+
+    // [추가] 키프레임 간 보간 곡선 (기본값: 직선)
+    [Header("Interpolation Settings")]
+    [Tooltip("키프레임 사이의 이동 곡선. 로켓처럼 가속하려면 아래로 볼록한(Ease-In) 곡선을 만드세요.")]
+    [SerializeField] private AnimationCurve interpolationCurve = AnimationCurve.Linear(0, 0, 1, 1);
 
     [System.Serializable]
     public struct AltitudeKey
@@ -118,7 +122,7 @@ public sealed class RocketYController : MonoBehaviour
         }
     }
 
-    /// <summary> 고도 키프레임을 선형 보간해서 현재 고도(km)를 반환. </summary>
+    /// <summary> 고도 키프레임을 커브(Curve)에 따라 보간해서 현재 고도(km)를 반환. </summary>
     private float EvaluateAltitudeKm(float tPlusSec)
     {
         if (altitudeKeys.Length == 1) return altitudeKeys[0].altitudeKm;
@@ -139,12 +143,14 @@ public sealed class RocketYController : MonoBehaviour
 
             if (tPlusSec >= k0.tPlusSeconds && tPlusSec <= k1.tPlusSeconds)
             {
-                float u = Mathf.InverseLerp(k0.tPlusSeconds, k1.tPlusSeconds, tPlusSec);
-                return Mathf.Lerp(k0.altitudeKm, k1.altitudeKm, u);
+                // [수정] AnimationCurve를 적용하여 보간
+                float linearU = Mathf.InverseLerp(k0.tPlusSeconds, k1.tPlusSeconds, tPlusSec);
+                float curvedU = interpolationCurve.Evaluate(linearU);
+
+                return Mathf.Lerp(k0.altitudeKm, k1.altitudeKm, curvedU);
             }
         }
 
-        // 이론상 여기까지 오면 안 오지만, 방어 코드
         return altitudeKeys[last].altitudeKm;
     }
 

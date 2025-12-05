@@ -95,8 +95,8 @@ public sealed class RocketFollowCam : MonoBehaviour
     ///<Summary>offset의 Y 값에 delta를 뺀다.</Summary>
     public void SubOffsetY(float deltaY)
     {
-        offset.y -= deltaY;
-        LaunchManager.Instance.VerticalCamera.fieldOfView += deltaY / 3;
+        offset.y += deltaY;
+        //LaunchManager.Instance.VerticalCamera.fieldOfView += deltaY / 3;
     }
 
 

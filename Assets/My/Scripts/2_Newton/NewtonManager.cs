@@ -355,27 +355,37 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
         _isSwitching = false;
     }
 
-    /// <summary> 루프 영상에서 입력을 받으면 다음 영상으로 진행 </summary>
+    /// <summary> 루프 영상에서 입력을 받거나 3초가 지나면 다음 영상으로 진행 </summary>
     private async UniTask WaitSkipThenProceedAsync(CancellationToken token, int ruleIndexAtStart)
     {
         if (ArduinoInputManager.Instance != null) ArduinoInputManager.Instance.FlushAll();
         await UniTask.Yield();
+
+        float elapsed = 0f;
+        const float autoSkipTime = 3.0f; // autoSkipTime 후 자동 스킵
 
         while (true)
         {
             if (token.IsCancellationRequested) return;
             if (_phase != Phase.RuleSeq) return;
 
+            // 1. 버튼 입력 체크
             bool arduinoPressed = ArduinoInputManager.Instance != null &&
                                   ArduinoInputManager.Instance.TryConsumeAnyPress(out _);
 
             if (arduinoPressed || TryConsumeSingleInput()) break;
+
+            // 2. 시간 경과 체크 (3초)
+            elapsed += Time.deltaTime;
+            if (elapsed >= autoSkipTime) break;
+
             await UniTask.Yield();
         }
 
         if (token.IsCancellationRequested) return;
         if (ruleIndexAtStart != _ruleIndex) return;
 
+        // 비디오 정지 및 정리
         if (_vp != null)
         {
             _vp.loopPointReached -= OnVideoEnded;
@@ -388,6 +398,7 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
 
         CancelAndDispose(ref _skipCts);
 
+        // 다음 영상으로 진행
         _ruleIndex++;
         if (_ruleIndex < _ruleSeq.Length)
         {

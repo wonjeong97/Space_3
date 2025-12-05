@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Remoting.Contexts;
 using System.Threading;
 using UnityEngine;
 using Cysharp.Threading.Tasks;
@@ -12,6 +13,7 @@ public class NuriAnimEvent : MonoBehaviour
 
     [Header("Bottom Smoke & Flame")] 
     [SerializeField] private ParticleSystem bottomSmoke;
+    [SerializeField] private ParticleSystem engineSmoke;
     [SerializeField] private ParticleSystem rocketFlame;
 
     [Header("Fairing")]
@@ -42,6 +44,9 @@ public class NuriAnimEvent : MonoBehaviour
     [SerializeField] private Transform rocketRoot;                // 기준 방향(없으면 this.transform)
     [SerializeField] private float smokeFlowSpeed = 2f;           // 연기가 밀려나는 속도
     [SerializeField] private ParticleSystem[] directionalSmokes;  // 방향 보정할 파티클들
+    
+    [Header("Satellites")]
+    [SerializeField] private GameObject[] satellite;
 
     public CollisionDetectionMode collisionMode = CollisionDetectionMode.ContinuousDynamic;
     public RigidbodyInterpolation interpolation = RigidbodyInterpolation.Interpolate;
@@ -58,29 +63,37 @@ public class NuriAnimEvent : MonoBehaviour
         _jetVFXAnimStage1 = stage1Flame.GetComponent<JetVFXAnim>();
         _jetVFXAnimStage2 = stage2Flame.GetComponent<JetVFXAnim>();
         _jetVFXAnimStage3 = stage3Flame.GetComponent<JetVFXAnim>();
+    }
 
+    private void Start()
+    {
         _verticalCameraInst = LaunchManager.Instance.VerticalCamera;
         _verticalCameraShake = CameraShaker.Instance;
     }
 
-    public void StartBottomSmoke()
+    public void StartBottomAndEngineSmoke()
     {
-        if (bottomSmoke && !bottomSmoke.isPlaying)
+        if (bottomSmoke && !bottomSmoke.isPlaying
+            && engineSmoke && !engineSmoke.isPlaying)
         {
             bottomSmoke.Play();
+            engineSmoke.Play();
         }
     }
     
-    
-    public void StopBottomSmoke()
+    public void StopBottomAndEngineSmoke()
     {
-        if (!bottomSmoke || !bottomSmoke.isPlaying)
+        if (!bottomSmoke || !bottomSmoke.isPlaying || !engineSmoke || !engineSmoke.isPlaying)
             return;
 
         var main = bottomSmoke.main;
         main.loop = false;
 
+        var main2 = engineSmoke.main;
+        main2.loop = false;
+
         StartCoroutine(StopAfterDelay(bottomSmoke, 0.1f));
+        StartCoroutine(StopAfterDelay(engineSmoke, 0.1f));
     }
 
     private IEnumerator StopAfterDelay(ParticleSystem ps, float delay)
@@ -96,7 +109,14 @@ public class NuriAnimEvent : MonoBehaviour
     /// <summary> 1단 분리: 1단 제트 축소 → 연기 → 분리 → 2단 점화/확장 → 폐기 </summary>
     public async UniTask DropStage1()
     {
+        Debug.Log("DropStage1 Called");
         var token = this.GetCancellationTokenOnDestroy();
+
+        if (!stage1 || !stage1Smoke || !stage1Flame) 
+        {
+            Debug.LogError("DropStage1: 필수 컴포넌트가 연결되지 않았습니다!");
+            return;
+        }
         try
         {
             if (!stage1 || !stage1Smoke || !stage1Flame) return;
@@ -112,10 +132,6 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(3000, cancellationToken: token);
 
             _jetVFXAnimStage2?.Expand();
-
-            await UniTask.Delay(10000, cancellationToken: token);
-
-            if (stage1) Destroy(stage1);
         }
         catch (OperationCanceledException)
         {
@@ -124,6 +140,23 @@ public class NuriAnimEvent : MonoBehaviour
         {
             Debug.LogError(e);
         }
+    }
+
+    public void DestroyStage1()
+    {
+        if (stage1) Destroy(stage1);
+    }
+    
+    public void DestroyStage2()
+    {
+        if (stage2) Destroy(stage2);
+    }
+
+    public void DestroyFairing()
+    {   
+        if (fairingSmoke) Destroy(fairingSmoke.gameObject);
+        if (fairing1) Destroy(fairing1);
+        if (fairing2) Destroy(fairing2);
     }
 
     public void StopStage1Smoke()
@@ -144,12 +177,6 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Fairing");
-
-            await UniTask.Delay(5000, cancellationToken: token);
-
-            if (fairingSmoke) Destroy(fairingSmoke.gameObject);
-            if (fairing1) Destroy(fairing1);
-            if (fairing2) Destroy(fairing2);
         }
         catch (OperationCanceledException)
         {
@@ -185,9 +212,6 @@ public class NuriAnimEvent : MonoBehaviour
             await UniTask.Delay(3000, cancellationToken: token);
             
             _jetVFXAnimStage3.Expand();
-
-            await UniTask.Delay(10000, cancellationToken: token);
-            if (stage2) Destroy(stage2);
         }
         catch (OperationCanceledException)
         {
@@ -209,10 +233,14 @@ public class NuriAnimEvent : MonoBehaviour
         try
         {
             if (!stage3 || !stage3Flame) return;
-
+            
+            SoundManager.Instance?.StopCrossSound();
             _jetVFXAnimStage3?.Shrink();
-
-            await UniTask.Delay(5000, cancellationToken: token);
+            
+            await UniTask.Delay(1000, cancellationToken: token);
+            SoundManager.Instance?.PlayByKey("Stage3");
+            
+            await UniTask.Delay(3000, cancellationToken: token);
 
             separateAnimator?.SetTrigger("Stage03");
             rfc.LerpLookAtOffset(new Vector3(6f, 30f, 0f ), 2f);
@@ -254,6 +282,12 @@ public class NuriAnimEvent : MonoBehaviour
         SoundManager.Instance?.CrossFadeByKey(soundKey, loop: true);
     }
 
+    public void PlayMissionEndSound()
+    {
+        SoundManager.Instance?.PlayByKey("MissionEnd");
+    }
+    
+    [ContextMenu("Test")]
     public async void SetVerticalCameraToSocket()
     {
         try
@@ -278,7 +312,8 @@ public class NuriAnimEvent : MonoBehaviour
             _verticalCameraInst.transform.localPosition = Vector3.zero;
             _verticalCameraInst.transform.localRotation = Quaternion.identity;
             _verticalCameraInst.fieldOfView = 120f;
-
+            
+            await UniTask.Delay(500);
             await LaunchManager.Instance.FadeVerticalAsync(1f, 0f);
         }
         catch (Exception e)
@@ -307,5 +342,33 @@ public class NuriAnimEvent : MonoBehaviour
         }
         
         _verticalCameraShake.StopShake();
+    }
+
+    public void PlayStage1()
+    {
+        SoundManager.Instance?.PlayAnnounceByKey("Stage1");
+    }
+
+    public void PlayFairing()
+    {
+        SoundManager.Instance?.PlayAnnounceByKey("Pairing");
+    }
+
+    public void PlayStage2()
+    {
+        SoundManager.Instance?.PlayAnnounceByKey("Stage2");
+    }
+
+    public void PlayStage3()
+    {
+        SoundManager.Instance?.PlayAnnounceByKey("Stage3");
+    }
+
+    public void SetActiveSatellites()
+    {
+        for (int i = 0; i < satellite.Length; i++)
+        {
+            satellite[i].SetActive(true);
+        }
     }
 }

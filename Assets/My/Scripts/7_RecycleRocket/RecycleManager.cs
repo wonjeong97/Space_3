@@ -86,12 +86,18 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
         
         // 첫 페이드 인
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
-
+        
+        float elapsed = 0f;
+        const float autoSkipTime = 15.0f; // 15초 대기
+        
         // 입력 대기 루프 (아두이노 버튼 or 키보드)
         while (!token.IsCancellationRequested)
         {
             bool pressed = (ArduinoInputManager.Instance != null && ArduinoInputManager.Instance.TryConsumeAnyPress(out _))|| TryConsumeSingleInput();
-            if (pressed)
+            elapsed += Time.deltaTime;
+            bool timeOut = elapsed >= autoSkipTime;
+
+            if (pressed || timeOut)
             {
                 StopLedEffects();
                 ArduinoInputManager.Instance?.SetLedAll(false);

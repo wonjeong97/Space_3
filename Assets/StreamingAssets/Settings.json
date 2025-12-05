@@ -2,7 +2,7 @@
   "portName": "COM4",
   "baudRate": 9600,
   "buttonDelayTime": 1,
-  "inactivityTime": 180.0,
+  "inactivityTime": 900000.0,
   "fadeTime": 0.5,
   "closeSetting": {
 	"position": { "x": 1, "y": 1 },
@@ -18,10 +18,11 @@
   },
   "fontMap": {
 	"font1": "Fonts/TMPro/Freesentation-4Regular SDF.asset",
-	"font2": "Fonts/TMPro/EliceDigitalBaeum_Bold SDF.asset"
+	"font2": "Fonts/TMPro/EliceDigitalBaeum_Bold SDF.asset",
+	"font3": "Fonts/TMPro/Freesentation-7Bold SDF.asset"
   },
   "sounds": [
-	{ "key": "BGM", "clipPath": "Sound/03-Ethereal_Light.wav", "volume": 0.5 },
+	{ "key": "BGM", "clipPath": "Sound/03-Ethereal_Light.wav", "volume": 1.0 },
 	{ "key": "ButtonSound", "clipPath": "Sound/Button.wav", "volume": 1.0 },
 	{ "key": "Countdown", "clipPath": "Sound/Countdown.wav", "volume": 1.0 },
 	{ "key": "Launch", "clipPath": "Sound/Launch.mp3", "volume": 0.7 },
@@ -31,7 +32,15 @@
 	{ "key": "Launch_Stage03", "clipPath": "Sound/Launch_Stage03.wav", "volume": 1.0 },
 	{ "key": "Title_Confirm", "clipPath": "Sound/Title_Confirm.wav", "volume": 1.0 },
 	{ "key": "Popup_Close", "clipPath": "Sound/Popup_Close.wav", "volume": 1.0 },
-	{ "key": "End", "clipPath": "Sound/End.wav", "volume": 1.0 }
+	{ "key": "End", "clipPath": "Sound/End.wav", "volume": 1.0 },
+	{ "key": "LaunchOK", "clipPath": "Sound/audio_0_누리호가_발사되었습니다.wav", "volume": 1.0 },
+	{ "key": "NormalFly", "clipPath": "Sound/audio_1_비행_정상.wav", "volume": 1.0 },
+	{ "key": "Stage1", "clipPath": "Sound/audio_2 1단 분리.wav", "volume": 1.0 },
+	{ "key": "Pairing", "clipPath": "Sound/audio_3_페어링_분리_확인.wav", "volume": 1.0 },
+	{ "key": "Stage2", "clipPath": "Sound/audio_4_2단_분리_확인.wav", "volume": 1.0 },
+	{ "key": "Stage3", "clipPath": "Sound/audio_5_3단_엔진_정지.wav", "volume": 1.0 },
+	{ "key": "Satellite", "clipPath": "Sound/audio_6_탑재_위성_분리.wav", "volume": 1.0 },
+	{ "key": "MissionEnd", "clipPath": "Sound/audio_7_임무_종료.wav", "volume": 1.0 }
   ],
   "buttonSound": { "key": "ButtonSound", "clipPath": "Sound/Button.wav", "volume": 1.0 },
   "canvas1TargetMonitorIndex": 0,
@@ -44,12 +53,12 @@
   "subtitleFadeTime": 0.3,
   "subtitle1Set": {
 	"position": {"x": 960, "y": 980},
-	"fontName": "font1",
+	"fontName": "font3",
 	"fontSize": 55
   },
   "subtitle2Set": {
 	"position": {"x": 960, "y": 980},
-	"fontName": "font1",
+	"fontName": "font3",
 	"fontSize": 55
   }
 }
