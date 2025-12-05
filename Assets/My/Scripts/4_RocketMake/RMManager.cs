@@ -154,6 +154,7 @@ public class RMManager : SceneManager_Base<RMSetting>
 
         // 시작 페이드 아웃
         await FadeImageAsync(1f, 0f, fadeTime, new[] { fadeImage1, fadeImage2, fadeImage3 });
+        TurnCamera3Async(DestroyToken).Forget();
 
         // LED 효과 시작
         ArduinoInputManager.Instance?.SetLedAll(true);
@@ -416,23 +417,35 @@ public class RMManager : SceneManager_Base<RMSetting>
         _isSwitching = false;
     }
 
-    /// <summary> Loop 영상에서 사용자 입력이 들어오면 현재 시퀀스의 다음 아이템으로 진행 </summary>
+   /// <summary> Loop 영상에서 사용자 입력이 들어오거나 (영상 길이 + 3초)가 지나면 진행 </summary>
     private async UniTask WaitSkipThenProceedAsync(CancellationToken token, int locIndexAtStart, int makeIndexAtStart)
     {
         if (ArduinoInputManager.Instance != null) ArduinoInputManager.Instance.FlushAll();
         await UniTask.Yield();
+        
+        // 자동 스킵 시간 계산: 영상 길이 + 3초
+        // 영상 길이만큼 재생(=한 번은 끝까지 재생)된 후, 3초 뒤에 넘어감
+        double clipDuration = (_vp != null) ? _vp.length : 0f;
+        Debug.Log("ClipDuration: " + clipDuration);
+        float totalWaitTime = (float)clipDuration + 3.0f;
+        float elapsed = 0f;
 
         while (true)
         {
             if (token.IsCancellationRequested) return;
             if (_phase != Phase.Location && _phase != Phase.PlayingMake) return;
 
+            // 1. 버튼 입력 체크 (입력 시 즉시 스킵)
             bool arduinoPressed =
                 ArduinoInputManager.Instance != null &&
                 ArduinoInputManager.Instance.TryConsumeAnyPress(out _);
 
             if (arduinoPressed || TryConsumeSingleInput())
                 break;
+            
+            // 2. 시간 경과 체크
+            elapsed += Time.deltaTime;
+            if (elapsed >= totalWaitTime) break; // (영상 길이 + 3초) 경과 시 자동 스킵
 
             await UniTask.Yield();
         }
