@@ -41,7 +41,28 @@ int prevB3 = HIGH;
 // NeoPixel 전역 밝기(0~255)
 uint8_t g_brightness = 64;
 
+// Heart-beat
+unsigned long g_lastPingMs = 0;
+const unsigned long PING_INTERVAL_MS = 60000; // 60초
+int g_missedAcks = 0;
+const int MAX_MISSED_ACKS = 3; // 3회 응답 없으면 종료
+
 void handleCommand(String cmd); // 직렬 명령 처리
+
+// Unity 무응답 시 버튼 릴레이, LED 스트립, Throttle Off 함수
+void turnOffSystem() {
+  // 릴레이(버튼 LED) 끄기
+  relayOff(RELAY_1);
+  relayOff(RELAY_2);
+  relayOff(RELAY_3);
+
+  // 네오픽셀(Strip LED) 끄기
+  pixels.clear();
+  pixels.show();
+  
+  // 스로틀 전송 모드 침묵
+  g_thrMode = Silent;
+}
 
 // 안전 범위 클램프
 static inline uint8_t clamp255(int v) 
@@ -148,6 +169,27 @@ void loop()
       break;
   }
 
+  if (now - g_lastPingMs >= PING_INTERVAL_MS)
+  {
+    g_lastPingMs = now;
+    
+    // 유니티로 PING 전송
+    Serial.println("PING");
+    
+    // 응답 실패 카운트 증가
+    g_missedAcks++;
+
+   // 3회 이상 응답 없음
+    if (g_missedAcks >= MAX_MISSED_ACKS)
+    {
+      // 3회째 되는 순간에만 1번 실행
+      if (g_missedAcks == MAX_MISSED_ACKS) 
+      {
+          turnOffSystem();
+      }      
+    }
+  }
+
   delay(20); // 디바운싱(20ms)
 }
 
@@ -172,6 +214,13 @@ void handleCommand(String cmd)
 
   // 대소문자 무시를 위해 모두 대문자로 변환
   cmd.toUpperCase();
+
+  // Unity로 부터 "PONG" 수신 시 카운터 리셋
+  if (cmd == "PONG")
+  {
+    g_missedAcks = 0;
+    return;
+  }
 
   // ----- 스로틀 제어 -----
   if (cmd == "THROTTLE ON") 

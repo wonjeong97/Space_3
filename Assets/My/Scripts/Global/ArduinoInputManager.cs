@@ -247,6 +247,13 @@ public class ArduinoInputManager : MonoBehaviour
 
                 string s = line.Trim();
                 
+                // 아두이노 Heartbeat 응답 처리
+                if (s.Equals("PING", StringComparison.OrdinalIgnoreCase))
+                {
+                    Send("PONG");
+                    continue; // PING 메시지는 다른 로직에 전달하지 않음
+                }
+                
                 // 먼저 원문 한 줄을 브로드캐스트
                 try { LineReceived?.Invoke(s); } catch { /* 구독자 예외 방지 */ }
                 
