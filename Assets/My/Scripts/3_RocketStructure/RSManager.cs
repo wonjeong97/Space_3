@@ -18,6 +18,7 @@ public class RSSetting
 /// <summary> 우주발사체의 구조와 기능 씬 관리 매니저 </summary>
 public sealed class RSManager : SceneManager_Base<RSSetting>
 {
+    public static RSManager Instance;
     // ===== JSON 경로 =====
     protected override string JsonPath => "JSON/RSSetting.json";
 
@@ -41,6 +42,19 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
     #endregion
 
     #region Initialization
+    
+    protected override void Awake()
+    {   
+        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     /// <summary> 초기화: 비디오 준비/바인딩 → 첫 프레임 보장 → 페이드 인 </summary>
     protected override async UniTask Init()
@@ -138,8 +152,12 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
             try { _vp.loopPointReached -= OnVideoEnded; }
             catch (Exception e) { Debug.LogWarning($"[RSManager] OnDisable-> 이벤트 해제 중 예외: {e.Message}"); }
 
-            try { _vp.Stop(); }
-            catch (Exception e) { Debug.LogWarning($"[RSManager] OnDisable-> 비디오 정지 중 예외: {e.Message}"); }
+            bool isQuitting = GameManager.Instance != null && GameManager.Instance.IsQuitting;
+            if (!isQuitting)
+            {
+                try { _vp.Stop(); }
+                catch (Exception e) { Debug.LogWarning($"[RSManager] OnDisable-> 비디오 정지 중 예외: {e.Message}"); }
+            }
         }
     }
 
@@ -168,4 +186,13 @@ public sealed class RSManager : SceneManager_Base<RSSetting>
     }
 
     #endregion
+    
+    public void ForceStopVideo()
+    {
+        if (_vp != null)
+        {
+            if (_vp.isPlaying) _vp.Stop();
+            _vp.enabled = false;
+        }
+    }
 }

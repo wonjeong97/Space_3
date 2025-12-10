@@ -21,7 +21,8 @@ public class NewtonSetting
 
 /// <summary> 뉴턴의 제 1~3법칙 씬 관리 매니저 </summary>
 public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
-{
+{   
+    public static NewtonManager Instance;
     // ===== JSON 경로 =====
     protected override string JsonPath => "JSON/NewtonSetting.json";
 
@@ -57,6 +58,19 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
 
     #region Unity Life-Cycle
 
+    protected override void Awake()
+    {   
+        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+
     /// <summary> 씬 비활성화 시 비디오/토큰/리소스 정리 </summary>
     protected override void OnDisable()
     {   
@@ -71,8 +85,12 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
             try { _vp.loopPointReached -= OnVideoEnded; }
             catch (Exception e) { Debug.LogWarning("[NewtonManager] OnDisable-> 비디오 이벤트 해제 중 예외: " + e.Message); }
 
-            try { _vp.Stop(); }
-            catch (Exception e) { Debug.LogWarning("[NewtonManager] OnDisable-> 비디오 정지 중 예외: " + e.Message); }
+            bool isQuitting = GameManager.Instance != null && GameManager.Instance.IsQuitting;
+            if (!isQuitting)
+            {
+                try { _vp.Stop(); }
+                catch (Exception e) { Debug.LogWarning("[NewtonManager] OnDisable-> 비디오 정지 중 예외: " + e.Message); }
+            }
         }
 
         // 마지막 RenderTexture 해제
@@ -479,4 +497,13 @@ public sealed class NewtonManager : SceneManager_Base<NewtonSetting>
     }
 
     #endregion
+    
+    public void ForceStopVideo()
+    {
+        if (_vp != null)
+        {
+            if (_vp.isPlaying) _vp.Stop();
+            _vp.enabled = false;
+        }
+    }
 }

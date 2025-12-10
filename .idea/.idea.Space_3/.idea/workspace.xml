@@ -6,8 +6,15 @@
   <component name="ChangeListManager">
     <list default="true" id="d8a5066d-edc2-43d2-a77e-932871d9aedc" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Arduino/Space_3/Space_3.ino" beforeDir="false" afterPath="$PROJECT_DIR$/Arduino/Space_3/Space_3.ino" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/0_Title/TitleManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/0_Title/TitleManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/2_Newton/NewtonManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/2_Newton/NewtonManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/3_RocketStructure/RSManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/3_RocketStructure/RSManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/4_RocketMake/RMManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/4_RocketMake/RMManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/7_RecycleRocket/RecycleManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/7_RecycleRocket/RecycleManager.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/ArduinoInputManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/ArduinoInputManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/GameCloser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/GameCloser.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/GameManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/GameManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/SkyBox/M_SkyboxBlended.mat" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/SkyBox/M_SkyboxBlended.mat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
@@ -51,6 +58,18 @@
       <option name="EXE_PATH" value="C:\Program Files\Unity\Hub\Editor\2022.3.62f2\Editor\Unity.exe" />
       <option name="PROGRAM_PARAMETERS" value="-runTests -batchmode -projectPath D:\Github\Space_3 -testResults Logs/results.xml -logFile Logs/Editor.log -testPlatform EditMode -debugCodeOptimization" />
       <option name="WORKING_DIRECTORY" value="D:\Github\Space_3" />
+      <option name="PASS_PARENT_ENVS" value="1" />
+      <option name="USE_EXTERNAL_CONSOLE" value="0" />
+      <option name="ENV_FILE_PATHS" value="" />
+      <option name="REDIRECT_INPUT_PATH" value="" />
+      <option name="PTY_MODE" value="Auto" />
+      <option name="MIXED_MODE_DEBUG" value="0" />
+      <method v="2" />
+    </configuration>
+    <configuration name="독립실행형 플레이어" type="RunUnityExe" factoryName="Unity Executable">
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../Builds/3.우주발사체\Space-3.exe" />
+      <option name="PROGRAM_PARAMETERS" value="" />
+      <option name="WORKING_DIRECTORY" value="D:\Builds\3.우주발사체" />
       <option name="PASS_PARENT_ENVS" value="1" />
       <option name="USE_EXTERNAL_CONSOLE" value="0" />
       <option name="ENV_FILE_PATHS" value="" />
@@ -113,6 +132,7 @@
       <workItem from="1764920989549" duration="1814000" />
       <workItem from="1765153560818" duration="117000" />
       <workItem from="1765154539224" duration="740000" />
+      <workItem from="1765265611653" duration="3246000" />
     </task>
     <servers />
   </component>

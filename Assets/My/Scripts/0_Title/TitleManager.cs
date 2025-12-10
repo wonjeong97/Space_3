@@ -19,6 +19,7 @@ public class TitleSetting
 /// <summary> 타이틀 씬 관리 클래스 </summary>
 public sealed class TitleManager : SceneManager_Base<TitleSetting>
 {
+    public static TitleManager Instance;
     // ===== JSON 경로 =====
     protected override string JsonPath => "JSON/TitleSetting.json";
 
@@ -40,6 +41,19 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     private VideoPlayer _vp;
     private RawImage _raw;
     private AudioSource _audio;
+
+    protected override void Awake()
+    {   
+        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     /// <summary> 씬 초기화: UI 세팅 → 아두이노 준비 대기 → LED/카메라 시작 → 페이드 인 → 입력 대기 → 다음 씬 </summary>
     protected override async UniTask Init()
@@ -133,7 +147,8 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     protected override void OnDisable()
     {
         base.OnDisable();
-        if (_vp != null)
+        bool isQuitting = GameManager.Instance != null && GameManager.Instance.IsQuitting;
+        if (!isQuitting && _vp != null)
         {
             _vp.Stop();
         }
@@ -167,4 +182,13 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     }
 
     #endregion
+    
+    public void ForceStopVideo()
+    {
+        if (_vp != null)
+        {
+            if (_vp.isPlaying) _vp.Stop();
+            _vp.enabled = false;
+        }
+    }
 }

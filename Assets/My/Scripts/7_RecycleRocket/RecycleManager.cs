@@ -26,6 +26,8 @@ public class RecycleSetting
 /// </summary>
 public class RecycleManager : SceneManager_Base<RecycleSetting>
 {
+    public static RecycleManager Instance;
+    
     [Header("UI")]
     [SerializeField] private GameObject recyclePopup;
     [SerializeField] private GameObject recycleVideo;
@@ -43,12 +45,30 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
     private VideoPlayer _video;
 
     #region Unity lifecycle
+    
+    protected override void Awake()
+    {   
+        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
 
     protected override void OnDisable()
     {
         base.OnDisable();
 
         SoundManager.Instance?.StopBGM();
+        bool isQuitting = GameManager.Instance != null && GameManager.Instance.IsQuitting;
+        if (!isQuitting && _video != null)
+        {
+            _video.Stop();
+        }
     }
 
     /// <summary> 초기 세팅 및 입력 대기 -> 크로스페이드 -> 종료 타이머 -> 타이틀 복귀 </summary>
@@ -142,4 +162,13 @@ public class RecycleManager : SceneManager_Base<RecycleSetting>
     }
 
     #endregion
+    
+    public void ForceStopVideo()
+    {
+        if (_video != null)
+        {
+            if (_video.isPlaying) _video.Stop();
+            _video.enabled = false;
+        }
+    }
 }

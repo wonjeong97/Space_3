@@ -18,6 +18,7 @@ public class GameManager : MonoBehaviour
 
     // 종료 시퀀스 재진입 방지
     private bool _isQuitting = false;
+    public bool IsQuitting => _isQuitting;
 
     private void Awake()
     {
@@ -81,7 +82,8 @@ public class GameManager : MonoBehaviour
     private void OnPlayModeStateChanged(PlayModeStateChange state)
     {
         if (state == PlayModeStateChange.ExitingPlayMode)
-        {
+        {   
+            _isQuitting = true;
             TryTurnOffLocally();
             TurnOffArduinosAsync().Forget();
         }
@@ -230,5 +232,24 @@ public class GameManager : MonoBehaviour
         {
             Debug.LogWarning($"[GameManager] 아두이노 종료 실패: {e.Message}");
         }
+    }
+    
+    public void QuitGame()
+    {
+        // 1. 각 씬 매니저의 비디오 강제 정지 (Instance가 살아있는지 체크 후 호출)
+        if (TitleManager.Instance)  TitleManager.Instance.ForceStopVideo();
+        if (NewtonManager.Instance) NewtonManager.Instance.ForceStopVideo();
+        if (RSManager.Instance)     RSManager.Instance.ForceStopVideo();
+        if (RMManager.Instance)     RMManager.Instance.ForceStopVideo();
+        if (RecycleManager.Instance) RecycleManager.Instance.ForceStopVideo();
+
+        Debug.Log("[GameManager] Quitting Application...");
+
+        // 3. 어플리케이션 종료
+        #if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+        #else
+        Application.Quit();
+        #endif
     }
 }

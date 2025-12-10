@@ -319,11 +319,30 @@ public class ArduinoInputManager : MonoBehaviour
     {
         _running = false;
         
+        if (_serialPort != null && _serialPort.IsOpen)
+        {
+            try
+            {
+                // 종료 직전 끄기 명령 전송 (Fire-and-forget이 아닌 즉시 전송)
+                _serialPort.WriteLine("THROTTLE OFF");
+                _serialPort.WriteLine("CLEAR");      // Strip LED 끄기
+                _serialPort.WriteLine("LED1 OFF");   // 버튼 LED 끄기
+                _serialPort.WriteLine("LED2 OFF");
+                _serialPort.WriteLine("LED3 OFF");
+                
+                // 데이터가 전송될 시간을 아주 잠깐 확보 (50~100ms)
+                Thread.Sleep(100); 
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"[Arduino] Quit cleanup failed: {e.Message}");
+            }
+
+            _serialPort.Close();
+        }
+
         if (_readThread != null && _readThread.IsAlive)
             _readThread.Join(200);
-        
-        if (_serialPort != null && _serialPort.IsOpen)
-            _serialPort.Close();
     }
 
     // 한 번만 소비하는 입력: 누적된 눌림 중 하나를 반환하고, 해당 비트를 클리어

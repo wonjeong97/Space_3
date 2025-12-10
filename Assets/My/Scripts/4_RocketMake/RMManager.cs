@@ -28,6 +28,7 @@ public class RMSetting
 /// </summary>
 public class RMManager : SceneManager_Base<RMSetting>
 {
+    public static RMManager Instance;
     // JSON 경로
     protected override string JsonPath => "JSON/RMSetting.json";
 
@@ -70,6 +71,19 @@ public class RMManager : SceneManager_Base<RMSetting>
 
     #region Unity lifecycle
 
+    protected override void Awake()
+    {   
+        base.Awake();
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     /// <summary> 리소스/이벤트/토큰 정리 </summary>
     protected override void OnDisable()
     {
@@ -80,7 +94,11 @@ public class RMManager : SceneManager_Base<RMSetting>
             {
                 _vp.loopPointReached -= OnLocationEnded;
                 _vp.loopPointReached -= OnMakeEnded;
-                if (_vp.isPlaying) _vp.Stop();
+                bool isQuitting = GameManager.Instance != null && GameManager.Instance.IsQuitting;
+                if (!isQuitting && _vp.isPlaying) 
+                {
+                    _vp.Stop();
+                }
             }
 
             if (_audio != null) _audio.Stop();
@@ -606,4 +624,13 @@ public class RMManager : SceneManager_Base<RMSetting>
     }
 
     #endregion
+    
+    public void ForceStopVideo()
+    {
+        if (_vp != null)
+        {
+            if (_vp.isPlaying) _vp.Stop();
+            _vp.enabled = false;
+        }
+    }
 }
