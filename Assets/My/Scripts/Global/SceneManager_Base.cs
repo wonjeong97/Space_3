@@ -620,7 +620,8 @@ public abstract class SceneManager_Base<T> : MonoBehaviour, ISceneResettable
                 rt,
                 size: vs.size,
                 anchoredPos: new Vector2(vs.position.x, -vs.position.y),
-                rotation: Vector3.zero
+                rotation: Vector3.zero,
+                scale: vs.scale
             );
         }
 

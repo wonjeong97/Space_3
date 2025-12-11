@@ -127,6 +127,7 @@ public class VideoSetting
     public Vector2 position;
     public Vector2 size;
     public string fileName;
+    public Vector3 scale =  Vector3.one;
     public float volume;
     public string subtitle;
     public float videoSpeed = 1.0f;
