@@ -57,4 +57,9 @@ public class LauncherAnimEvent : MonoBehaviour
             FuelManager.Instance.RocketReady = true;
         }
     }
+
+    public void PlayCraneSound()
+    {
+        SoundManager.Instance?.PlayByKey("Crane");
+    }
 }

@@ -26,7 +26,7 @@ RenderSettings:
   m_AmbientIntensity: 1
   m_AmbientMode: 0
   m_SubtractiveShadowColor: {r: 0.42, g: 0.478, b: 0.627, a: 1}
-  m_SkyboxMaterial: {fileID: 2100000, guid: fc64aa2c9af1dc3438837efc2c780239, type: 2}
+  m_SkyboxMaterial: {fileID: 10304, guid: 0000000000000000f000000000000000, type: 0}
   m_HaloStrength: 0.5
   m_FlareStrength: 1
   m_FlareFadeSpeed: 3
@@ -37,7 +37,7 @@ RenderSettings:
   m_ReflectionBounces: 1
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
-  m_Sun: {fileID: 0}
+  m_Sun: {fileID: 1430513676}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -6233,7 +6233,7 @@ MonoBehaviour:
   sharedProfile: {fileID: 11400000, guid: 01ec24359176fa14b9144e32274279a5, type: 2}
   isGlobal: 1
   blendDistance: 0
-  weight: 1
+  weight: 0.3
   priority: 0
 --- !u!4 &443980183
 Transform:
@@ -21254,6 +21254,18 @@ PrefabInstance:
     - target: {fileID: 3735212836815468863, guid: 5a6b9315f5675274d822489467d3c8db, type: 3}
       propertyPath: m_Layer
       value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223827764327896093, guid: 5a6b9315f5675274d822489467d3c8db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 16.998085
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223827764327896093, guid: 5a6b9315f5675274d822489467d3c8db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0.08955334
+      objectReference: {fileID: 0}
+    - target: {fileID: 4223827764327896093, guid: 5a6b9315f5675274d822489467d3c8db, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0.5992793
       objectReference: {fileID: 0}
     - target: {fileID: 4294947129057400938, guid: 5a6b9315f5675274d822489467d3c8db, type: 3}
       propertyPath: m_LocalScale.z
@@ -38264,7 +38276,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.8191521
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalRotation.x
@@ -38272,11 +38284,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0
+      value: 0.5735764
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -38284,7 +38296,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
+      value: 70
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: d7862dd7770588d4e9afa9b1b1aecee9, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
@@ -38616,6 +38628,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1848741078}
   - component: {fileID: 1848741077}
+  - component: {fileID: 1848741079}
   m_Layer: 0
   m_Name: Test
   m_TagString: Untagged
@@ -38650,6 +38663,23 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1848741079
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1848741076}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67efc62f9ae891842835fb2e7408affa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sfxSource: {fileID: 0}
+  crossSource: {fileID: 0}
+  bgmSource: {fileID: 0}
+  buttonSource: {fileID: 0}
+  announceSource: {fileID: 0}
 --- !u!1 &1861275193
 GameObject:
   m_ObjectHideFlags: 0

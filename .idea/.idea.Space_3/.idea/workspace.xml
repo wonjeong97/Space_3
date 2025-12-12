@@ -5,10 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d8a5066d-edc2-43d2-a77e-932871d9aedc" name="변경" comment="">
+      <change afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Sound/크레인.mp3" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/JsonLoader.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/JsonLoader.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/TitleSetting.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/JSON/TitleSetting.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Nuri/Animations/Root_CraneAction.anim" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Nuri/Animations/Root_CraneAction.anim" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/LauncherAnimEvent.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/LauncherAnimEvent.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/0_TitleScene.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/0_TitleScene.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/5_RocketFuel.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/5_RocketFuel.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/Scenes/6_RocketLaunch.unity" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/Scenes/6_RocketLaunch.unity" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
@@ -61,7 +65,7 @@
       <method v="2" />
     </configuration>
     <configuration name="독립실행형 플레이어" type="RunUnityExe" factoryName="Unity Executable">
-      <option name="EXE_PATH" value="$PROJECT_DIR$/../../Builds/3.우주발사체(25.12.11.1)\Space-3.exe" />
+      <option name="EXE_PATH" value="$PROJECT_DIR$/../../Builds/3.우주발사체(25.12.11.3)\Space-3.exe" />
       <option name="PROGRAM_PARAMETERS" value="" />
       <option name="WORKING_DIRECTORY" value="D:\Builds\3.우주발사체" />
       <option name="PASS_PARENT_ENVS" value="1" />
@@ -128,6 +132,8 @@
       <workItem from="1765154539224" duration="740000" />
       <workItem from="1765265611653" duration="3246000" />
       <workItem from="1765441819351" duration="951000" />
+      <workItem from="1765505532172" duration="706000" />
+      <workItem from="1765514549889" duration="998000" />
     </task>
     <servers />
   </component>
