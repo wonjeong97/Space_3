@@ -45,9 +45,7 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
 
     #region Initialization
 
-    /// <summary>
-    /// 초기화 루틴: 이미지 세팅, LED/카메라 시작, 페이드 인, 입력 루프
-    /// </summary>
+    /// <summary> 초기화 루틴: 이미지 세팅, LED/카메라 시작, 페이드 인, 입력 루프 </summary>
     protected override async UniTask Init()
     {
         try
@@ -68,8 +66,18 @@ public sealed class TutorialManager : SceneManager_Base<TutorialSetting>
             await UniTask.Yield();
 
             // 3) LED/카메라 시작
-            StartBlinkGreenAsync(500, 160);
-            ArduinoInputManager.Instance?.SetLedAll(true);
+            // 타이틀에서 꺼둔 LED를 여기서 다시 켠다.
+            try 
+            { 
+                ArduinoInputManager.Instance?.SetLedAll(true); // 버튼 LED 켜기
+            } 
+            catch (Exception e) 
+            { 
+                Debug.LogWarning($"[TutorialManager] Init-> LED 켜기 중 예외: {e.Message}"); 
+            }
+
+            StartBlinkGreenAsync(500, 160); // 스트립 LED 초록색 점멸 시작 (입력 대기 상태 표시)
+            
             TurnCamera3Async(DestroyToken).Forget();
 
             SoundManager.Instance?.PlayBGMByKey("BGM");

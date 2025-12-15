@@ -24,8 +24,8 @@
 	"name": "idleVideo",
 	"position": { "x": 0, "y": 0 },
 	"size": { "x": 2160, "y": 3840 },
-	"scale": { "x": 1.1, "y": 1, "z": 1 },
-	"fileName": "Video/Title/Idle.mp4",
+	"scale": { "x": 1, "y": 1, "z": 1 },
+	"fileName": "Video/Title/idle_종비수정.mp4",
 	"volume": 1.0,
 	"subtitle": ""
   }

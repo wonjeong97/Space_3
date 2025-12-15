@@ -119,9 +119,18 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
                 Debug.LogWarning($"[TitleManager] Init-> 초기 지연 중 예외: {e.Message}");
             }
 
-            try { ArduinoInputManager.Instance?.SetLedAll(true); } 
-            catch (Exception e) { Debug.LogWarning($"[TitleManager] Init-> LED 전체 켜기 중 예외: {e.Message}"); }
-            StartBlinkGreenAsync(500, 160);
+            // 타이틀 진입 시 LED 모두 끄기
+            StopLedEffects(); // 기존 효과(깜빡임 등) 정지
+            LedStrip.Clear(); // 스트립 LED 끄기
+
+            try 
+            { 
+                ArduinoInputManager.Instance?.SetLedAll(false); // 버튼 LED 끄기 (true -> false로 변경)
+            } 
+            catch (Exception e) 
+            { 
+                Debug.LogWarning($"[TitleManager] Init-> LED 전체 끄기 중 예외: {e.Message}"); 
+            }
         }
 
         // 3) 페이드 인

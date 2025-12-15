@@ -424,19 +424,14 @@ public class ArduinoInputManager : MonoBehaviour
 
     public void Send(string line)
     {
+        if (!_running || _serialPort == null || !_serialPort.IsOpen) return;
         try
         {
-            if (_serialPort != null && _serialPort.IsOpen)
-            {
-                _serialPort.WriteLine(line);
-            }
-            else
-            {
-                Debug.LogError("[Arduino] Send failed: port not open.");
-            }
+            _serialPort.WriteLine(line);
         }
         catch (Exception e)
         {
+            // 실제 전송 시도 중 예외는 기록
             Debug.LogError("[Arduino] Send exception: " + e.Message);
         }
     }
