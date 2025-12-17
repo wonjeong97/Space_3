@@ -22,6 +22,9 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
     public static TitleManager Instance;
     // ===== JSON 경로 =====
     protected override string JsonPath => "JSON/TitleSetting.json";
+    
+    // 앱 실행 후 최초 진입인지 확인하는 정적 변수
+    private static bool _hasInitializedOnce = false;
 
     #region Serialized Refs
 
@@ -105,26 +108,23 @@ public sealed class TitleManager : SceneManager_Base<TitleSetting>
         }
         else
         {
-            try
+            if (!_hasInitializedOnce)
             {
-                await UniTask.Delay(1000, cancellationToken: ct); // 1초 지연
+                try
+                {
+                    await UniTask.Delay(1000, cancellationToken: ct); 
+                }
+                catch (OperationCanceledException) { return; }
+                
+                _hasInitializedOnce = true; // 플래그 설정
             }
-            catch (OperationCanceledException)
-            {
-                Debug.LogWarning("[TitleManager] Init-> 초기 지연 취소");
-                return;
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"[TitleManager] Init-> 초기 지연 중 예외: {e.Message}");
-            }
-
-            // 타이틀 진입 시 LED 모두 끄기
-            StopLedEffects(); // 기존 효과(깜빡임 등) 정지
-            LedStrip.Clear(); // 스트립 LED 끄기
 
             try 
-            { 
+            {   
+                // 타이틀 진입 시 LED 모두 끄기
+                StopLedEffects(); // 기존 효과(깜빡임 등) 정지
+                LedStrip.Clear(); // 스트립 LED 끄기
+                ArduinoInputManager.Instance?.Send("THROTTLE OFF"); // 스로틀 해제
                 ArduinoInputManager.Instance?.SetLedAll(false); // 버튼 LED 끄기 (true -> false로 변경)
             } 
             catch (Exception e) 

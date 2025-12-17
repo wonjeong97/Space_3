@@ -65,7 +65,10 @@ public class JetVFXAnim : MonoBehaviour
         StartCoroutine(ScaleAnim(targetA.transform, Vector3.zero, _originalScaleA));
         StartCoroutine(ScaleAnim(targetB.transform, Vector3.zero, _originalScaleB));
         StartCoroutine(ScaleAnim(targetC.transform, Vector3.zero, _originalScaleC));
-        StartCoroutine(ScaleAnim(addtionalSmoke.transform, Vector3.zero, _originalScaleD));
+        if (addtionalSmoke)
+        {
+            StartCoroutine(ScaleAnim(addtionalSmoke.transform, Vector3.zero, _originalScaleD));    
+        }
     }
 
     /// <summary> target들을 원래 크기 → 0으로 축소 </summary>

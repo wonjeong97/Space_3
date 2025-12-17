@@ -490,6 +490,10 @@ public abstract class SceneManager_Base<T> : MonoBehaviour, ISceneResettable
         {
             Debug.LogWarning($"[SceneManager_Base] OnBeforeSceneUnload-> StopAllCoroutines 실패: {e.Message}");
         }
+        
+        StopAllAnchoredY(); 
+        StopAllButtonBlinks();
+        
         SoundManager.Instance?.StopSFX();
         StopLedEffects();
 
