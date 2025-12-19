@@ -3,7 +3,7 @@ using TMPro;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
-/// <summary> 키 사이 보간에 사용할 이징 종류(기존) </summary>
+/// <summary> 키 사이 보간에 사용할 이징 종류 </summary>
 public enum EasingMode
 {
     SmoothStep,
@@ -13,7 +13,7 @@ public enum EasingMode
     EaseInOutCubic
 }
 
-/// <summary> 선형 u(0..1)를 이징 u(0..1)로 변환(기존) </summary>
+/// <summary> 선형 u(0..1)를 이징 u(0..1)로 변환 </summary>
 public static class EasingUtil
 {
     public static float Apply(float u, EasingMode mode)
@@ -43,11 +43,16 @@ public class CountController : MonoBehaviour
     [Header("Speed")]
     [SerializeField] private float deltaTimeSpeed = 5f;
 
-    [Header("Checkpoint (T+ 0:51 에서 정지 후 SLP 맞추면 진행)")]
+    [Header("Checkpoint (T+ 0:51)")]
     [SerializeField] private SlopeController slope;      // 현재 SLP 확인/설정용
     [SerializeField] private float checkpointSeconds = 51f;   // 0:51
     [SerializeField] private float requiredSlopeDeg = 49.5f;  // 목표 SLP
     [SerializeField] private float slopeToleranceDeg = 0.2f;  // 허용 오차(±)
+    
+    [Header("Checkpoint Timeout")]
+    [Tooltip("체크포인트에서 이 시간(초) 동안 목표에 도달하지 못하면 강제로 진행")]
+    [SerializeField] private float checkpointTimeout = 15f; 
+
     [Tooltip("체크포인트 대기 중 T+ 표시를 0:51에 고정할지 여부")]
     [SerializeField] private bool lockTimeAtCheckpoint = true;
     [Tooltip("외부 클래스에서 T+ 시간을 고정할지 여부")]
@@ -63,7 +68,7 @@ public class CountController : MonoBehaviour
         set => deltaTimeSpeed = value;
     }
 
-    // -> SLP 자동 스케줄 키들(체크포인트 통과 후 사용자 입력 없이 자동 진행)
+    // -> SLP 자동 스케줄 키들
     [Serializable] private struct SlopeKey { public int m; public int s; public float deg; public float T() => m * 60f + s; }
     [SerializeField] private SlopeKey[] slopeKeys = new SlopeKey[]
     {
@@ -87,13 +92,13 @@ public class CountController : MonoBehaviour
     private bool _checkpointArmed;    // T+가 시작된 뒤 체크포인트 감시 중
     private bool _checkpointHolding;  // 체크포인트에 도달하여 멈춘 상태
     private bool _checkpointCleared;  // 조건을 만족해 해제됨
+    private float _checkpointTimer;   // 체크포인트 타임아웃 체크용
 
     // 내부 상태 -> 자동 SLP
     private bool _autoSlopeEnabled;   // 체크포인트 통과 후 자동 진행 on
     private float[] _slpT;            // 초 단위 시간 캐시
     private float[] _slpV;            // 각도 캐시
 
-    // -> 싱글턴 설정 및 스케줄 캐시 구성
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -105,8 +110,6 @@ public class CountController : MonoBehaviour
 
     /// <summary>
     /// 카운트다운 시작 -> 0 도달 시 T+ 진행.
-    /// T+ 0:51에 도달하면 SLP를 requiredSlopeDeg±tolerance로 맞출 때까지 정지한다.
-    /// 체크포인트 통과 후에는 SLP를 키프레임에 따라 자동으로 선형 보간하여 진행하고, 사용자 입력은 받지 않는다.
     /// </summary>
     public async UniTask RunCountdownAsync()
     {
@@ -120,6 +123,7 @@ public class CountController : MonoBehaviour
         _checkpointHolding = false;
         _checkpointCleared = false;
         _autoSlopeEnabled = false;
+        _checkpointTimer = 0f;
         bool firedGreenLed = false;
 
         UpdateHint(false);
@@ -160,15 +164,13 @@ public class CountController : MonoBehaviour
             {
                 // T+ 구간
                 float deltaPlus = Time.deltaTime * Mathf.Max(0f, deltaTimeSpeed);
-                if (_externalHold) // 외부 홀드 여부
+                if (_externalHold) 
                 {
-                    deltaPlus = 0f; // 시간 진행 중단
-
-                    // 표기 고정(옵션)
+                    deltaPlus = 0f; 
                     if (lockTimeOnExternalHold)
                     {
                         TPlusSeconds = _externalHoldTimeSnap;
-                        time = _externalHoldTimeSnap; // 카운터 텍스트도 해당 값으로 고정
+                        time = _externalHoldTimeSnap; 
                     }
                 }
 
@@ -179,8 +181,8 @@ public class CountController : MonoBehaviour
                     if (!_checkpointHolding && (TPlusSeconds + deltaPlus) >= checkpointSeconds)
                     {
                         _checkpointHolding = true;
+                        _checkpointTimer = 0f; // 타이머 초기화
 
-                        // 안내 문구 출력
                         UpdateHint(true);
                         LaunchManager.Instance?.FixStageAlpha(1);
                         LaunchManager.Instance?.StartStagePingPong(2);
@@ -191,28 +193,27 @@ public class CountController : MonoBehaviour
                             LaunchManager.Instance?.PublicStartBlinkGreen(500, 160);
                         }
                         
-                        // 스로틀 버튼 애니메이션 실행
                         LaunchManager.Instance?.AnimateThrottleY(-110f, 0f, 0.8f, 0.2f);
                         LaunchManager.Instance?.SetGuideText("각도 조정기를 올리세요.");
-                        LaunchManager.Instance?.ResumeInactivityTimer();
                         
-                        // 표기/내부 시간 고정
+                        // [25. 12.19 수정] 미입력 타이머 재개 코드 제거 (계속 Pause 상태 유지)
+                        // LaunchManager.Instance?.ResumeInactivityTimer(); 
+                        
                         if (lockTimeAtCheckpoint)
                         {
                             TPlusSeconds = checkpointSeconds;
-                            time = TPlusSeconds; // T+ 표기를 정확히 0:51로 고정
+                            time = TPlusSeconds; 
                         }
 
-                        // 이후 deltaPlus는 0으로 강제
                         deltaPlus = 0f;
                     }
 
-                    // 이미 홀딩 중이면 deltaPlus를 0으로 유지(정지)
+                    // 이미 홀딩 중이면 deltaPlus를 0으로 유지(정지)하고 조건 검사
                     if (_checkpointHolding)
                     {
                         deltaPlus = 0f;
+                        _checkpointTimer += Time.deltaTime; // 타임아웃 타이머 진행
                         
-                        // Slope 조건 검사(오차 포함)
                         bool ok = false;
                         if (slope != null)
                         {
@@ -220,9 +221,39 @@ public class CountController : MonoBehaviour
                             ok = (diff <= Mathf.Max(0f, slopeToleranceDeg));
                         }
 
+                        // [25. 12. 19 수정] 타임아웃 발생 시 강제 진행 처리
+                        if (!ok && _checkpointTimer >= checkpointTimeout)
+                        {
+                            // 1. 아두이노 스로틀 끄기
+                            try { ArduinoInputManager.Instance?.Send("THROTTLE OFF"); } catch {}
+
+                            // 2. 목표 각도까지 부드럽게 이동 (2초)
+                            if (slope != null)
+                            {
+                                float startDeg = slope.CurrentSlopeDeg;
+                                float duration = 2.0f;
+                                float elapsed = 0f;
+
+                                while (elapsed < duration)
+                                {
+                                    elapsed += Time.deltaTime;
+                                    float t = Mathf.Clamp01(elapsed / duration);
+                                    // SmoothStep 이징
+                                    float easedT = t * t * (3f - 2f * t);
+                                    float val = Mathf.Lerp(startDeg, requiredSlopeDeg, easedT);
+                                    slope.SetSlopeDeg(val, forceWhenLocked: true);
+                                    
+                                    await UniTask.Yield(); // 메인 루프 일시 대기 (시간은 흐르지 않음)
+                                }
+                                slope.SetSlopeDeg(requiredSlopeDeg, forceWhenLocked: true);
+                            }
+                            
+                            ok = true; // 조건 만족으로 처리
+                        }
+
                         if (ok)
                         {
-                            LaunchManager.Instance?.StopAnimateThrottleY(); // 스로틀 애니메이션 해제
+                            LaunchManager.Instance?.StopAnimateThrottleY(); 
                             LaunchManager.Instance?.SetGuideText("");
                             
                             _checkpointCleared = true;
@@ -233,7 +264,6 @@ public class CountController : MonoBehaviour
                             
                             LaunchManager.Instance?.FixStageAlpha(2);
 
-                            // -> 이후는 자동 SLP 진행 모드로 전환 + 입력 잠금(스냅)
                             _autoSlopeEnabled = true;
                             if (slope != null)
                             {
@@ -248,7 +278,7 @@ public class CountController : MonoBehaviour
                 TPlusSeconds += deltaPlus;
                 time += deltaPlus;
 
-                // -> 자동 SLP 진행: 키프레임을 선형 보간하여 매 프레임 적용
+                // 자동 SLP 진행
                 if (_autoSlopeEnabled && slope != null)
                 {
                     float scheduled = EvaluateScheduledSlope(TPlusSeconds);
@@ -258,14 +288,11 @@ public class CountController : MonoBehaviour
         }
     }
 
-    /// <summary> 체크포인트 안내 문구 표시/숨김 </summary>
     private void UpdateHint(bool show)
     {
         if (!textHint) return;
-
         if (show)
         {
-            // 예: "SLP를 49.5º로 맞추세요"
             textHint.text = $"Set SLP to {requiredSlopeDeg:F1} º";
             textHint.gameObject.SetActive(true);
         }
@@ -275,7 +302,6 @@ public class CountController : MonoBehaviour
         }
     }
 
-    /// <summary> SLP 키 스케줄 캐시를 구성(시간 오름차순 정렬) </summary>
     private void BuildSlopeCaches()
     {
         if (slopeKeys == null || slopeKeys.Length == 0)
@@ -297,7 +323,6 @@ public class CountController : MonoBehaviour
         }
     }
 
-    /// <summary> 주어진 T+초에서 스케줄된 SLP 각도를 반환(선형 보간, 양끝 고정) </summary>
     private float EvaluateScheduledSlope(float tPlusSec)
     {
         if (_slpT == null || _slpT.Length == 0) return 0f;
@@ -309,9 +334,9 @@ public class CountController : MonoBehaviour
         int hi = Array.BinarySearch(_slpT, tPlusSec);
         if (hi >= 0) return _slpV[hi];
 
-        int idx = ~hi;              // 삽입 위치
-        int i0 = idx - 1;           // 앞 키
-        int i1 = idx;               // 뒤 키
+        int idx = ~hi;              
+        int i0 = idx - 1;           
+        int i1 = idx;               
 
         float t0 = _slpT[i0];
         float t1 = _slpT[i1];
@@ -322,7 +347,6 @@ public class CountController : MonoBehaviour
         return Mathf.Lerp(v0, v1, u);
     }
     
-    ///<summary> 외부 홀드 시작 </summary>
     public void BeginExternalHold()
     {
         if (_externalHold) return;
@@ -334,7 +358,6 @@ public class CountController : MonoBehaviour
         }
     }
 
-    ///<summary> 외부 홀드 해제 </summary>
     public void EndExternalHold()
     {
         _externalHold = false;

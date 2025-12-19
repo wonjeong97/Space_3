@@ -127,7 +127,7 @@ public class NuriTriggerController : MonoBehaviour
                         
                         LaunchManager.Instance.StartStagePingPong(3);
                         LaunchManager.Instance.SetGuideText("1단 분리 버튼을 누르세요.");
-                        LaunchManager.Instance.ResumeInactivityTimer();
+                        LaunchManager.Instance.ForceActiveInactivityTimer();
                         LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
 
                         try
@@ -175,7 +175,7 @@ public class NuriTriggerController : MonoBehaviour
                         
                         LaunchManager.Instance.StartStagePingPong(4);
                         LaunchManager.Instance.SetGuideText("3단(페어링 분리) 버튼을\n누르세요.");
-                        LaunchManager.Instance.ResumeInactivityTimer();
+                        LaunchManager.Instance.ForceActiveInactivityTimer();
                         LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
 
                         try
@@ -221,7 +221,7 @@ public class NuriTriggerController : MonoBehaviour
                         
                         LaunchManager.Instance.StartStagePingPong(5);
                         LaunchManager.Instance.SetGuideText("2단 분리 버튼을 누르세요");
-                        LaunchManager.Instance.ResumeInactivityTimer();
+                        LaunchManager.Instance.ForceActiveInactivityTimer();
                         LaunchManager.Instance.PublicStartBlinkGreen(500, 160);
 
                         try

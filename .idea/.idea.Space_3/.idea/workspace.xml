@@ -6,10 +6,13 @@
   <component name="ChangeListManager">
     <list default="true" id="d8a5066d-edc2-43d2-a77e-932871d9aedc" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/0_Title/TitleManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/0_Title/TitleManager.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/JetVFXAnim.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/JetVFXAnim.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/Controller/CountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/Controller/CountController.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/__Idle.mp4.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/idle_종비수정.mp4.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/idle_종비수정.mp4.meta" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -135,7 +138,8 @@
       <workItem from="1765514549889" duration="998000" />
       <workItem from="1765763821739" duration="1704000" />
       <workItem from="1765786231135" duration="978000" />
-      <workItem from="1765951835749" duration="5287000" />
+      <workItem from="1765951835749" duration="5791000" />
+      <workItem from="1766127456588" duration="3895000" />
     </task>
     <servers />
   </component>

@@ -1115,6 +1115,12 @@ public abstract class SceneManager_Base<T> : MonoBehaviour, ISceneResettable
     {
         Interlocked.Increment(ref _inactivityPauseCount);
     }
+    
+    // 중첩된 일시정지 카운트를 모두 초기화하고 즉시 타이머 가동
+    public void ForceActiveInactivityTimer()
+    {
+        _inactivityPauseCount = 0;
+    }
 
     private void EndInactivityPause()
     {
