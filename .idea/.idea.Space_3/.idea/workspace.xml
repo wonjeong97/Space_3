@@ -6,13 +6,10 @@
   <component name="ChangeListManager">
     <list default="true" id="d8a5066d-edc2-43d2-a77e-932871d9aedc" name="변경" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Space_3/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/AnimEvent/NuriTriggerController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/Controller/CountController.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/6_RocketLaunch/Controller/CountController.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/Global/SceneManager_Base.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/Idle.mp4.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/__Idle.mp4.meta" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/idle_종비수정.mp4.meta" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Video/Title/idle_종비수정.mp4.meta" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Fonts/TMPro/Freesentation-7Bold SDF.asset" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Fonts/TMPro/Freesentation-7Bold SDF.asset" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/4_RocketMake/RMManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/4_RocketMake/RMManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/My/Scripts/5_RocketFuel/FuelManager.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/My/Scripts/5_RocketFuel/FuelManager.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/Settings.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" beforeDir="false" afterPath="$PROJECT_DIR$/Assets/StreamingAssets/build_info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -26,6 +23,7 @@
   <component name="HighlightingSettingsPerFile">
     <setting file="file://$PROJECT_DIR$/Assets/StreamingAssets/Sound/03-Ethereal_Light.wav.meta" root0="FORCE_HIGHLIGHTING" />
   </component>
+  <component name="MetaFilesCheckinStateConfiguration" checkMetaFiles="true" />
   <component name="ProjectColorInfo">{
   &quot;customColor&quot;: &quot;&quot;,
   &quot;associatedIndex&quot;: 6
@@ -140,12 +138,14 @@
       <workItem from="1765786231135" duration="978000" />
       <workItem from="1765951835749" duration="5791000" />
       <workItem from="1766127456588" duration="3895000" />
+      <workItem from="1766973723927" duration="2835000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
   </component>
+  <component name="UnityCheckinConfiguration" checkUnsavedScenes="true" />
   <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
   <component name="UnityProjectDiscoverer">
     <option name="hasUnityReference" value="true" />
