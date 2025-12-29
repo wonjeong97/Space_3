@@ -1,0 +1,7 @@
+language: "ko-KR"          # 핵심: 언어를 한국어로 설정
+reviews:
+  profile: "chill"         # chill: 친절하게, assertive: 깐깐하게
+  high_level_summary: true # 요약본 제공 여부
+  poem: false              # true로 하면 리뷰 끝에 시를 써줍니다 (취향껏)
+  auto_review:
+    enabled: true          # 자동 리뷰 켜기
