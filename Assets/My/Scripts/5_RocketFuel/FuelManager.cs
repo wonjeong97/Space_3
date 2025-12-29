@@ -267,9 +267,11 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
 
     /// <summary> 단계별 입력/증가 루프를 비동기로 진행 </summary>
     private async UniTask FuelFillAsync()
-    {
+    {   
+        CancellationToken token = DestroyToken; // 씬 파괴 토큰
+        
         // 1단계: 왼쪽 버튼 3번
-        while (canInput && _phase == Phase.FuelInjection1)
+        while (canInput && _phase == Phase.FuelInjection1 && !token.IsCancellationRequested && isActiveAndEnabled)
         {
             ArduinoInputManager.ButtonId btn = ArduinoInputManager.ButtonId.None;
             if (ArduinoInputManager.Instance != null)
@@ -300,11 +302,11 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
 
         // 2단계: 가운데 버튼 2번
-        while (canInput && _phase == Phase.FuelInjection2)
+        while (canInput && _phase == Phase.FuelInjection2 && !token.IsCancellationRequested && isActiveAndEnabled)
         {
             ArduinoInputManager.ButtonId btn = ArduinoInputManager.ButtonId.None;
             if (ArduinoInputManager.Instance != null)
@@ -334,11 +336,11 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
 
         // 3단계: 오른쪽 버튼 1번
-        while (canInput && _phase == Phase.FuelInjection3)
+        while (canInput && _phase == Phase.FuelInjection3 && !token.IsCancellationRequested && isActiveAndEnabled)
         {
             ArduinoInputManager.ButtonId btn = ArduinoInputManager.ButtonId.None;
             if (ArduinoInputManager.Instance != null)
@@ -363,7 +365,7 @@ public sealed class FuelManager : SceneManager_Base<FuelSetting>
                 }
             }
 
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, token);
         }
 
         // 완료 처리
