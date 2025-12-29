@@ -182,7 +182,7 @@ public class RMManager : SceneManager_Base<RMSetting>
         _phase = Phase.SelectRocket;
 
         // 입력 루프: 아두이노 버튼 아무거나 + 디버그용 키 입력
-        while (_phase != Phase.Done)
+        while (_phase != Phase.Done && !DestroyToken.IsCancellationRequested && isActiveAndEnabled)
         {
             if (!ArduinoInputManager.Instance) return;
 
@@ -198,7 +198,7 @@ public class RMManager : SceneManager_Base<RMSetting>
             }
 
             ArduinoInputManager.Instance.FlushAll();
-            await UniTask.Yield();
+            await UniTask.Yield(PlayerLoopTiming.Update, DestroyToken);
         }
     }
 
@@ -444,7 +444,6 @@ public class RMManager : SceneManager_Base<RMSetting>
         // 자동 스킵 시간 계산: 영상 길이 + 3초
         // 영상 길이만큼 재생(=한 번은 끝까지 재생)된 후, 3초 뒤에 넘어감
         double clipDuration = (_vp != null) ? _vp.length : 0f;
-        Debug.Log("ClipDuration: " + clipDuration);
         float totalWaitTime = (float)clipDuration + 3.0f;
         float elapsed = 0f;
 
